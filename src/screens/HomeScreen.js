@@ -14,10 +14,8 @@ import { CartContext } from '../context/CartContext';
 import HeroCarousel from '../components/HeroCarousel';
 import FeaturedProductsCarousel from '../components/FeaturedProductsCarousel';
 import TestimonialsCarousel from '../components/TestimonialsCarousel';
-import BrandsCarousel from '../components/BrandsCarousel';
 import ToastMessage from '../components/ToastMessage';
 import WorkWithUsModal from '../components/WorkWithUsModal';
-import AboutUsSection from '../components/AboutUsSection';
 import ProductDetailModal from '../components/ProductDetailModal';
 import PromoDetailModal from '../components/PromoDetailModal';
 
@@ -202,7 +200,7 @@ export default function HomeScreen({ navigation }) {
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryNav}>
-          {['Todos', ...CATEGORY_NAMES, 'Quiénes Somos'].map(cat => (
+          {['Todos', ...CATEGORY_NAMES].map(cat => (
             <TouchableOpacity
               key={`nav-${cat}`}
               style={[styles.navButton, activeCategory === cat && styles.navButtonActive]}
@@ -241,12 +239,7 @@ export default function HomeScreen({ navigation }) {
 
             <View style={styles.carouselSection}><FeaturedProductsCarousel /></View>
             <View style={styles.carouselSection}><TestimonialsCarousel /></View>
-            <BrandsCarousel />
           </>
-        )}
-
-        {(activeCategory === 'Todos' || activeCategory === 'Quiénes Somos') && (
-          <View><AboutUsSection onWorkWithUsPress={() => setWorkWithUsVisible(true)} /></View>
         )}
 
         {activeCategory === 'Todos' && (

@@ -38,7 +38,6 @@ export default {
       animation: {
         'slide-up': 'slideUp 0.6s ease-out forwards',
         'fade-in': 'fadeIn 0.5s ease-in forwards',
-        'ticker': 'ticker 28s linear infinite',
       },
       transitionTimingFunction: {
         smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
