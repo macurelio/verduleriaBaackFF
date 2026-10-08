@@ -39,6 +39,7 @@ export default function ProductsScreen() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editing, setEditing] = useState<Product | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState<ProductInput>(emptyForm())
   const [busy, setBusy] = useState(false)
 
@@ -70,12 +71,13 @@ export default function ProductsScreen() {
     try {
       const payload: ProductInput = {
         ...form,
-        badge: form.badge.trim() || null,
+        badge: String(form.badge ?? '').trim() || null,
         emoji: form.emoji.trim() || '🥬',
       }
       if (editing) await productApi.update(editing.id, payload)
       else await productApi.create(payload)
       setEditing(null)
+      setModalOpen(false)
       await load()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar')
@@ -118,6 +120,7 @@ export default function ProductsScreen() {
   const openCreate = () => {
     setEditing(null)
     setForm({ ...emptyForm(), category: categories[0]?.name ?? '' })
+    setModalOpen(true)
   }
 
   const openEdit = (p: Product) => {
@@ -135,6 +138,7 @@ export default function ProductsScreen() {
       category: p.category,
       featured: p.featured,
     })
+    setModalOpen(true)
   }
 
   return (
@@ -232,10 +236,10 @@ export default function ProductsScreen() {
         </div>
       )}
 
-      {(editing || (!editing && products.length === 0 && !loading)) && form.name !== '' && (
+      {modalOpen && (
         <Modal
           title={editing ? `Editar ${editing.name}` : 'Nuevo producto'}
-          onClose={() => setEditing(null)}
+          onClose={() => setModalOpen(false)}
           wide
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -304,7 +308,7 @@ export default function ProductsScreen() {
             </Field>
             <Field label="Badge (opcional)">
               <TextInput
-                value={form.badge}
+                value={form.badge ?? ''}
                 onChange={(e) => setForm({ ...form, badge: e.target.value })}
                 placeholder="Más Popular"
               />
@@ -332,7 +336,7 @@ export default function ProductsScreen() {
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-6">
-            <ActionButton onClick={() => setEditing(null)}>Cancelar</ActionButton>
+            <ActionButton onClick={() => setModalOpen(false)}>Cancelar</ActionButton>
             <ActionButton variant="primary" onClick={save} disabled={busy}>
               {busy ? 'Guardando…' : 'Guardar'}
             </ActionButton>

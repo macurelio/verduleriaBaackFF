@@ -1,4 +1,4 @@
-import { api, type ApiError } from './client'
+import { api, ApiError } from './client'
 import type {
   PageResponse,
   Product,
