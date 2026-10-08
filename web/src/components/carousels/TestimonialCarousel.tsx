@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react'
 import { useCarousel } from '../../hooks/useCarousel'
 import { testimonials } from '../../data/testimonials'
+import { fetchTestimonials } from '../../api/catalog'
+import { useApiResource } from '../../api/useApiResource'
 
 const EASE_PREMIUM = [0.25, 1, 0.5, 1] as const
 
@@ -30,8 +32,9 @@ const cardVariants = {
  * Auto-plays every 6 s; pauses on hover.
  */
 export default function TestimonialCarousel() {
+  const items = useApiResource('testimonials', fetchTestimonials, testimonials)
   const { current, go, prev, next, pause, resume } = useCarousel(
-    testimonials.length,
+    items.length,
     { autoPlay: true, interval: 6000 },
   )
 
@@ -44,7 +47,7 @@ export default function TestimonialCarousel() {
     if (Math.abs(diff) > 50) diff > 0 ? next() : prev()
   }
 
-  const t = testimonials[current]
+  const t = items[current]
 
   return (
     <div
@@ -139,7 +142,7 @@ export default function TestimonialCarousel() {
         role="tablist"
         aria-label="Testimonios"
       >
-        {testimonials.map((_, i) => (
+        {items.map((_, i) => (
           <motion.button
             key={i}
             role="tab"

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Tag, Check, ShoppingCart, MessageCircle } from 'lucide-react'
 import { promos, type Promo } from '../../data/promos'
+import { fetchPromotions } from '../../api/catalog'
+import { useApiResource } from '../../api/useApiResource'
 import { useCart } from '../../context/CartContext'
 import { waLink } from '../../config'
 import type { Product } from '../../types'
@@ -166,6 +168,8 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
 }
 
 export default function PromoSection() {
+  const promoList = useApiResource('promos', fetchPromotions, promos)
+
   return (
     <section
       id="promociones"
@@ -196,7 +200,7 @@ export default function PromoSection() {
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-          {promos.map((promo, i) => (
+          {promoList.map((promo, i) => (
             <PromoCard key={promo.id} promo={promo} index={i} />
           ))}
         </div>

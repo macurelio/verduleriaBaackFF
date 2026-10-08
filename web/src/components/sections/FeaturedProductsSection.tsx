@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import ProductCarousel from '../carousels/ProductCarousel'
 import { products } from '../../data/products'
 import { CATEGORIES } from '../../data/categories'
+import { fetchProducts, fetchCategories } from '../../api/catalog'
+import { useApiResource } from '../../api/useApiResource'
 
 const EASE = [0.25, 1, 0.5, 1] as const
 
@@ -24,6 +26,9 @@ const categoryTitleVariants = {
 }
 
 export default function FeaturedProductsSection() {
+  const categoryList = useApiResource('categories', fetchCategories, CATEGORIES)
+  const productList = useApiResource('products', fetchProducts, products)
+
   return (
     <section id="productos" aria-label="Productos" className="py-20 sm:py-28 bg-charcoal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,8 +48,8 @@ export default function FeaturedProductsSection() {
         </motion.div>
 
         <div className="space-y-20">
-          {CATEGORIES.map(({ name, emoji, blurb }) => {
-            const items = products.filter((p) => p.category === name)
+          {categoryList.map(({ name, emoji, blurb }) => {
+            const items = productList.filter((p) => p.category === name)
             if (!items.length) return null
             return (
               <div key={name}>
