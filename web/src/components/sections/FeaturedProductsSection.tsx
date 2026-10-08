@@ -4,6 +4,7 @@ import { products } from '../../data/products'
 import { CATEGORIES } from '../../data/categories'
 import { fetchProducts, fetchCategories } from '../../api/catalog'
 import { useApiResource } from '../../api/useApiResource'
+import { getCategoryImage } from '../../produce'
 
 const EASE = [0.25, 1, 0.5, 1] as const
 
@@ -60,9 +61,19 @@ export default function FeaturedProductsSection() {
                   viewport={{ once: true, margin: '-40px' }}
                   variants={categoryTitleVariants}
                 >
-                  <span className="w-14 h-14 flex items-center justify-center text-4xl" aria-hidden="true">
-                    {emoji}
-                  </span>
+                  {getCategoryImage(name) ? (
+                    <img
+                      src={getCategoryImage(name)}
+                      alt=""
+                      className="w-11 h-11 object-contain"
+                      loading="lazy"
+                      draggable={false}
+                    />
+                  ) : (
+                    <span className="w-14 h-14 flex items-center justify-center text-4xl" aria-hidden="true">
+                      {emoji}
+                    </span>
+                  )}
                   <div>
                     <h3 className="font-heading font-black text-sand text-2xl sm:text-3xl uppercase tracking-wide">
                       {name}

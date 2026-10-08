@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Minus, Plus, Check } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { UNIT_LABELS } from '../../config'
+import { getProduceImage } from '../../produce'
 import type { Product } from '../../types'
 
 interface QuickViewModalProps {
@@ -98,21 +99,33 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
 
               {/* Visual */}
               <div
-                className="lg:w-[44%] flex-shrink-0 relative h-52 lg:h-auto overflow-hidden flex items-center justify-center"
+                className="lg:w-[44%] flex-shrink-0 relative h-52 lg:h-64 overflow-hidden flex items-center justify-center"
                 // eslint-disable-next-line react/forbid-dom-props
                 style={{
                   background: `linear-gradient(135deg, ${product.gradientFrom} 0%, ${product.gradientTo} 100%)`,
                 }}
               >
-                <motion.span
-                  className="text-8xl select-none"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.38, ease: EASE }}
-                  aria-hidden="true"
-                >
-                  {product.emoji}
-                </motion.span>
+                {getProduceImage(product) ? (
+                  <motion.img
+                    src={getProduceImage(product)}
+                    alt=""
+                    className="w-full h-full object-contain p-6"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.38, ease: EASE }}
+                    draggable={false}
+                  />
+                ) : (
+                  <motion.span
+                    className="text-8xl select-none"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.38, ease: EASE }}
+                    aria-hidden="true"
+                  >
+                    {product.emoji}
+                  </motion.span>
+                )}
 
                 {product.badge && (
                   <div className="absolute top-3 left-3 bg-cocoa text-sand text-[10px] font-heading font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">

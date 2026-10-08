@@ -5,6 +5,7 @@ import { promos, type Promo } from '../../data/promos'
 import { fetchPromotions } from '../../api/catalog'
 import { useApiResource } from '../../api/useApiResource'
 import { useCart } from '../../context/CartContext'
+import { getPromoImage } from '../../produce'
 import { waLink } from '../../config'
 import type { Product } from '../../types'
 
@@ -84,9 +85,19 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
           background: `linear-gradient(135deg, ${promo.gradientFrom}, ${promo.gradientTo})`,
         }}
       >
-        <span className="text-7xl drop-shadow-lg" aria-hidden="true">
-          {promo.emoji}
-        </span>
+        {getPromoImage(promo) ? (
+          <img
+            src={getPromoImage(promo)}
+            alt=""
+            className="w-32 h-32 object-contain drop-shadow-lg"
+            loading="lazy"
+            draggable={false}
+          />
+        ) : (
+          <span className="text-7xl drop-shadow-lg" aria-hidden="true">
+            {promo.emoji}
+          </span>
+        )}
         <div className="absolute bottom-3 left-4">
           <span className="text-sand/80 text-xs font-heading font-bold">
             {promo.label}

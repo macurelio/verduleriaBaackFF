@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { createOrder } from '../../api/orders'
+import { getProduceImage } from '../../produce'
 import {
   COMUNAS,
   DELIVERY_WINDOWS,
@@ -241,9 +242,17 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                         style={{
                           background: `linear-gradient(135deg, ${item.gradientFrom}, ${item.gradientTo})`,
                         }}
-                        aria-hidden="true"
                       >
-                        {item.emoji}
+                        {getProduceImage(item) ? (
+                          <img
+                            src={getProduceImage(item)}
+                            alt=""
+                            className="w-11 h-11 object-contain"
+                            draggable={false}
+                          />
+                        ) : (
+                          <span aria-hidden="true">{item.emoji}</span>
+                        )}
                       </div>
 
                       <div className="flex-1 min-w-0">

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Clock, Zap, ShoppingBag } from 'lucide-react'
 import { waLink } from '../../config'
+import { getProduceImage } from '../../produce'
 
 const OFFER = {
   title: 'Canasta Semanal',
@@ -147,7 +148,16 @@ export default function OfferModal({ open, onClose }: OfferModalProps) {
                   transition={{ delay: 0.12 + i * 0.07 }}
                 >
                   <div className="w-10 h-10 rounded-lg flex-shrink-0 bg-white/10 flex items-center justify-center text-xl">
-                    <span aria-hidden="true">{p.emoji}</span>
+                    {getProduceImage({ emoji: p.emoji }) ? (
+                      <img
+                        src={getProduceImage({ emoji: p.emoji })}
+                        alt=""
+                        className="w-7 h-7 object-contain"
+                        draggable={false}
+                      />
+                    ) : (
+                      <span aria-hidden="true">{p.emoji}</span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sand text-sm font-heading font-bold leading-tight truncate">

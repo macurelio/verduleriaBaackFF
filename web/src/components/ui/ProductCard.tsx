@@ -4,6 +4,7 @@ import { Minus, Plus, Check, Eye } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import QuickViewModal from './QuickViewModal'
 import { UNIT_LABELS } from '../../config'
+import { getProduceImage } from '../../produce'
 import type { ProductCardProps } from '../../types'
 
 const EASE = [0.25, 1, 0.5, 1] as const
@@ -28,6 +29,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       setQty(1)
     }, 1800)
   }
+
+  const produceImage = getProduceImage(product)
 
   return (
     <motion.article
@@ -54,14 +57,26 @@ export default function ProductCard({ product }: ProductCardProps) {
           background: `linear-gradient(135deg, ${product.gradientFrom} 0%, ${product.gradientTo} 100%)`,
         }}
       >
-        <motion.span
-          className="absolute inset-0 flex items-center justify-center text-7xl select-none"
-          animate={{ scale: isHovered ? 1.12 : 1 }}
-          transition={{ duration: 0.38, ease: EASE }}
-          aria-hidden="true"
-        >
-          {product.emoji}
-        </motion.span>
+        {produceImage ? (
+          <motion.img
+            src={produceImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain p-5 select-none pointer-events-none"
+            animate={{ scale: isHovered ? 1.1 : 1 }}
+            transition={{ duration: 0.38, ease: EASE }}
+            loading="lazy"
+            draggable={false}
+          />
+        ) : (
+          <motion.span
+            className="absolute inset-0 flex items-center justify-center text-7xl select-none"
+            animate={{ scale: isHovered ? 1.12 : 1 }}
+            transition={{ duration: 0.38, ease: EASE }}
+            aria-hidden="true"
+          >
+            {product.emoji}
+          </motion.span>
+        )}
 
         {/* Badge */}
         {product.badge && (
