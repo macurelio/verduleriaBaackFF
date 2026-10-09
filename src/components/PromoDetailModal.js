@@ -71,7 +71,7 @@ export default function PromoDetailModal({
                 onPress={() => onAddToCart(item)}
                 activeOpacity={0.85}
               >
-                <ShoppingCart color="#0A0A0A" size={18} />
+                <ShoppingCart color="#0E2C1C" size={18} />
                 <Text style={styles.cartButtonText}>Agregar</Text>
               </TouchableOpacity>
             ) : null}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   modalCard: {
-    backgroundColor: '#111111',
+    backgroundColor: '#163D27',
     borderRadius: 24,
     overflow: 'hidden',
     borderWidth: 1,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   badge: {
-    color: '#7CB342',
+    color: '#80C45B',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 2.2,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   priceLabel: {
-    color: '#7CB342',
+    color: '#80C45B',
     fontSize: 16,
     fontWeight: '900',
     marginBottom: 14,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
     marginTop: 7,
   },
   listText: {
@@ -195,13 +195,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 13,
   },
   cartButtonText: {
-    color: '#0A0A0A',
+    color: '#0E2C1C',
     fontSize: 14,
     fontWeight: '900',
   },

@@ -5,14 +5,15 @@ export default {
     extend: {
       colors: {
         mora: {
-          DEFAULT: '#2F7A3F',
-          light: '#DCEFD8',
-          dark: '#1E5631',
+          DEFAULT: '#2F7D32',
+          light: '#D9F2BD',
+          dark: '#205C2D',
         },
-        sand: '#D7CFC2',
-        muted: '#A09385',
-        cocoa: '#4A3C2F',
-        charcoal: '#1A1A1A',
+        sand: '#E4F3DD',
+        muted: '#52705B',
+        cocoa: '#19452B',
+        charcoal: '#0E2C1C',
+        surface: '#163D27',
       },
       fontFamily: {
         heading: ['Outfit', 'system-ui', 'sans-serif'],

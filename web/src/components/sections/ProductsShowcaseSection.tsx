@@ -27,10 +27,10 @@ export default function ProductsShowcaseSection() {
 
   return (
     <section id="productos" aria-label="Productos" className="bg-charcoal pb-8 md:pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+      <div className="store-container pt-6 pb-4">
         <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
           <div>
-            <p className="text-mora font-heading font-bold text-sm mb-2">Tu compra de la semana</p>
+            <p className="text-mora-light font-heading font-bold text-sm mb-2">Tu compra de la semana</p>
             <h2 className="text-sand font-heading font-black text-3xl sm:text-4xl">Arma tu canasta</h2>
             <p className="text-sand/60 text-sm mt-2">Frutas, verduras y packs. Elige tus productos y confirma por WhatsApp.</p>
           </div>

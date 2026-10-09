@@ -11,11 +11,7 @@ export default function CTASection() {
     <section
       id="contacto"
       aria-label="Sección de contacto y pedidos"
-      className="relative py-20 sm:py-28 overflow-hidden"
-      style={{
-        background:
-          'linear-gradient(135deg, #052e16 0%, #14532d 50%, #1a1a1a 100%)',
-      }}
+      className="relative py-10 sm:py-12 overflow-hidden bg-gradient-to-br from-mora-dark to-charcoal"
     >
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
@@ -31,12 +27,12 @@ export default function CTASection() {
           ¿Listo para cocinar hoy?
         </span>
 
-        <h2 className="font-heading font-black text-white text-4xl sm:text-5xl lg:text-6xl leading-tight mb-5">
+        <h2 className="font-heading font-black text-white text-3xl sm:text-4xl leading-tight mb-4">
           Haz tu pedido{' '}
           <span className="text-[#25D366]">ahora</span> 🚀
         </h2>
 
-        <p className="font-body text-white/50 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+        <p className="font-body text-sand/80 text-sm sm:text-base max-w-xl mx-auto mb-6 leading-relaxed">
           Entregamos en {DELIVERY_ZONE} el mismo día. Arma tu canasta, elige el
           horario y te la llevamos a la puerta.
         </p>
@@ -69,7 +65,7 @@ export default function CTASection() {
           </Button>
         </div>
 
-        <div className="mt-12 flex flex-wrap justify-center gap-6 text-white/40 text-xs font-heading font-bold uppercase tracking-widest">
+        <div className="mt-6 flex flex-wrap justify-center gap-3 text-sand/70 text-xs font-heading font-bold uppercase tracking-wide">
           {[
             `✓ Envío en ${DELIVERY_ZONE}`,
             '✓ Pedido en 30 segundos',

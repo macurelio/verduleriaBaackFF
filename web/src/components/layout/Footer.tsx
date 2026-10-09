@@ -17,12 +17,12 @@ export default function Footer() {
 
   return (
     <footer className="bg-charcoal text-white/60" aria-label="Pie de página">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="store-container py-8">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="sm:col-span-1">
             <a href="#inicio" className="inline-flex items-center gap-2 mb-3">
               <span
-                className="h-10 w-10 rounded-full bg-gradient-to-br from-[#14532d] to-[#052e16] flex items-center justify-center text-xl flex-shrink-0"
+                className="h-10 w-10 rounded-full bg-gradient-to-br from-mora to-mora-dark flex items-center justify-center text-xl flex-shrink-0"
                 aria-hidden="true"
               >
                 🥬

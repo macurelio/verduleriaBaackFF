@@ -21,9 +21,9 @@ const slides: HeroSlide[] = [
     cta: 'Ver verduras',
     ctaHref: '#productos',
     ctaVariant: 'secondary',
-    bg: 'linear-gradient(135deg, #14532d 0%, #052e16 55%, #022c22 100%)',
-    accent: '#86efac',
-    subtitleColor: '#cfe8d5',
+    bg: 'linear-gradient(135deg, var(--mora-green) 0%, var(--mora-dark) 55%, var(--mora-forest) 100%)',
+    accent: 'var(--mora-light)',
+    subtitleColor: 'var(--mora-text)',
     emoji: '🥬',
     image: '',
     imageAlt: '',
@@ -37,9 +37,9 @@ const slides: HeroSlide[] = [
     cta: 'Armar mi canasta',
     ctaHref: '#productos',
     ctaVariant: 'secondary',
-    bg: 'linear-gradient(135deg, #3f3f2e 0%, #1c1c14 55%, #141410 100%)',
-    accent: '#fdba74',
-    subtitleColor: '#e8dcc8',
+    bg: 'linear-gradient(135deg, var(--mora-dark) 0%, var(--mora-green) 60%, var(--mora-forest) 100%)',
+    accent: 'var(--mora-light)',
+    subtitleColor: 'var(--mora-text)',
     emoji: '🧺',
     image: '',
     imageAlt: '',
@@ -179,8 +179,7 @@ export default function HeroCarousel() {
 
   return (
     <div
-      className="relative w-full overflow-hidden select-none"
-      style={{ height: 'min(90vh, 680px)' }}
+      className="compact-hero relative w-full overflow-hidden select-none"
       onMouseEnter={pause}
       onMouseLeave={() => { resume(); handleMouseLeave(); }}
       onMouseMove={handleMouseMove}
@@ -212,7 +211,7 @@ export default function HeroCarousel() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(to right, rgba(10,6,4,0.82) 0%, rgba(10,6,4,0.62) 45%, rgba(10,6,4,0.28) 70%, rgba(10,6,4,0.10) 100%)',
+                'linear-gradient(to right, rgba(14,44,28,0.55) 0%, rgba(14,44,28,0.25) 55%, transparent 100%)',
             }}
             aria-hidden
           />
@@ -236,7 +235,7 @@ export default function HeroCarousel() {
 
           {/* Staggered content */}
           <motion.div
-            className="relative z-10 w-full h-full flex items-center"
+            className="store-container relative z-10 h-full flex items-center"
             style={{ x: contentX, y: contentY }}
             variants={contentVariants}
             initial="hidden"
@@ -244,11 +243,11 @@ export default function HeroCarousel() {
             exit="exit"
           >
             {/* Left: text content */}
-            <div className="w-full lg:w-[52%] flex flex-col justify-center px-6 sm:px-14 lg:pl-24 lg:pr-8 text-left">
+            <div className="min-w-0 w-full lg:w-[62%] flex flex-col justify-center px-4 sm:px-10 py-12 text-left">
               {/* Badge */}
               <motion.span
                 variants={itemVariants}
-                className="inline-block w-fit mb-5 text-[11px] font-heading font-semibold uppercase tracking-[0.22em]"
+                className="inline-block w-fit mb-3 text-[11px] font-heading font-semibold uppercase tracking-[0.22em]"
                 style={{ color: slide.accent }}
               >
                 {slide.badge}
@@ -258,7 +257,7 @@ export default function HeroCarousel() {
               <motion.h1
                 variants={itemVariants}
                 className="font-heading font-black text-white leading-[0.93] mb-5 whitespace-pre-line"
-                style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
+                style={{ fontSize: 'clamp(2rem, 5vw, 4rem)' }}
               >
                 {slide.title}
               </motion.h1>
@@ -266,7 +265,7 @@ export default function HeroCarousel() {
               {/* Subtitle */}
               <motion.p
                 variants={itemVariants}
-                className="font-body text-base sm:text-[1.05rem] max-w-md mb-9 leading-relaxed"
+                className="font-body text-sm sm:text-base max-w-lg mb-5 leading-relaxed"
                 style={{ color: slide.subtitleColor }}
               >
                 {slide.subtitle}
@@ -294,7 +293,7 @@ export default function HeroCarousel() {
               >
                 <span
                   className="leading-none drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]"
-                  style={{ fontSize: 'clamp(9rem, 16vw, 15rem)' }}
+                  style={{ fontSize: 'clamp(7rem, 12vw, 11rem)' }}
                 >
                   {slide.emoji}
                 </span>
@@ -326,7 +325,7 @@ export default function HeroCarousel() {
         whileTap={{ scale: 0.94 }}
         transition={{ duration: 0.18, ease: EASE_PREMIUM }}
         aria-label="Diapositiva anterior"
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
+        className="absolute left-3 bottom-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
       >
         <ChevronLeft size={20} />
       </motion.button>
@@ -337,7 +336,7 @@ export default function HeroCarousel() {
         whileTap={{ scale: 0.94 }}
         transition={{ duration: 0.18, ease: EASE_PREMIUM }}
         aria-label="Siguiente diapositiva"
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
+        className="absolute right-3 bottom-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
       >
         <ChevronRight size={20} />
       </motion.button>

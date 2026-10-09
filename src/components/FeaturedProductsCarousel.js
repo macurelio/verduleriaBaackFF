@@ -46,7 +46,7 @@ export default function FeaturedProductsCarousel() {
           onPress={() => handleAdd(item)}
           activeOpacity={0.85}
         >
-          <ShoppingCart color="#0A0A0A" size={14} />
+          <ShoppingCart color="#0E2C1C" size={14} />
           <Text style={styles.addButtonText}>Añadir al carrito</Text>
         </TouchableOpacity>
       </View>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 2.5,
-    color: '#7CB342',
+    color: '#80C45B',
     marginBottom: 2,
   },
   sectionTitle: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(124,179,66,0.45)',
   },
   priceBadgeText: {
-    color: '#7CB342',
+    color: '#80C45B',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   categoryTag: {
     backgroundColor: 'rgba(124,179,66,0.12)',
-    color: '#7CB342',
+    color: '#80C45B',
     fontSize: 9,
     fontWeight: '800',
     paddingHorizontal: 7,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   addButton: {
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   addButtonText: {
-    color: '#0A0A0A',
+    color: '#0E2C1C',
     fontSize: 12,
     fontWeight: '900',
   },

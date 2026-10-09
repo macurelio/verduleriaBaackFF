@@ -48,22 +48,22 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
       ].join(' ')}
     >
       <nav
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16"
+        className="store-container flex items-center justify-between h-16"
         aria-label="Navegación principal"
       >
         <a
           href="#inicio"
-          className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal rounded-lg"
+          className="min-w-0 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal rounded-lg"
           aria-label={`${brandName} — volver al inicio`}
         >
           <span
-            className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#14532d] to-[#052e16] flex items-center justify-center text-xl flex-shrink-0"
+            className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-mora to-mora-dark flex items-center justify-center text-xl flex-shrink-0"
             aria-hidden="true"
           >
             🥬
           </span>
-          <span className="flex items-baseline gap-1 leading-none">
-            <span className="font-heading font-black text-lg text-sand">{brandName}</span>
+          <span className="min-w-0 flex items-baseline gap-1 leading-none">
+            <span className="truncate max-w-[9rem] sm:max-w-none font-heading font-black text-sm sm:text-lg text-sand">{brandName}</span>
           </span>
         </a>
 
@@ -90,7 +90,7 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Instagram de ${brandName}`}
-            className="p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
+            className="hidden sm:inline-flex p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
           >
             <Instagram size={20} />
           </a>

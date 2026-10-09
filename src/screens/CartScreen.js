@@ -260,21 +260,21 @@ export default function CartScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#0A0A0A' },
+  screen: { flex: 1, backgroundColor: '#0E2C1C' },
   content: { padding: 20, paddingBottom: 50 },
   title: { color: '#FFFFFF', fontSize: 24, fontWeight: '900', marginBottom: 20, marginTop: 8 },
 
   emptyContainer: {
-    flex: 1, backgroundColor: '#0A0A0A',
+    flex: 1, backgroundColor: '#0E2C1C',
     justifyContent: 'center', alignItems: 'center', padding: 40,
   },
   emptyEmoji: { fontSize: 52, marginBottom: 16 },
   emptyTitle: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', marginBottom: 8 },
   emptySubtitle: { color: '#666666', fontSize: 14, marginBottom: 28, textAlign: 'center' },
   emptyBtn: {
-    backgroundColor: '#7CB342', paddingHorizontal: 28, paddingVertical: 14, borderRadius: 14,
+    backgroundColor: '#80C45B', paddingHorizontal: 28, paddingVertical: 14, borderRadius: 14,
   },
-  emptyBtnText: { color: '#0A0A0A', fontSize: 15, fontWeight: '900' },
+  emptyBtnText: { color: '#0E2C1C', fontSize: 15, fontWeight: '900' },
 
   cartItem: {
     backgroundColor: '#141414', borderRadius: 14, padding: 14,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   itemEmoji: { fontSize: 26 },
   itemInfo: { flex: 1 },
   itemName: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', marginBottom: 2 },
-  itemUnit: { color: '#7CB342', fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
+  itemUnit: { color: '#80C45B', fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
   removeBtn: {
     padding: 6, backgroundColor: 'rgba(239,68,68,0.1)',
     borderRadius: 8, borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)',
@@ -326,9 +326,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', backgroundColor: '#141414',
   },
-  chipActive: { backgroundColor: '#7CB342', borderColor: '#7CB342' },
+  chipActive: { backgroundColor: '#80C45B', borderColor: '#80C45B' },
   chipText: { color: '#AAAAAA', fontSize: 12, fontWeight: '700' },
-  chipTextActive: { color: '#0A0A0A' },
+  chipTextActive: { color: '#0E2C1C' },
 
   errorBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
@@ -348,9 +348,9 @@ const styles = StyleSheet.create({
   },
   totalLabelText: { color: '#888888', fontSize: 14 },
   totalValueSm: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  shippingHint: { color: '#7CB342', fontSize: 11, fontWeight: '700', marginBottom: 10 },
+  shippingHint: { color: '#80C45B', fontSize: 11, fontWeight: '700', marginBottom: 10 },
   totalFinalLabel: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
-  totalFinalValue: { color: '#7CB342', fontSize: 24, fontWeight: '900' },
+  totalFinalValue: { color: '#80C45B', fontSize: 24, fontWeight: '900' },
 
   waBtn: {
     backgroundColor: '#25D366', flexDirection: 'row', alignItems: 'center',

@@ -125,14 +125,14 @@ const styles = StyleSheet.create({
   section: { marginBottom: 32 },
   sectionHeader: { paddingHorizontal: 20, marginBottom: 16 },
   sectionLabel: {
-    fontSize: 10, fontWeight: '800', letterSpacing: 2, color: '#7CB342', marginBottom: 2,
+    fontSize: 10, fontWeight: '800', letterSpacing: 2, color: '#80C45B', marginBottom: 2,
   },
   sectionTitle: {
     fontSize: 22, fontWeight: '900', color: '#FFFFFF', letterSpacing: -0.5,
   },
   scrollContent: { paddingHorizontal: 20, gap: 16, paddingBottom: 4 },
   card: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#163D27',
     borderRadius: 20, padding: 22,
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25, shadowRadius: 10, elevation: 4,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   avatarInitial: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
   authorName: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
   authorRole: { color: '#666666', fontSize: 11, fontWeight: '500', marginTop: 1 },
-  igHandle: { color: '#7CB342', fontSize: 11, fontWeight: '700', marginLeft: 'auto' },
+  igHandle: { color: '#80C45B', fontSize: 11, fontWeight: '700', marginLeft: 'auto' },
   dotsRow: {
     flexDirection: 'row', justifyContent: 'center', marginTop: 14, gap: 6,
   },
@@ -166,5 +166,5 @@ const styles = StyleSheet.create({
     width: 6, height: 6, borderRadius: 3,
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
-  dotActive: { width: 18, backgroundColor: '#7CB342' },
+  dotActive: { width: 18, backgroundColor: '#80C45B' },
 });

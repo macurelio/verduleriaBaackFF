@@ -175,14 +175,14 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   ctaButton: {
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
     paddingHorizontal: 24,
     paddingVertical: 13,
     borderRadius: 30,
     alignSelf: 'flex-start',
   },
   ctaText: {
-    color: '#0A0A0A',
+    color: '#0E2C1C',
     fontWeight: '900',
     fontSize: 14,
     letterSpacing: 0.3,
@@ -205,6 +205,6 @@ const styles = StyleSheet.create({
   },
   dotActive: {
     width: 20,
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
   },
 });

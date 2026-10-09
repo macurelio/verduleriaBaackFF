@@ -168,14 +168,14 @@ export default function ProductsScreen() {
           <h1 className="font-heading font-black text-sand text-2xl">Productos</h1>
           <p className="text-sand/50 text-sm">Administra precios, categorías y visibilidad del catálogo.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <TextInput
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && load(search, 0)}
             aria-label="Buscar productos"
             placeholder="Buscar…"
-            className="w-48"
+            className="flex-1 min-w-0 sm:w-48"
           />
           <ActionButton onClick={() => load(search, 0)} disabled={loading}>Buscar</ActionButton>
           <ActionButton variant="primary" onClick={openCreate}>
@@ -207,7 +207,7 @@ export default function ProductsScreen() {
               {products.map((p) => (
                 <tr key={p.id} className="border-b border-white/5 hover:bg-white/5">
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                       <span
                         className="h-8 w-8 rounded-lg flex items-center justify-center text-lg shrink-0"
                         style={{

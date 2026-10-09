@@ -27,7 +27,7 @@ export default function ToastMessage({ visible, message = '¡Agregado al carrito
     >
       <View style={styles.toast}>
         <View style={styles.iconWrapper}>
-          <Check color="#0A0A0A" size={16} />
+          <Check color="#0E2C1C" size={16} />
         </View>
         <Text style={styles.text}>{message}</Text>
       </View>
@@ -44,14 +44,14 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toast: {
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 22,
     paddingVertical: 14,
     borderRadius: 50,
-    shadowColor: '#7CB342',
+    shadowColor: '#80C45B',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.45,
     shadowRadius: 18,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   text: {
-    color: '#0A0A0A',
+    color: '#0E2C1C',
     fontWeight: '900',
     fontSize: 15,
     letterSpacing: 0.2,

@@ -205,7 +205,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Carrito de compras"
-            className="fixed top-0 right-0 z-[160] h-full w-full max-w-sm bg-charcoal shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 z-[160] h-[100dvh] w-full max-w-md bg-charcoal shadow-2xl flex flex-col"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -227,7 +227,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-4 px-5 space-y-4">
+            <div className="flex-1 min-h-0 overflow-y-auto py-3 px-4 space-y-3">
               {cart.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -418,7 +418,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                   <div
                     role="radiogroup"
                     aria-label="Forma de pago (opcional)"
-                    className="flex gap-2"
+                    className="flex flex-wrap gap-2"
                   >
                     {PAYMENT_METHODS.map((m) => (
                       <button

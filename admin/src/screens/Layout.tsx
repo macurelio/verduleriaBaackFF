@@ -62,7 +62,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex bg-charcoal">
-      <aside className="hidden md:flex flex-col w-60 bg-[#111111] border-r border-white/10 p-4 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-52 shrink-0 bg-surface border-r border-white/10 p-4 sticky top-0 h-[100dvh] overflow-y-auto">
         <div className="flex items-center gap-2 px-2 py-3 mb-4">
           <span className="h-9 w-9 rounded-lg bg-gradient-to-br from-mora to-charcoal flex items-center justify-center text-xl">
             🥬
@@ -104,7 +104,7 @@ export default function Layout() {
       </aside>
 
       <div className="flex-1 min-w-0">
-        <header className="md:hidden sticky top-0 z-40 bg-[#111111] border-b border-white/10 px-4 py-3 flex items-center justify-between">
+        <header className="md:hidden sticky top-0 z-40 bg-surface border-b border-white/10 px-4 py-3 flex items-center justify-between">
           <span className="font-heading font-black text-sand">Mora Verduras · Admin</span>
           <button
             onClick={logout}
@@ -115,7 +115,7 @@ export default function Layout() {
           </button>
         </header>
 
-        <main className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
+        <main className="w-full p-3 sm:p-4 lg:p-5 max-w-[1440px] mx-auto">
           <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4" aria-label="Secciones del panel">
             {NAV.map(({ key, label, icon }) => (
               <button

@@ -62,7 +62,7 @@ export default function WorkWithUsModal({ visible, onClose }) {
           {BENEFITS.map(({ Icon, title, desc }) => (
             <View key={title} style={styles.benefitRow}>
               <View style={styles.benefitIcon}>
-                <Icon color="#7CB342" size={20} />
+                <Icon color="#80C45B" size={20} />
               </View>
               <View style={styles.benefitText}>
                 <Text style={styles.benefitTitle}>{title}</Text>
@@ -74,7 +74,7 @@ export default function WorkWithUsModal({ visible, onClose }) {
           <View style={styles.divider} />
 
           <TouchableOpacity style={styles.cta} onPress={openContact} activeOpacity={0.85}>
-            <MessageCircle color="#0A0A0A" size={20} />
+            <MessageCircle color="#0E2C1C" size={20} />
             <Text style={styles.ctaText}>Contactar por WhatsApp</Text>
           </TouchableOpacity>
 
@@ -86,7 +86,7 @@ export default function WorkWithUsModal({ visible, onClose }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0A' },
+  container: { flex: 1, backgroundColor: '#0E2C1C' },
   topBar: {
     paddingTop: 16, paddingHorizontal: 20, paddingBottom: 8,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 28, paddingBottom: 48, paddingTop: 12 },
   logoBadge: {
     width: 80, height: 80, borderRadius: 22,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#163D27',
     justifyContent: 'center', alignItems: 'center',
     marginBottom: 24, marginTop: 8,
     borderWidth: 1, borderColor: 'rgba(124,179,66,0.3)',
   },
   logoEmoji: { fontSize: 40 },
   eyebrow: {
-    color: '#7CB342', fontSize: 10, fontWeight: '800',
+    color: '#80C45B', fontSize: 10, fontWeight: '800',
     letterSpacing: 2.5, marginBottom: 10,
   },
   headline: {
@@ -138,11 +138,11 @@ const styles = StyleSheet.create({
   },
   benefitDesc: { color: '#666666', fontSize: 13, lineHeight: 20 },
   cta: {
-    backgroundColor: '#7CB342',
+    backgroundColor: '#80C45B',
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     paddingVertical: 16, borderRadius: 16, gap: 10, marginBottom: 16,
   },
-  ctaText: { color: '#0A0A0A', fontSize: 16, fontWeight: '900' },
+  ctaText: { color: '#0E2C1C', fontSize: 16, fontWeight: '900' },
   emailNote: {
     color: '#444444', fontSize: 12, textAlign: 'center',
   },

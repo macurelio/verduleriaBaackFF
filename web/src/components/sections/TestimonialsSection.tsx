@@ -9,7 +9,7 @@ export default function TestimonialsSection() {
     <section
       id="testimonios"
       aria-label="Testimonios de clientes"
-      className="py-16 sm:py-20 bg-charcoal overflow-hidden"
+      className="py-8 sm:py-10 bg-charcoal overflow-hidden"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">

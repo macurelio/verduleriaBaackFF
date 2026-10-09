@@ -188,12 +188,12 @@ export default function PromoSection() {
     <section
       id="promociones"
       aria-label="Promociones y packs más vendidos"
-      className="py-20 sm:py-28 bg-charcoal"
+      className="py-10 sm:py-12 bg-charcoal"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="store-container">
         {/* Header */}
         <motion.div
-          className="text-center mb-14"
+          className="text-center mb-6"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-40px' }}
@@ -203,7 +203,7 @@ export default function PromoSection() {
             <Tag size={12} />
             Packs
           </span>
-          <h2 className="font-heading font-black text-sand text-4xl sm:text-5xl leading-tight">
+          <h2 className="font-heading font-black text-sand text-3xl sm:text-4xl leading-tight">
             Packs armados
           </h2>
           <p className="mt-4 text-white/50 font-body text-base max-w-md mx-auto">
@@ -213,7 +213,7 @@ export default function PromoSection() {
         </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {promoList.map((promo, i) => (
             <PromoCard key={promo.id} promo={promo} index={i} />
           ))}

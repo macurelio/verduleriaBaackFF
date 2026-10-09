@@ -23,8 +23,8 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products, emptyMessage }: ProductGridProps) {
   return (
-    <section aria-label="Listado de productos" className="py-8 md:py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section aria-label="Listado de productos" className="py-4 md:py-5">
+      <div className="store-container">
         {products.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -41,7 +41,7 @@ export default function ProductGrid({ products, emptyMessage }: ProductGridProps
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4"
+            className="catalog-grid"
           >
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />

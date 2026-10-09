@@ -20,10 +20,10 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator
             screenOptions={{
-              headerStyle: { backgroundColor: '#111111' },
+              headerStyle: { backgroundColor: '#163D27' },
               headerTintColor: '#FFFFFF',
               headerTitleStyle: { fontWeight: '900', color: '#FFFFFF' },
-              contentStyle: { backgroundColor: '#0A0A0A' },
+              contentStyle: { backgroundColor: '#0E2C1C' },
             }}
           >
             <Stack.Screen
@@ -36,8 +36,8 @@ export default function App() {
               component={CartScreen}
               options={{
                 title: 'Tu pedido',
-                headerStyle: { backgroundColor: '#0A0A0A' },
-                headerTintColor: '#7CB342',
+                headerStyle: { backgroundColor: '#0E2C1C' },
+                headerTintColor: '#80C45B',
                 headerTitleStyle: { fontWeight: '900', color: '#FFFFFF' },
               }}
             />

@@ -57,14 +57,14 @@ export default function WelcomeModal() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="welcome-title"
-            className="relative z-10 bg-charcoal rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+            className="relative z-10 bg-charcoal rounded-2xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto"
             initial={{ opacity: 0, scale: 0.9, y: 32 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 32 }}
             transition={{ type: 'spring', stiffness: 280, damping: 24 }}
           >
             {/* Header visual band */}
-            <div className="relative h-44 bg-gradient-to-br from-[#14532d] to-[#052e16] flex items-center justify-center overflow-hidden">
+            <div className="relative h-28 bg-gradient-to-br from-mora to-mora-dark flex items-center justify-center overflow-hidden">
               <span className="absolute -right-6 -bottom-6 text-[8rem] opacity-20" aria-hidden="true">
                 🥬
               </span>

@@ -6,20 +6,21 @@ export default {
       colors: {
         // Brand accent — verde huerta
         mora: {
-          DEFAULT: '#2F7A3F',
-          light: '#DCEFD8',
-          dark: '#1E5631',
+          DEFAULT: '#2F7D32',
+          light: '#D9F2BD',
+          dark: '#205C2D',
         },
         // Neutral warmth palette
         cream: {
-          DEFAULT: '#F9F8F6',
-          warm: '#F0E6D7',
-          border: '#E8E2D9',
+          DEFAULT: '#F4FAEF',
+          warm: '#E7F3DC',
+          border: '#CFE2C5',
         },
-        sand: '#D7CFC2',
-        muted: '#A09385',
-        cocoa: '#4A3C2F',
-        charcoal: '#1A1A1A',
+        sand: '#E4F3DD',
+        muted: '#52705B',
+        cocoa: '#19452B',
+        charcoal: '#0E2C1C',
+        surface: '#163D27',
       },
       fontFamily: {
         heading: ['Outfit', 'system-ui', 'sans-serif'],
@@ -47,5 +48,13 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [({ addBase, theme }) => {
+    addBase({ ':root': {
+      '--mora-green': theme('colors.mora.DEFAULT'),
+      '--mora-dark': theme('colors.mora.dark'),
+      '--mora-forest': theme('colors.charcoal'),
+      '--mora-light': theme('colors.mora.light'),
+      '--mora-text': theme('colors.sand'),
+    } })
+  }],
 }

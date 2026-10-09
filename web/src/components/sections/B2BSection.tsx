@@ -12,7 +12,7 @@ export default function B2BSection() {
   )
 
   return (
-    <section id="trabaja" aria-label="Trabaja con nosotros" className="bg-charcoal py-16 sm:py-24">
+    <section id="trabaja" aria-label="Trabaja con nosotros" className="bg-charcoal py-8 sm:py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
 
         {/* ── Hero card: fondo + texto centrado ── */}
@@ -21,15 +21,11 @@ export default function B2BSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.65, ease: EASE }}
-          className="relative rounded-3xl overflow-hidden min-h-[280px] sm:min-h-[340px] flex items-center justify-center"
+          className="relative rounded-3xl overflow-hidden min-h-[220px] sm:min-h-[260px] flex items-center justify-center"
         >
           {/* Background gradient */}
           <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(135deg, #14532d 0%, #1c1c14 55%, #0a0a0a 100%)',
-            }}
+            className="absolute inset-0 bg-gradient-to-br from-mora-dark via-surface to-charcoal"
             aria-hidden="true"
           />
           <span
@@ -40,7 +36,7 @@ export default function B2BSection() {
           </span>
 
           {/* Content */}
-          <div className="relative z-10 text-center px-6 py-12 flex flex-col items-center gap-5">
+          <div className="relative z-10 text-center px-4 py-7 flex flex-col items-center gap-5">
             <span className="text-[10px] font-heading font-bold uppercase tracking-[0.28em] text-white/50 border border-white/15 px-4 py-1.5 rounded-full">
               Para restaurantes, almacenes y cafeterías
             </span>
@@ -74,7 +70,7 @@ export default function B2BSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.65, ease: EASE, delay: 0.12 }}
-          className="rounded-3xl bg-white/[0.05] border border-white/10 px-8 py-10 sm:px-12 sm:py-12"
+          className="rounded-3xl bg-white/[0.05] border border-white/10 px-5 py-6 sm:px-8 sm:py-8"
         >
           <h3 className="font-heading font-black text-sand text-xl sm:text-2xl uppercase tracking-wide mb-5">
             La Propuesta

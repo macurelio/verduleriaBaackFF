@@ -31,8 +31,8 @@ export default function FeaturedProductsSection() {
   const productList = useApiResource('products', fetchProducts, products)
 
   return (
-    <section id="productos" aria-label="Productos" className="py-20 sm:py-28 bg-charcoal">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="productos" aria-label="Productos" className="py-10 sm:py-12 bg-charcoal">
+      <div className="store-container">
         <motion.div
           className="text-center mb-16"
           initial="hidden"
@@ -40,7 +40,7 @@ export default function FeaturedProductsSection() {
           viewport={{ once: true, margin: '-40px' }}
           variants={headerVariants}
         >
-          <h2 className="font-heading font-black text-sand text-4xl sm:text-5xl leading-tight">
+          <h2 className="font-heading font-black text-sand text-3xl sm:text-4xl leading-tight">
             Nuestras Verduras
           </h2>
           <p className="mt-4 text-white/50 font-body text-base max-w-md mx-auto">

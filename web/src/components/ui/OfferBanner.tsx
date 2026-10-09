@@ -18,13 +18,13 @@ export default function OfferBanner({ onOpenOffer }: OfferBannerProps) {
     <AnimatePresence>
       {visible && offer && (
         <motion.div
-          className="relative z-50 bg-gradient-to-r from-[#14532d] via-[#166534] to-[#14532d]"
+          className="relative z-50 bg-mora-dark"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.35, ease: 'easeInOut' }}
         >
-          <div className="flex items-center justify-center gap-2.5 px-10 py-2.5 text-sm">
+          <div className="store-container flex flex-wrap items-center justify-center gap-x-2 gap-y-1 pl-2 pr-7 py-2 text-xs sm:text-sm">
             <Zap size={13} className="fill-white text-white flex-shrink-0" />
             <p className="text-white/90 font-body text-center leading-snug">
               <span className="font-heading font-black text-white">PACK DESTACADO:</span>{' '}

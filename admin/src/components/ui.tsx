@@ -59,11 +59,11 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative bg-[#111111] border border-white/10 rounded-2xl shadow-2xl w-full ${
+        className={`relative bg-surface border border-white/10 rounded-2xl shadow-2xl w-full ${
           wide ? 'max-w-4xl' : 'max-w-lg'
         } max-h-[88vh] overflow-y-auto`}
       >
-        <div className="sticky top-0 bg-[#111111] flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div className="sticky top-0 bg-surface flex items-center justify-between px-5 py-4 border-b border-white/10">
           <h2 className="font-heading font-black text-sand text-lg uppercase tracking-wide">
             {title}
           </h2>

@@ -10,7 +10,18 @@
 
   body {
     @apply bg-charcoal font-body text-sand antialiased;
+    margin: 0;
+    min-width: 280px;
+    overflow-wrap: break-word;
   }
+
+  #root { min-height: 100svh; }
+
+  section[id] { scroll-margin-top: 4.5rem; }
+
+  input, select, textarea { min-width: 0; }
+
+  select option { @apply bg-charcoal text-sand; }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
@@ -34,6 +45,24 @@
 }
 
 @layer utilities {
+  .store-container {
+    width: min(100% - 2rem, 1200px);
+    margin-inline: auto;
+  }
+
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+    gap: 0.75rem;
+  }
+
+  .compact-hero { height: clamp(350px, 54svh, 480px); }
+
+  @media (min-width: 640px) {
+    .store-container { width: min(100% - 3rem, 1200px); }
+    .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

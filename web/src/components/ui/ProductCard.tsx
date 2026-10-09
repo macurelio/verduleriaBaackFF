@@ -50,14 +50,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           : '0 2px 8px rgba(26,26,26,0.04)',
       }}
       transition={{ duration: 0.35, ease: EASE }}
-      className="flex flex-col bg-white border border-cream-border rounded-2xl overflow-hidden will-change-transform"
+      className="min-w-0 flex flex-col bg-cream border border-cream-border rounded-xl overflow-hidden will-change-transform"
       role="group"
       aria-label={product.name}
     >
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden aspect-[4/3]"
         style={{
-          height: '220px',
           background: `linear-gradient(135deg, ${product.gradientFrom} 0%, ${product.gradientTo} 100%)`,
         }}
       >
@@ -65,7 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <motion.img
             src={produceImage}
             alt=""
-            className="absolute inset-0 w-full h-full object-contain p-5 select-none pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain p-3 select-none pointer-events-none"
             animate={{ scale: isHovered ? 1.1 : 1 }}
             transition={{ duration: 0.38, ease: EASE }}
             loading="lazy"
@@ -113,17 +112,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         </motion.div>
       </div>
 
-      <div className="flex flex-col flex-1 p-5 gap-3">
-        <div className="flex items-start justify-between gap-2">
-          <span className="text-xs font-heading font-bold text-muted uppercase tracking-widest">
+      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-1.5">
+          <span className="text-[10px] font-heading font-bold text-muted uppercase tracking-wide">
             {product.category}
           </span>
-          <span className="font-heading font-black text-charcoal text-xl leading-none">
+          <span className="font-heading font-black text-mora-dark text-lg leading-none whitespace-nowrap">
             ${product.price.toLocaleString('es-CL')}
           </span>
         </div>
 
-        <h3 className="font-heading font-black text-charcoal text-lg leading-tight">
+        <h3 className="font-heading font-black text-charcoal text-sm sm:text-base leading-tight">
           {product.name}
         </h3>
 

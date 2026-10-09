@@ -15,7 +15,7 @@ export default function Hero() {
 
   return (
     <section id="inicio" aria-label="Hero Mora Verduras" className="relative pt-10 md:pt-16 pb-12 md:pb-16 bg-charcoal">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="store-container">
         <div className="text-center">
           <h1 className="font-heading font-black text-sand text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight">
             Mora Verduras

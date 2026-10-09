@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#0E2C1C',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10000,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     borderWidth: 1.5,
     borderColor: 'rgba(124,179,66,0.35)',
-    shadowColor: '#7CB342',
+    shadowColor: '#80C45B',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 30,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   brand: {
     color: '#FFFFFF', fontSize: 34, fontWeight: '900', letterSpacing: -1,
   },
-  brandAccent: { color: '#7CB342' },
+  brandAccent: { color: '#80C45B' },
   tagline: {
     color: 'rgba(255,255,255,0.4)',
     fontSize: 13, letterSpacing: 1.5,
@@ -87,6 +87,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.2)', fontSize: 22, lineHeight: 22,
   },
   dotActive: {
-    color: '#7CB342',
+    color: '#80C45B',
   },
 });

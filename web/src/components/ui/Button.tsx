@@ -2,9 +2,9 @@ import type { ButtonProps, ButtonVariant, ButtonSize } from '../../types'
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    'bg-charcoal text-white hover:bg-cocoa active:bg-cocoa/90 shadow-md hover:shadow-lg',
+    'bg-mora text-white hover:bg-mora-dark active:bg-mora-dark/90 shadow-md hover:shadow-lg',
   secondary:
-    'bg-cocoa text-white hover:bg-[#3d2e1e] active:bg-[#2e1a08] shadow-md hover:shadow-lg',
+    'bg-mora-light text-charcoal hover:bg-cream-warm active:bg-cream-border shadow-md hover:shadow-lg',
   outline:
     'border-2 border-charcoal text-charcoal hover:bg-charcoal hover:text-white',
   ghost: 'text-charcoal hover:bg-cream-warm active:bg-cream-border',
@@ -15,7 +15,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
 const SIZES: Record<ButtonSize, string> = {
   sm: 'px-4 py-2 text-sm gap-1.5',
   md: 'px-6 py-3 text-base gap-2',
-  lg: 'px-8 py-4 text-lg gap-2.5',
+  lg: 'px-6 py-3 text-base gap-2',
 }
 
 export default function Button({
