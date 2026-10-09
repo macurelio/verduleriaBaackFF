@@ -43,6 +43,6 @@ Verify changes with the web build and/or `tsc --noEmit`.
 
 ## Conventions
 
-- UI copy is **Spanish** (Chilean market). Prices are integer CLP formatted with `toLocaleString('es-CL')`. The WhatsApp number, shipping fee, comunas, payment methods and Instagram handle live in the config files (`web/src/config.ts` / `src/config.js`) — change them there, not in components. The number is currently a placeholder with a `TODO: confirmar`.
+- UI copy is **Spanish** (Chilean market). Prices are integer CLP formatted with `toLocaleString('es-CL')`. The WhatsApp number, shipping fee, comunas, payment methods and Instagram handle live in the config files (`web/src/config.ts` / `src/config.js`) — change them there, not in components. The number is `+56 9 9577 8113` (the admin panel can override it via the API config).
 - Commit messages: conventional commits (`feat:`/`fix:`/`refactor:`), often in Spanish.
 - `.idea/` is partially tracked; new IDE files show up as untracked — don't commit IDE noise.

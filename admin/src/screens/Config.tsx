@@ -90,7 +90,7 @@ export default function ConfigScreen() {
             <TextInput
               value={config.whatsappNumber}
               onChange={(e) => setConfig({ ...config, whatsappNumber: e.target.value })}
-              placeholder="56954099576"
+              placeholder="56995778113"
             />
           </Field>
           <Field label="Instagram handle">

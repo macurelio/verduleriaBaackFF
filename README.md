@@ -48,7 +48,7 @@ El catálogo usa **fotos PNG realistas** de frutas/verduras (generadas con IA, 7
   - `web/src/config.ts` (web)
   - `src/config.js` (Expo)
   - La API devuelve (`GET /api/v1/config`) y se pueden editar desde el **admin**, ya que el storefront carga la configuración desde la API con fallback a `src/config.ts`.
-- El número de WhatsApp es un placeholder con `TODO: confirmar`.
+- El número de WhatsApp es `+56 9 9577 8113` (configurable también desde el **admin**, que sobreescribe el valor por defecto de `config.ts`).
 
 ## Desarrollo
 
