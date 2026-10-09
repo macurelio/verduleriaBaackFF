@@ -5,8 +5,7 @@
 
 export const BRAND_NAME = 'Mora Verduras';
 
-/** TODO: confirmar el número definitivo de WhatsApp que recibe los pedidos. */
-export const WHATSAPP_NUMBER = '+56954099576';
+export const WHATSAPP_NUMBER = '+56995778113';
 export const WHATSAPP_NUMBER_RAW = WHATSAPP_NUMBER.replace(/\D/g, '');
 
 export const INSTAGRAM_HANDLE = '@mora.verduras';
