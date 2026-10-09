@@ -94,7 +94,7 @@ export default function HomeScreen({ navigation }) {
     setActiveModal(null);
   };
 
-  const numCols = width > 600 ? 3 : 2;
+  const numCols = width >= 1200 ? 5 : width >= 900 ? 4 : width >= 640 ? 3 : 2;
   const cardWidth = Math.floor((width - 24 - (numCols - 1) * 10) / numCols);
 
   const renderComboBanner = (combo) => (
@@ -148,7 +148,7 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <View style={styles.cardContent}>
-            <Text style={styles.productCategory}>{item.category}</Text>
+            <Text style={styles.productCategory} numberOfLines={1}>{item.category}</Text>
             <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
             <Text style={styles.productDescription} numberOfLines={1}>
               {UNIT_LABELS[item.unit]}
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   categoryLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, gap: 10, paddingBottom: 8 },
   card: { backgroundColor: '#1E1E1E', borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 6, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
-  imageContainer: { width: '100%', aspectRatio: 1.1, justifyContent: 'center', alignItems: 'center', position: 'relative' },
+  imageContainer: { width: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', position: 'relative' },
   productEmoji: { fontSize: 64 },
   imageBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(10,10,10,0.75)', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 8 },
   imageBadgeText: { color: '#A5D6A7', fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   imagePriceText: { color: '#0E2C1C', fontWeight: '900', fontSize: 12 },
   cardContent: { padding: 10 },
   productCategory: { color: '#80C45B', fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
-  productName: { color: '#FFFFFF', fontSize: 13, fontWeight: '900', marginBottom: 3, letterSpacing: -0.2, lineHeight: 18 },
+  productName: { color: '#FFFFFF', fontSize: 13, fontWeight: '900', height: 36, marginBottom: 3, letterSpacing: -0.2, lineHeight: 18 },
   productDescription: { color: '#777777', fontSize: 11, lineHeight: 15, marginBottom: 10, textTransform: 'uppercase' },
   addToCartButton: { backgroundColor: '#80C45B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 9, borderRadius: 10, gap: 5 },
   addToCartText: { color: '#0E2C1C', fontSize: 12, fontWeight: '900' },

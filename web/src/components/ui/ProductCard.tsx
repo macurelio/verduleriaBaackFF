@@ -44,18 +44,18 @@ export default function ProductCard({ product }: ProductCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       whileTap={{ scale: 0.97 }}
       animate={{
-        y: isHovered ? -8 : 0,
+        y: isHovered ? -4 : 0,
         boxShadow: isHovered
           ? '0 24px 56px -12px rgba(26,26,26,0.2), 0 8px 20px -8px rgba(26,26,26,0.08)'
           : '0 2px 8px rgba(26,26,26,0.04)',
       }}
       transition={{ duration: 0.35, ease: EASE }}
-      className="min-w-0 flex flex-col bg-cream border border-cream-border rounded-xl overflow-hidden will-change-transform"
+      className="min-w-0 h-full flex flex-col bg-cream border border-cream-border rounded-xl overflow-hidden will-change-transform"
       role="group"
       aria-label={product.name}
     >
       <div
-        className="relative overflow-hidden aspect-[4/3]"
+        className="relative shrink-0 overflow-hidden aspect-square"
         style={{
           background: `linear-gradient(135deg, ${product.gradientFrom} 0%, ${product.gradientTo} 100%)`,
         }}
@@ -112,8 +112,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </motion.div>
       </div>
 
-      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-2">
-        <div className="flex flex-wrap items-start justify-between gap-1.5">
+      <div className="flex flex-col flex-1 p-2.5 sm:p-3 gap-2">
+        <div className="flex flex-col items-start gap-1.5">
           <span className="text-[10px] font-heading font-bold text-muted uppercase tracking-wide">
             {product.category}
           </span>
@@ -122,7 +122,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        <h3 className="font-heading font-black text-charcoal text-sm sm:text-base leading-tight">
+        <h3 className="min-h-[2.5em] line-clamp-2 font-heading font-black text-charcoal text-sm sm:text-base leading-tight" title={product.name}>
           {product.name}
         </h3>
 
