@@ -4,7 +4,7 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import HeroSection from './components/sections/HeroSection'
 import ProductsShowcaseSection from './components/sections/ProductsShowcaseSection'
-import FeaturedProductsSection from './components/sections/FeaturedProductsSection'
+
 import PromoSection from './components/sections/PromoSection'
 import TestimonialsSection from './components/sections/TestimonialsSection'
 import B2BSection from './components/sections/B2BSection'
@@ -35,7 +35,6 @@ function AppContent() {
       <main>
         <HeroSection />
         <ProductsShowcaseSection />
-        <FeaturedProductsSection />
         <PromoSection />
         <TestimonialsSection />
         <B2BSection />
