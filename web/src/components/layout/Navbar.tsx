@@ -24,7 +24,9 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
-    const handleResize = () => { if (window.innerWidth >= 768) setMenuOpen(false) }
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMenuOpen(false)
+    }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -45,7 +47,6 @@ export default function Navbar() {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16"
         aria-label="Navegación principal"
       >
-        {/* Logo */}
         <a
           href="#inicio"
           className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal rounded-lg"
@@ -57,13 +58,12 @@ export default function Navbar() {
           >
             🥬
           </span>
-          <span className="hidden sm:flex items-baseline gap-1 leading-none">
+          <span className="flex items-baseline gap-1 leading-none">
             <span className="font-heading font-black text-lg text-white">Mora</span>
             <span className="font-heading font-black text-lg text-sand">Verduras</span>
           </span>
         </a>
 
-        {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map(({ label, href }) => (
             <li key={href}>
