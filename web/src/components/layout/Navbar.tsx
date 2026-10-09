@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ShoppingCart, Instagram, Menu, X } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
-import CartDrawer from '../ui/CartDrawer'
 import { INSTAGRAM_URL } from '../../config'
 
 const NAV_LINKS = [
@@ -11,11 +10,14 @@ const NAV_LINKS = [
   { label: 'Contacto', href: '#contacto' },
 ]
 
-export default function Navbar() {
+interface NavbarProps {
+  onOpenCart: () => void
+}
+
+export default function Navbar({ onOpenCart }: NavbarProps) {
   const { getCartCount } = useCart()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [cartOpen, setCartOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60)
@@ -93,7 +95,7 @@ export default function Navbar() {
           </a>
 
           <button
-            onClick={() => setCartOpen(true)}
+            onClick={onOpenCart}
             aria-label={`Carrito${cartCount > 0 ? `, ${cartCount} producto${cartCount !== 1 ? 's' : ''}` : ''}`}
             className="relative p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
           >
@@ -137,8 +139,6 @@ export default function Navbar() {
           </ul>
         </div>
       )}
-
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   )
 }
