@@ -4,7 +4,6 @@ import {
   ShoppingBag,
   Tag,
   Grid3x3,
-  Star,
   Settings,
   Users,
   LogOut,
@@ -14,7 +13,6 @@ import OrdersScreen from './Orders'
 import ProductsScreen from './Products'
 import PromotionsScreen from './Promotions'
 import CategoriesScreen from './Categories'
-import TestimonialsScreen from './Testimonials'
 import ConfigScreen from './Config'
 import UsersScreen from './Users'
 
@@ -23,7 +21,6 @@ type ViewKey =
   | 'products'
   | 'promotions'
   | 'categories'
-  | 'testimonials'
   | 'config'
   | 'users'
 
@@ -32,7 +29,6 @@ const NAV: { key: ViewKey; label: string; icon: ReactNode }[] = [
   { key: 'products', label: 'Productos', icon: <ShoppingBag size={16} /> },
   { key: 'promotions', label: 'Promociones', icon: <Tag size={16} /> },
   { key: 'categories', label: 'Categorías', icon: <Grid3x3 size={16} /> },
-  { key: 'testimonials', label: 'Testimonios', icon: <Star size={16} /> },
   { key: 'config', label: 'Configuración', icon: <Settings size={16} /> },
   { key: 'users', label: 'Usuarios', icon: <Users size={16} /> },
 ]
@@ -51,8 +47,6 @@ export default function Layout() {
         return <PromotionsScreen />
       case 'categories':
         return <CategoriesScreen />
-      case 'testimonials':
-        return <TestimonialsScreen />
       case 'config':
         return <ConfigScreen />
       case 'users':

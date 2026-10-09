@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
-import { promotionApi } from '../api/resources'
-import type { Promotion, PromotionInput } from '../api/types'
+import { promotionApi, productApi } from '../api/resources'
+import type { Product, Promotion, PromotionInput } from '../api/types'
+import { formatPromotionItem, restorePromotionItems, UNIT_LABELS, type SelectedProduct } from '../promotionItems'
 import {
   ActionButton,
   EmptyState,
@@ -25,8 +26,9 @@ const emptyForm = (): PromotionInput => ({
   promoPrice: 0,
   badge: '',
   emoji: '🛒',
-  gradientFrom: '#2F7A3F',
-  gradientTo: '#1E5631',
+  // Required by the existing API; equal colors give new promotions a solid background.
+  gradientFrom: '#205C2D',
+  gradientTo: '#205C2D',
   tag: '',
   items: [],
   targetCategory: null,
@@ -44,6 +46,12 @@ export default function PromotionsScreen() {
   const [editing, setEditing] = useState<Promotion | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [itemsText, setItemsText] = useState('')
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([])
+  const [productSearch, setProductSearch] = useState('')
+  const [productsLoading, setProductsLoading] = useState(false)
+  const [productsError, setProductsError] = useState('')
+  const [productsRetry, setProductsRetry] = useState(0)
   const [form, setForm] = useState<PromotionInput>(emptyForm())
   const [busy, setBusy] = useState(false)
 
@@ -63,8 +71,52 @@ export default function PromotionsScreen() {
     load()
   }, [])
 
+  useEffect(() => {
+    if (!modalOpen) return
+    let alive = true
+    setProductsLoading(true)
+    setProductsError('')
+    const loadProducts = async () => {
+      const all: Product[] = []
+      let page = 0
+      let totalPages = 1
+      do {
+        const result = await productApi.list(undefined, page, 100)
+        all.push(...result.content)
+        totalPages = result.totalPages
+        page += 1
+      } while (page < totalPages)
+      if (!alive) return
+      setProducts(all)
+      if (editing) {
+        const restored = restorePromotionItems(editing.items, all)
+        setSelectedProducts(restored.selected)
+        setItemsText(restored.unmatched.join('\n'))
+      }
+    }
+    loadProducts().catch((err: unknown) => {
+      if (alive) setProductsError(err instanceof Error ? err.message : 'Error al cargar productos')
+    }).finally(() => { if (alive) setProductsLoading(false) })
+    return () => { alive = false }
+  }, [modalOpen, editing, productsRetry])
+
+  const selectedTotal = selectedProducts.reduce((total, item) => {
+    const product = products.find((p) => p.id === item.productId)
+    return total + (product?.price ?? 0) * item.quantity
+  }, 0)
+  const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-CL')
+  const visibleProducts = products.filter((product) =>
+    normalize(`${product.name} ${product.category}`).includes(normalize(productSearch.trim())),
+  )
+
+  const selectProduct = (product: Product, checked: boolean) => {
+    setSelectedProducts((previous) => checked
+      ? [...previous, { productId: product.id, quantity: 1 }]
+      : previous.filter((item) => item.productId !== product.id))
+  }
+
   const save = async () => {
-    if (busy) return
+    if (busy || productsLoading) return
     if (!form.id.trim() || !form.title.trim() || !form.description.trim()) {
       setError('Completa el código, título y descripción de la promoción.')
       return
@@ -77,13 +129,25 @@ export default function PromotionsScreen() {
       setError('La fecha de término debe ser igual o posterior a la fecha de inicio.')
       return
     }
+    if (!selectedProducts.length && !itemsText.trim()) {
+      setError('Selecciona al menos un producto para la promoción.')
+      return
+    }
+    if (selectedProducts.some((item) => !Number.isSafeInteger(item.quantity) || item.quantity < 1 || item.quantity > 99 || !products.some((p) => p.id === item.productId))) {
+      setError('Revisa los productos seleccionados y sus cantidades (entre 1 y 99).')
+      return
+    }
     setBusy(true)
     setError('')
     try {
-      const items = itemsText
+      const legacyItems = itemsText
         .split('\n')
         .map((s) => s.trim())
         .filter(Boolean)
+      const items = [
+        ...selectedProducts.map((item) => formatPromotionItem(products.find((p) => p.id === item.productId)!, item.quantity)),
+        ...legacyItems,
+      ]
       const payload: PromotionInput = {
         ...form,
         id: form.id.trim(),
@@ -128,6 +192,11 @@ export default function PromotionsScreen() {
     setEditing(null)
     setForm(emptyForm())
     setItemsText('')
+    setSelectedProducts([])
+    setProducts([])
+    setProductsLoading(true)
+    setProductSearch('')
+    setError('')
     setModalOpen(true)
   }
 
@@ -135,6 +204,11 @@ export default function PromotionsScreen() {
     setEditing(p)
     setForm({ ...p })
     setItemsText(p.items.join('\n'))
+    setSelectedProducts([])
+    setProducts([])
+    setProductsLoading(true)
+    setProductSearch('')
+    setError('')
     setModalOpen(true)
   }
 
@@ -167,8 +241,7 @@ export default function PromotionsScreen() {
                 className="flex flex-wrap items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-4 py-3"
               >
                 <span
-                  className="h-11 w-11 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${p.gradientFrom}, ${p.gradientTo})` }}
+                  className="h-11 w-11 rounded-xl bg-mora/20 flex items-center justify-center text-2xl shrink-0"
                 >
                   {p.emoji}
                 </span>
@@ -261,14 +334,46 @@ export default function PromotionsScreen() {
                 onChange={(e) => setForm({ ...form, promoPrice: Number(e.target.value) })}
               />
             </Field>
-            <Field label="Item por línea (uno por línea)">
-              <TextArea
-                value={itemsText}
-                onChange={(e) => setItemsText(e.target.value)}
-                rows={4}
-                placeholder={'1 kg Lechuga Economica\n1 kg Tomate Pomarola'}
-              />
-            </Field>
+            <div className="sm:col-span-2 rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-heading font-bold text-sand">Productos de la promoción</h3>
+                <span className="text-xs text-sand/60" role="status">{selectedProducts.length} seleccionado{selectedProducts.length === 1 ? '' : 's'}</span>
+              </div>
+              <TextInput type="search" aria-label="Buscar productos para la promoción" placeholder="Buscar por nombre o categoría…" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} disabled={productsLoading} />
+              <ErrorBox message={productsError} />
+              {productsError && <ActionButton onClick={() => setProductsRetry((value) => value + 1)}>Reintentar carga de productos</ActionButton>}
+              {productsLoading ? <Spinner label="Cargando catálogo…" /> : (
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {visibleProducts.map((product) => {
+                    const selected = selectedProducts.find((item) => item.productId === product.id)
+                    return (
+                      <div key={product.id} className="flex flex-wrap items-center gap-3 rounded-lg bg-charcoal/40 p-3">
+                        <label className="flex flex-1 items-center gap-3 min-w-[140px] cursor-pointer">
+                          <input type="checkbox" checked={!!selected} onChange={(e) => selectProduct(product, e.target.checked)} disabled={busy || (product.active === false && !selected)} className="h-4 w-4 accent-mora" />
+                          <span className="min-w-0">
+                            <span className="block text-sm font-semibold text-sand">{product.emoji} {product.name}</span>
+                            <span className="block text-xs text-sand/60">{fmtCLP(product.price)} / {UNIT_LABELS[product.unit]}{product.active === false ? ' · Inactivo' : ''}</span>
+                          </span>
+                        </label>
+                        {selected && <label className="flex items-center gap-2 text-xs text-sand/70">
+                          Cantidad
+                          <TextInput type="number" min={1} max={99} step={1} value={selected.quantity || ''} aria-label={`Cantidad de ${product.name}`} disabled={busy} onChange={(e) => setSelectedProducts((previous) => previous.map((item) => item.productId === product.id ? { ...item, quantity: Number(e.target.value) } : item))} className="!w-20" />
+                        </label>}
+                      </div>
+                    )
+                  })}
+                  {!productsError && visibleProducts.length === 0 && <p className="text-sm text-sand/60 py-3">{products.length ? 'No hay productos que coincidan con tu búsqueda.' : 'Crea productos en el catálogo para agregarlos a una promoción.'}</p>}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-3">
+                <p className="text-sm text-sand">Total de productos: <strong>{fmtCLP(selectedTotal)}</strong></p>
+                <ActionButton disabled={!selectedProducts.length || busy || productsLoading} onClick={() => setForm({ ...form, originalPrice: selectedTotal })}>Usar como precio original</ActionButton>
+              </div>
+            </div>
+            {itemsText && <Field label="Contenido anterior sin producto asociado (una línea por ítem)" className="sm:col-span-2">
+              <TextArea value={itemsText} onChange={(e) => setItemsText(e.target.value)} rows={3} />
+              <p className="text-xs text-sand/50 mt-2">Estas líneas se conservarán. Puedes quitarlas después de seleccionar sus productos en el catálogo.</p>
+            </Field>}
             <Field label="Emoji">
               <TextInput
                 value={form.emoji}
@@ -281,20 +386,6 @@ export default function PromotionsScreen() {
                 value={form.tag}
                 onChange={(e) => setForm({ ...form, tag: e.target.value })}
                 placeholder="OFERTA"
-              />
-            </Field>
-            <Field label="Gradiente desde">
-              <TextInput
-                value={form.gradientFrom}
-                onChange={(e) => setForm({ ...form, gradientFrom: e.target.value })}
-                placeholder="#2F7A3F"
-              />
-            </Field>
-            <Field label="Gradiente hasta">
-              <TextInput
-                value={form.gradientTo}
-                onChange={(e) => setForm({ ...form, gradientTo: e.target.value })}
-                placeholder="#1E5631"
               />
             </Field>
             <Field label="Vigente desde (opcional)">
@@ -313,7 +404,7 @@ export default function PromotionsScreen() {
           </div>
           <div className="flex justify-end gap-2 mt-6">
             <ActionButton onClick={() => setModalOpen(false)}>Cancelar</ActionButton>
-            <ActionButton variant="primary" onClick={save} disabled={busy}>
+            <ActionButton variant="primary" onClick={save} disabled={busy || productsLoading || (!!productsError && !editing)}>
               {busy ? 'Guardando…' : 'Guardar'}
             </ActionButton>
           </div>

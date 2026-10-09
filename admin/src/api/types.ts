@@ -99,31 +99,6 @@ export interface CategoryInput {
   active: boolean
 }
 
-export interface Testimonial {
-  id: number
-  name: string
-  handle: string
-  initials: string
-  color: string
-  text: string
-  rating: number
-  product: string
-  sortOrder: number
-  active: boolean
-}
-
-export interface TestimonialInput {
-  name: string
-  handle: string
-  initials: string
-  color: string
-  text: string
-  rating: number
-  product: string
-  sortOrder: number
-  active: boolean
-}
-
 export interface OrderItem {
   productId: string
   productName: string

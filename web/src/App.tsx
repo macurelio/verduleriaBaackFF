@@ -7,7 +7,6 @@ import HeroSection from './components/sections/HeroSection'
 import ProductsShowcaseSection from './components/sections/ProductsShowcaseSection'
 
 import PromoSection from './components/sections/PromoSection'
-import TestimonialsSection from './components/sections/TestimonialsSection'
 import B2BSection from './components/sections/B2BSection'
 import CTASection from './components/sections/CTASection'
 import WelcomeModal from './components/ui/WelcomeModal'
@@ -28,6 +27,7 @@ function AppContent() {
   const { brandName, deliveryZone } = useSiteConfig()
   const [offerOpen, setOfferOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   useSessionRedirects()
 
   useEffect(() => {
@@ -38,12 +38,11 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-charcoal pb-14 md:pb-0">
       <OfferBanner onOpenOffer={() => setOfferOpen(true)} />
-      <Navbar onOpenCart={() => setCartOpen(true)} />
+      <Navbar onOpenCart={() => setCartOpen(true)} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
       <main>
         <HeroSection />
-        <ProductsShowcaseSection />
+        <ProductsShowcaseSection selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
         <PromoSection />
-        <TestimonialsSection />
         <B2BSection />
         <CTASection />
       </main>

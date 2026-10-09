@@ -35,19 +35,6 @@ export interface CategoryMeta {
   blurb: string
 }
 
-// ─── Testimonial ─────────────────────────────────────────────────────────────
-
-export interface Testimonial {
-  id: number
-  name: string
-  handle: string
-  initials: string
-  color: string
-  text: string
-  rating: number
-  product: string
-}
-
 // ─── Hero Slide ──────────────────────────────────────────────────────────────
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'whatsapp'

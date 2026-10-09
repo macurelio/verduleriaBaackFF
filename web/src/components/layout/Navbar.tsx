@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { CATEGORIES } from '../../data/categories'
+import { fetchCategories } from '../../api/catalog'
+import { useApiResource } from '../../api/useApiResource'
 import { ShoppingCart, Instagram, Menu, X } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
@@ -12,9 +15,14 @@ const NAV_LINKS = [
 
 interface NavbarProps {
   onOpenCart: () => void
+  selectedCategory: string | null
+  onSelectCategory: (category: string | null) => void
 }
 
-export default function Navbar({ onOpenCart }: NavbarProps) {
+export default function Navbar({ onOpenCart, selectedCategory, onSelectCategory }: NavbarProps) {
+  const categories = useApiResource('categories', fetchCategories, CATEGORIES)
+  const headerRef = useRef<HTMLElement>(null)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const { instagramUrl: INSTAGRAM_URL, brandName } = useSiteConfig()
 
   const { getCartCount } = useCart()
@@ -28,17 +36,29 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
   }, [])
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) setMenuOpen(false)
+    if (!menuOpen) return
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+        menuButtonRef.current?.focus()
+      }
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    const handleOutside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !headerRef.current?.contains(event.target)) setMenuOpen(false)
+    }
+    document.addEventListener('keydown', handleKey)
+    document.addEventListener('pointerdown', handleOutside)
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      document.removeEventListener('pointerdown', handleOutside)
+    }
+  }, [menuOpen])
 
   const cartCount = getCartCount()
 
   return (
     <header
+      ref={headerRef}
       className={[
         'sticky top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
@@ -67,7 +87,7 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
           </span>
         </a>
 
-        <ul className="hidden md:flex items-center gap-1">
+        <ul className="hidden lg:flex items-center gap-1">
           {NAV_LINKS.map(({ label, href }) => (
             <li key={href}>
               <a
@@ -96,7 +116,7 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
           </a>
 
           <button
-            onClick={onOpenCart}
+            onClick={() => { setMenuOpen(false); onOpenCart() }}
             aria-label={`Carrito${cartCount > 0 ? `, ${cartCount} producto${cartCount !== 1 ? 's' : ''}` : ''}`}
             className="relative p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
           >
@@ -109,11 +129,12 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
           </button>
 
           <button
+            ref={menuButtonRef}
             onClick={() => setMenuOpen((o) => !o)}
             aria-expanded={menuOpen ? 'true' : 'false'}
             aria-controls="mobile-menu"
-            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-            className="md:hidden p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
+            aria-label={menuOpen ? 'Cerrar menú de productos y categorías' : 'Abrir menú de productos y categorías'}
+            className="p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -121,16 +142,17 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
       </nav>
 
       {menuOpen && (
-        <div
+        <nav
           id="mobile-menu"
-          className="md:hidden bg-charcoal border-t border-white/10 px-4 pb-4"
+          aria-label="Productos y categorías"
+          className="absolute top-full inset-x-0 lg:left-auto lg:right-4 lg:w-80 max-h-[calc(100dvh-5rem)] overflow-y-auto bg-surface border border-white/10 rounded-b-xl shadow-xl px-4 pb-4"
         >
           <ul className="flex flex-col gap-1 pt-2">
             {NAV_LINKS.map(({ label, href }) => (
               <li key={href}>
                 <a
                   href={href}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => { if (href === '#productos') onSelectCategory(null); setMenuOpen(false) }}
                   className="block px-4 py-3 rounded-xl text-sm font-heading font-bold text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150"
                 >
                   {label}
@@ -138,7 +160,16 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
               </li>
             ))}
           </ul>
-        </div>
+          <div className="border-t border-white/10 mt-3 pt-3">
+            <h2 className="px-4 mb-2 text-xs font-heading font-bold text-mora-light uppercase tracking-wide">Categorías de productos</h2>
+            <ul className="space-y-1">
+              <li><a href="#productos" onClick={() => { onSelectCategory(null); setMenuOpen(false) }} aria-current={selectedCategory === null ? 'true' : undefined} className={`block px-4 py-2.5 rounded-lg text-sm ${selectedCategory === null ? 'bg-mora text-white' : 'text-sand hover:bg-white/10'}`}>Todos los productos</a></li>
+              {categories.map((category) => <li key={category.name}>
+                <a href="#productos" onClick={() => { onSelectCategory(category.name); setMenuOpen(false) }} aria-current={selectedCategory === category.name ? 'true' : undefined} className={`block px-4 py-2.5 rounded-lg text-sm ${selectedCategory === category.name ? 'bg-mora text-white' : 'text-sand hover:bg-white/10'}`}>{category.emoji} {category.name}</a>
+              </li>)}
+            </ul>
+          </div>
+        </nav>
       )}
     </header>
   )

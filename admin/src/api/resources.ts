@@ -7,8 +7,6 @@ import type {
   PromotionInput,
   Category,
   CategoryInput,
-  Testimonial,
-  TestimonialInput,
   Order,
   OrderStatus,
   SiteConfig,
@@ -68,16 +66,6 @@ export const categoryApi = {
   update: (id: number, input: CategoryInput) =>
     api.put<Category>(`${ADMIN}/categories/${id}`, input),
   remove: (id: number) => api.del<void>(`${ADMIN}/categories/${id}`),
-}
-
-// ─── Testimonios ──────────────────────────────────────────────────────────────
-
-export const testimonialApi = {
-  list: () => api.get<Testimonial[]>(`${ADMIN}/testimonials`),
-  create: (input: TestimonialInput) => api.post<Testimonial>(`${ADMIN}/testimonials`, input),
-  update: (id: number, input: TestimonialInput) =>
-    api.put<Testimonial>(`${ADMIN}/testimonials/${id}`, input),
-  remove: (id: number) => api.del<void>(`${ADMIN}/testimonials/${id}`),
 }
 
 // ─── Pedidos ──────────────────────────────────────────────────────────────────

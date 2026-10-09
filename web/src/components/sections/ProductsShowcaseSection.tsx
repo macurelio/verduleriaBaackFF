@@ -7,8 +7,12 @@ import { useApiResource } from '../../api/useApiResource'
 import CategoryChips from '../ui/CategoryChips'
 import ProductGrid from '../ui/ProductGrid'
 
-export default function ProductsShowcaseSection() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+interface ProductsShowcaseProps {
+  selectedCategory: string | null
+  onSelectCategory: (category: string | null) => void
+}
+
+export default function ProductsShowcaseSection({ selectedCategory, onSelectCategory }: ProductsShowcaseProps) {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('default')
   const config = useSiteConfig()
@@ -58,10 +62,10 @@ export default function ProductsShowcaseSection() {
         </div>
         <div className="mt-3 flex justify-between items-center gap-3 text-xs text-sand/50">
           <p role="status">{filtered.length} producto{filtered.length === 1 ? '' : 's'}</p>
-          {(search || selectedCategory) && <button onClick={() => { setSearch(''); setSelectedCategory(null) }} className="text-sand hover:underline">Limpiar filtros</button>}
+          {(search || selectedCategory) && <button onClick={() => { setSearch(''); onSelectCategory(null) }} className="text-sand hover:underline">Limpiar filtros</button>}
         </div>
       </div>
-      <CategoryChips selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+      <CategoryChips selectedCategory={selectedCategory} onSelectCategory={onSelectCategory} />
       <ProductGrid products={filtered} emptyMessage="No encontramos productos con estos filtros. Prueba otra búsqueda." />
     </section>
   )

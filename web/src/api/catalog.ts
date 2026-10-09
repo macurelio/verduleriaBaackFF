@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { Product, Testimonial, CategoryMeta } from '../types'
+import type { Product, CategoryMeta } from '../types'
 import type { Promo } from '../data/promos'
 
 // ─── DTOs del backend (mora-verduras-api) ────────────────────────────────────
@@ -41,11 +41,6 @@ export interface ApiPromotionResponse extends Promo {
   primaryLabel: string
   validFrom: string | null
   validTo: string | null
-  sortOrder: number
-  active: boolean
-}
-
-export interface ApiTestimonialResponse extends Testimonial {
   sortOrder: number
   active: boolean
 }
@@ -101,14 +96,6 @@ export async function fetchPromotions(): Promise<Promo[]> {
       (!p.validTo || new Date(p.validTo.length === 10 ? `${p.validTo}T23:59:59` : p.validTo).getTime() >= Date.now()))
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(({ subtitle: _subtitle, targetCategory: _tc, primaryLabel: _pl, validFrom: _vf, validTo: _vt, sortOrder: _so, active: _a, ...promo }) => promo)
-}
-
-export async function fetchTestimonials(): Promise<Testimonial[]> {
-  const list = await api.get<ApiTestimonialResponse[]>('/testimonials')
-  return list
-    .filter((t) => t.active)
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map(({ sortOrder: _sortOrder, active: _active, ...testimonial }) => testimonial)
 }
 
 export function fetchSiteConfig(): Promise<SiteConfigResponse> {

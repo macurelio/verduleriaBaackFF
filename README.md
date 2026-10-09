@@ -80,7 +80,7 @@ La URL base se toma de `VITE_API_URL` (`.env` = producción, `.env.development` 
 
 ## Datos
 
-- Web: catálogo en `web/src/data/` como fallback; la fuente primaria es la API (`GET /api/v1/products|categories|promotions|testimonials`). El checkout registra el pedido en la API (`POST /api/v1/orders`) y abre WhatsApp; si la API no responde, genera el link `wa.me` directamente.
+- Web: catálogo en `web/src/data/` como fallback; la fuente primaria es la API (`GET /api/v1/products|categories|promotions`). El checkout registra el pedido en la API (`POST /api/v1/orders`) y abre WhatsApp; si la API no responde, genera el link `wa.me` directamente.
 - Admin: CRUD contra la API (`/api/v1/admin/*`) con JWT, y login en `/api/v1/auth/login`. El usuario admin inicial lo crea la API desde sus variables de entorno (por defecto `admin`/`admin123`, solo si la tabla está vacía).
 - Combinados/combos usan IDs `promo-*` que no existen como productos en la API, por lo que el checkout los manda directo por WhatsApp.
 - El catálogo incluye búsqueda, filtros y ordenamiento. El carrito se conserva al recargar y se actualiza con precios/disponibilidad remotos cuando la API responde.

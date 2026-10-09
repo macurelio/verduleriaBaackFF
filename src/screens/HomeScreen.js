@@ -13,7 +13,6 @@ import { UNIT_LABELS } from '../config';
 import { CartContext } from '../context/CartContext';
 import HeroCarousel from '../components/HeroCarousel';
 import FeaturedProductsCarousel from '../components/FeaturedProductsCarousel';
-import TestimonialsCarousel from '../components/TestimonialsCarousel';
 import ToastMessage from '../components/ToastMessage';
 import WorkWithUsModal from '../components/WorkWithUsModal';
 import ProductDetailModal from '../components/ProductDetailModal';
@@ -238,7 +237,6 @@ export default function HomeScreen({ navigation }) {
             </View>
 
             <View style={styles.carouselSection}><FeaturedProductsCarousel /></View>
-            <View style={styles.carouselSection}><TestimonialsCarousel /></View>
           </>
         )}
 

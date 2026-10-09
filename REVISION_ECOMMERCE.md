@@ -9,7 +9,7 @@ El proyecto vende frutas, verduras y packs con despacho y confirmación por What
 | Aplicación | Responsabilidad | Datos |
 | --- | --- | --- |
 | `web/` | Tienda pública, búsqueda, categorías, promociones, carrito y checkout | API externa, con catálogo estático de respaldo |
-| `admin/` | Login y gestión de productos, precios, visibilidad, promociones, categorías, testimonios, pedidos, configuración y usuarios | API externa con JWT |
+| `admin/` | Login y gestión de productos, precios, visibilidad, promociones, categorías, pedidos, configuración y usuarios | API externa con JWT |
 | Raíz Expo | Aplicación móvil con Home y Cart | Datos estáticos; aún sin conexión a la API |
 
 GitHub Pages publica tienda y panel desde `.github/workflows/deploy.yml`. El admin es una aplicación independiente bajo `/verduleriaBaackFF/admin/`. No hay rutas de servidor ni procesamiento de pagos en Pages. La API `mora-verduras-api` es la responsable de persistir datos y validar operaciones administrativas.
@@ -30,7 +30,7 @@ GitHub Pages publica tienda y panel desde `.github/workflows/deploy.yml`. El adm
 | Media | Promociones futuras o vencidas podían seguir visibles | Filtro de vigencia y edición de fechas desde el admin |
 | Media | Sesión expirada eliminaba token pero mantenía el panel visible | La autenticación responde al cambio de token y al cierre desde otra pestaña |
 | Media | Consultas HTTP sin límite de espera | Límite de 25 segundos para tienda y admin |
-| Media | Errores de edición detrás del modal | Errores visibles dentro de los editores de productos, promociones, categorías y testimonios |
+| Media | Errores de edición detrás del modal | Errores visibles dentro de los editores de productos, promociones, categorías |
 | Media | Pedidos con fecha anterior; fechas de admin desplazadas por UTC | Validación de fecha y fecha actual en Santiago; fechas sin hora se muestran sin retroceder un día |
 | Media | Filtro de pedidos conservaba página anterior | Sincronización de página al cambiar de filtro |
 | Media | `predeploy` dependía del comando Unix `cp` | Copia mediante Node compatible con Windows y CI; CI incorpora TypeScript antes de compilar |
@@ -48,7 +48,7 @@ GitHub Pages publica tienda y panel desde `.github/workflows/deploy.yml`. El adm
 
 ## Lo que realmente permite el admin
 
-Productos y precios, categorías, activación/desactivación, destacados, promociones y vigencia, testimonios, consulta y cambio de estado de pedidos, configuración de marca/contacto/despacho/pago, y gestión de usuarios según el contrato actual de la API.
+Productos y precios, categorías, activación/desactivación, destacados, promociones y vigencia, consulta y cambio de estado de pedidos, configuración de marca/contacto/despacho/pago, y gestión de usuarios según el contrato actual de la API.
 
 Los cambios se aplican al catálogo web al recargar o durante la revalidación de datos. Expo sigue usando datos locales. No existe aún un CMS para editar libremente cada sección de la portada, imágenes, textos del hero o políticas comerciales. Esos contenidos requieren una extensión de los contratos de la API y un editor correspondiente; no se inventaron endpoints.
 

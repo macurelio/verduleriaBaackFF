@@ -4,7 +4,6 @@ import { useSiteConfig } from '../../hooks/useSiteConfig'
 const FOOTER_LINKS = [
   { label: 'Inicio', href: '#inicio' },
   { label: 'Productos', href: '#productos' },
-  { label: 'Testimonios', href: '#testimonios' },
   { label: 'Contacto', href: '#contacto' },
 ]
 
