@@ -8,7 +8,7 @@ Tienda online de **Mora Verduras** (verduras y frutas a domicilio). Tres apps en
 | Panel admin | `admin/` | Vite 5 · React 18 · TypeScript strict · Tailwind 3 | CRUD de productos, promos, pedidos, configuración y usuarios (con login JWT) |
 | App móvil (Expo) | raíz | Expo ~55 · React Native 0.83 · React 19 · JavaScript | App nativa (iOS/Android/web) aún sin conectar a la API |
 
-No hay backend en este repo: los datos vienen de la API **`mora-verduras-api`** (https://mora-verduras-api.onrender.com/api/v1, CORS habilitado). Los pedidos se hacen **solo por WhatsApp**; no hay pago online.
+No hay backend en este repo: los datos vienen de la API **`mora-verduras-api`** (https://mora-verduras-api.onrender.com/api/v1, CORS habilitado). Los pedidos se guardan desde la tienda, con WhatsApp opcional; no hay pago online.
 
 ## Sitios
 
@@ -80,9 +80,9 @@ La URL base se toma de `VITE_API_URL` (`.env` = producción, `.env.development` 
 
 ## Datos
 
-- Web: catálogo en `web/src/data/` como fallback; la fuente primaria es la API (`GET /api/v1/products|categories|promotions`). El checkout registra el pedido en la API (`POST /api/v1/orders`) y abre WhatsApp; si la API no responde, genera el link `wa.me` directamente.
+- Web: catálogo en `web/src/data/` como fallback; la fuente primaria es la API (`GET /api/v1/products|categories|promotions`). Ambos botones del checkout registran el pedido en la API (`POST /api/v1/orders`); solo la opción con WhatsApp abre su enlace. Los errores no se presentan como pedidos guardados.
 - Admin: CRUD contra la API (`/api/v1/admin/*`) con JWT, y login en `/api/v1/auth/login`. El usuario admin inicial lo crea la API desde sus variables de entorno (por defecto `admin`/`admin123`, solo si la tabla está vacía).
-- Combinados/combos usan IDs `promo-*` que no existen como productos en la API, por lo que el checkout los manda directo por WhatsApp.
+- Los pedidos admiten productos y promociones: el backend resuelve sus IDs y calcula los precios desde PostgreSQL.
 - El catálogo incluye búsqueda, filtros y ordenamiento. El carrito se conserva al recargar y se actualiza con precios/disponibilidad remotos cuando la API responde.
 - La tienda comparte configuración remota para contacto y despacho. Los recursos se revalidan cada minuto con la pestaña visible y al volver a ella; ante errores posteriores conserva el último dato válido.
 - Banner y modal de packs usan las promociones del catálogo, filtradas por activación y vigencia; sus fechas se editan en el admin.
@@ -101,3 +101,5 @@ La URL base se toma de `VITE_API_URL` (`.env` = producción, `.env.development` 
 4. Publica `web/dist` completo en GitHub Pages.
 
 El deploy de Expo (rama `gh-pages`, comando `npm run deploy` en la raíz) es legacy y no se usa salvo que se pida explícitamente.
+
+El registro y las tablas se explican en [FLUJO_PEDIDOS.md](FLUJO_PEDIDOS.md).

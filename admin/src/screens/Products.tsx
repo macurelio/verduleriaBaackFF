@@ -19,15 +19,15 @@ import {
 const UNITS: ProductUnit[] = ['kilo', 'unidad', 'atado', 'bolsa', 'docena', 'pack']
 
 const emptyForm = (): ProductInput => ({
-  id: '',
+  id: `product-${crypto.randomUUID()}`,
   name: '',
   description: '',
   price: 0,
   unit: 'kilo',
   emoji: '🥬',
   badge: '',
-  gradientFrom: '#2F7A3F',
-  gradientTo: '#1E5631',
+  gradientFrom: '#205C2D',
+  gradientTo: '#205C2D',
   category: '',
   featured: false,
 })
@@ -72,7 +72,7 @@ export default function ProductsScreen() {
   const save = async () => {
     if (busy) return
     if (!form.id.trim() || !form.name.trim() || !form.category.trim() || !form.description.trim()) {
-      setError('Completa el código, nombre, categoría y descripción del producto.')
+      setError('Completa el nombre, categoría y descripción del producto.')
       return
     }
     if (!Number.isSafeInteger(form.price) || form.price <= 0) {
@@ -191,70 +191,30 @@ export default function ProductsScreen() {
       ) : products.length === 0 ? (
         <EmptyState message="Sin productos. Crea uno con «Nuevo»." />
       ) : (
-        <div className="bg-white/5 border border-white/10 rounded-2xl overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-sand/40 border-b border-white/10">
-                <th className="px-4 py-3">Producto</th>
-                <th className="px-4 py-3">Categoría</th>
-                <th className="px-4 py-3">Precio</th>
-                <th className="px-4 py-3">Unidad</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                      <span
-                        className="h-8 w-8 rounded-lg flex items-center justify-center text-lg shrink-0"
-                        style={{
-                          background: `linear-gradient(135deg, ${p.gradientFrom}, ${p.gradientTo})`,
-                        }}
-                      >
-                        {p.emoji}
-                      </span>
-                      <div>
-                        <p className="font-semibold text-sand">
-                          {p.name} {p.featured && <span className="text-[#A5D6A7]">★</span>}
-                        </p>
-                        <p className="text-sand/40 text-xs">{p.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sand/70">{p.category}</td>
-                  <td className="px-4 py-3 font-semibold">{fmtCLP(p.price)}</td>
-                  <td className="px-4 py-3 text-sand/70">{p.unit}</td>
-                  <td className="px-4 py-3">
-                    <Toggle
-                      checked={p.active !== false}
-                      onChange={(v) => toggleActive(p, v)}
-                      label={p.active === false ? 'Inactivo' : 'Activo'}
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <ActionButton
-                        title={p.featured ? 'Quitar destacado' : 'Marcar destacado'}
-                        onClick={() => toggleFeatured(p, !p.featured)}
-                        variant={p.featured ? 'success' : 'ghost'}
-                      >
-                        ★
-                      </ActionButton>
-                      <ActionButton onClick={() => openEdit(p)} title="Editar">
-                        <Pencil size={14} />
-                      </ActionButton>
-                      <ActionButton onClick={() => remove(p)} variant="danger" title="Eliminar">
-                        <Trash2 size={14} />
-                      </ActionButton>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="admin-mosaic">
+          {products.map((p) => (
+            <article key={p.id} className="admin-tile h-full">
+              <div className="flex items-start justify-between gap-2">
+                <span className="w-16 h-16 rounded-xl bg-mora/20 flex items-center justify-center text-4xl" aria-hidden="true">{p.emoji}</span>
+                <ActionButton onClick={() => openEdit(p)} title={`Editar ${p.name}`} aria-label={`Editar ${p.name}`}>
+                  <Pencil size={18} />
+                </ActionButton>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-sand/50">{p.category}</p>
+                <h2 className="font-heading font-bold text-sand text-lg">{p.name}</h2>
+                <p className="text-sm text-sand/50 line-clamp-2">{p.description}</p>
+              </div>
+              <p className="text-xl font-heading font-black text-mora-light">{fmtCLP(p.price)} <span className="text-xs text-sand/50 font-normal">/ {p.unit}</span></p>
+              <Toggle checked={p.active !== false} onChange={(v) => toggleActive(p, v)} label={p.active === false ? 'Inactivo' : 'Activo'} />
+              <div className="flex justify-between gap-2 border-t border-white/10 pt-3">
+                <ActionButton aria-label={`${p.featured ? 'Quitar destacado de' : 'Destacar'} ${p.name}`} onClick={() => toggleFeatured(p, !p.featured)} variant={p.featured ? 'success' : 'ghost'}>
+                  ★ {p.featured ? 'Destacado' : 'Destacar'}
+                </ActionButton>
+                <ActionButton onClick={() => remove(p)} variant="danger" title={`Eliminar ${p.name}`} aria-label={`Eliminar ${p.name}`}><Trash2 size={14} /></ActionButton>
+              </div>
+            </article>
+          ))}
         </div>
       )}
 
@@ -274,14 +234,6 @@ export default function ProductsScreen() {
         >
           <ErrorBox message={error} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="ID (código corto, ej. h1)">
-              <TextInput
-                value={form.id}
-                onChange={(e) => setForm({ ...form, id: e.target.value })}
-                disabled={!!editing}
-                placeholder="h1"
-              />
-            </Field>
             <Field label="Nombre">
               <TextInput
                 value={form.name}
@@ -342,20 +294,6 @@ export default function ProductsScreen() {
                 value={form.badge ?? ''}
                 onChange={(e) => setForm({ ...form, badge: e.target.value })}
                 placeholder="Más Popular"
-              />
-            </Field>
-            <Field label="Gradiente desde">
-              <TextInput
-                value={form.gradientFrom}
-                onChange={(e) => setForm({ ...form, gradientFrom: e.target.value })}
-                placeholder="#2F7A3F"
-              />
-            </Field>
-            <Field label="Gradiente hasta">
-              <TextInput
-                value={form.gradientTo}
-                onChange={(e) => setForm({ ...form, gradientTo: e.target.value })}
-                placeholder="#1E5631"
               />
             </Field>
             <div className="sm:col-span-2">

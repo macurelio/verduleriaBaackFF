@@ -231,14 +231,14 @@ export default function PromotionsScreen() {
       ) : promos.length === 0 ? (
         <EmptyState message="Sin promociones. Crea una con «Nueva»." />
       ) : (
-        <div className="space-y-3">
+        <div className="admin-mosaic">
           {promos
             .slice()
             .sort((a, b) => a.sortOrder - b.sortOrder)
             .map((p) => (
               <div
                 key={p.id}
-                className="flex flex-wrap items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-4 py-3"
+                className="admin-tile"
               >
                 <span
                   className="h-11 w-11 rounded-xl bg-mora/20 flex items-center justify-center text-2xl shrink-0"
@@ -246,7 +246,7 @@ export default function PromotionsScreen() {
                   {p.emoji}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-sand truncate">
+                  <p className="font-semibold text-sand">
                     {p.title}{' '}
                     <span className="text-sand/40 text-xs font-normal">{p.tag}</span>
                   </p>
@@ -262,7 +262,7 @@ export default function PromotionsScreen() {
                     onChange={(v) => toggleActive(p, v)}
                     label={p.active ? 'Activa' : 'Inactiva'}
                   />
-                  <ActionButton onClick={() => openEdit(p)} title="Editar">
+                  <ActionButton onClick={() => openEdit(p)} title={`Editar ${p.title}`} aria-label={`Editar ${p.title}`}>
                     <Pencil size={14} />
                   </ActionButton>
                   <ActionButton onClick={() => remove(p)} variant="danger" title="Eliminar">

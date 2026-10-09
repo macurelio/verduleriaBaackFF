@@ -54,7 +54,7 @@ Los cambios se aplican al catálogo web al recargar o durante la revalidación d
 
 ## Pendientes para una operación ecommerce completa
 
-1. **Packs registrados en pedidos:** la API de pedidos recibe `productId` y cantidad. Las promociones no son productos comprables en ese contrato. Pedidos con packs continúan por WhatsApp, con aviso explícito de que no aparecen en el panel. Se requiere soporte del backend para persistirlos y calcular sus precios.
+1. **Packs registrados en pedidos (resuelto):** el backend resuelve `productId` contra productos o promociones y guarda el pack con precio remoto y unidad PACK. Ambos botones registran pedidos; WhatsApp es opcional. Ver `FLUJO_PEDIDOS.md`.
 2. **Stock y disponibilidad:** la API expone productos activos, pero los tipos actuales no tienen inventario, reservas ni control de concurrencia. Incorporar esos mecanismos requiere backend.
 3. **Pagos online:** el flujo actual confirma por WhatsApp. Para añadir pagos se necesita proveedor, backend, webhooks y conciliación; las credenciales nunca deben ir en variables `VITE_*`.
 4. **Gestión integral de contenido:** ampliar configuración para hero, secciones, imágenes y políticas, con permisos y validación del servidor.

@@ -36,11 +36,11 @@ export default function ProductsShowcaseSection({ selectedCategory, onSelectCate
           <div>
             <p className="text-mora-light font-heading font-bold text-sm mb-2">Tu compra de la semana</p>
             <h2 className="text-sand font-heading font-black text-3xl sm:text-4xl">Arma tu canasta</h2>
-            <p className="text-sand/60 text-sm mt-2">Frutas, verduras y packs. Elige tus productos y confirma por WhatsApp.</p>
+            <p className="text-sand/60 text-sm mt-2">Frutas, verduras y packs. Elige tus productos y envía tu pedido desde la tienda.</p>
           </div>
           <div className="flex flex-wrap gap-3 text-xs text-sand/70">
             <span className="inline-flex items-center gap-2"><Truck size={16} /> Reparto en {config.deliveryZone}</span>
-            <span className="inline-flex items-center gap-2"><MessageCircle size={16} /> Confirmación por WhatsApp</span>
+            <span className="inline-flex items-center gap-2"><MessageCircle size={16} /> WhatsApp opcional</span>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Pencil } from 'lucide-react'
 import { orderApi } from '../api/resources'
 import type { Order, OrderStatus } from '../api/types'
 import { EmptyState, ErrorBox, Select, Spinner, StatusPill, fmtCLP } from '../components/ui'
@@ -58,7 +58,7 @@ export default function OrdersScreen() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="font-heading font-black text-sand text-2xl">Pedidos</h1>
-          <p className="text-sand/50 text-sm">Pedidos por WhatsApp registrados en la tienda.</p>
+          <p className="text-sand/50 text-sm">Pedidos registrados en la tienda, con o sin WhatsApp.</p>
         </div>
         <div className="flex items-center gap-2">
           <Select
@@ -95,15 +95,17 @@ export default function OrdersScreen() {
       ) : orders.length === 0 ? (
         <EmptyState message="No hay pedidos para este filtro." />
       ) : (
-        <div className="space-y-3">
+        <div className="admin-mosaic">
           {orders.map((order) => (
             <div key={order.id} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
               <button
                 onClick={() => setExpanded(expanded === order.id ? null : order.id)}
                 aria-expanded={expanded === order.id}
-                className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                aria-label={`Ver y editar estado del pedido ${order.code}`}
+                className="w-full flex flex-col items-start gap-2 px-4 py-4 text-left hover:bg-white/5 transition-colors"
               >
                 <span className="font-heading font-bold text-[#A5D6A7] text-sm">{order.code}</span>
+                <Pencil size={16} className="self-end text-sand/70" aria-hidden="true" />
                 <span className="text-sand text-sm font-semibold">{order.customerName}</span>
                 <span className="text-sand/50 text-xs">{order.comuna}</span>
                 <span className="text-sand/50 text-xs">{fmtDate(order.deliveryDate)}</span>
@@ -198,7 +200,7 @@ export default function OrdersScreen() {
           ))}
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-2">
+            <div className="col-span-full flex items-center justify-center gap-2 pt-2">
               <button
                 disabled={page === 0}
                 onClick={() => {

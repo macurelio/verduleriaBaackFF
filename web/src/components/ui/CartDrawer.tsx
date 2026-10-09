@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -63,6 +63,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const [orderNote, setOrderNote] = useState('')
   const [orderError, setOrderError] = useState('')
   const [whatsappUrl, setWhatsappUrl] = useState('')
+  const [savedFingerprint, setSavedFingerprint] = useState('')
+  const submitLock = useRef(false)
   const todayISO = getTodayISO()
 
   useEffect(() => {
@@ -97,6 +99,9 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     cart: cart.length > 0,
   }
   const isValid = Object.values(fields).every(Boolean)
+  const fingerprint = JSON.stringify({ name, phone, address, comuna, date, window_, payment, notes,
+    items: cart.map(i => [i.id, i.quantity, i.price]) })
+  const alreadySaved = savedFingerprint === fingerprint
 
   const buildWhatsappText = () => {
     const lines: string[] = ['¡Hola! Quiero hacer un pedido de verduras 🥬', '']
@@ -127,27 +132,23 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     return lines.join('\n')
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (withWhatsapp: boolean) => {
     setSubmitted(true)
-    if (!isValid || submitting) return
-
-    const fallbackUrl = waLink(buildWhatsappText())
-
-    const hasPack = cart.some((i) => i.source === 'promotion' || i.id.startsWith('promo-') || i.id.startsWith('combo-'))
-    if (hasPack) {
-      setWhatsappUrl(fallbackUrl)
-      setOrderNote('Este pedido incluye packs: confírmalo por WhatsApp. No se registra en el panel de pedidos.')
-      setOrderError('')
-      window.open(fallbackUrl, '_blank', 'noopener noreferrer')
+    if (!isValid || submitLock.current) return
+    if (alreadySaved) {
+      if (withWhatsapp && whatsappUrl) window.open(whatsappUrl, '_blank', 'noopener noreferrer')
       return
     }
 
+    const fallbackUrl = waLink(buildWhatsappText())
+
+    submitLock.current = true
     setSubmitting(true)
     setOrderNote('')
     setOrderError('')
     setWhatsappUrl('')
     // Reserve the tab while the click still has browser user activation.
-    const whatsappTab = window.open('about:blank', '_blank')
+    const whatsappTab = withWhatsapp ? window.open('about:blank', '_blank') : null
     if (whatsappTab) whatsappTab.opener = null
     const openWhatsapp = (url: string) => {
       setWhatsappUrl(url)
@@ -156,7 +157,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     try {
       const order = await createOrder({
         customerName: name.trim(),
-        phone: phone.trim(),
+        phone: phone.replace(/[\s.-]/g, ''),
         address: address.trim(),
         comuna,
         deliveryDate: date || todayISO,
@@ -165,10 +166,13 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         notes: notes.trim(),
         items: cart.map((i) => ({ productId: i.id, quantity: i.quantity })),
       })
-      const url = new URL(order.whatsappUrl)
-      const safeUrl = url.protocol === 'https:' && ['wa.me', 'api.whatsapp.com'].includes(url.hostname)
-        ? url.href : fallbackUrl
-      setOrderNote(`Pedido ${order.code} registrado por ${formatPrice(order.total)}. Confírmalo por WhatsApp.`)
+      let safeUrl = fallbackUrl
+      try {
+        const url = new URL(order.whatsappUrl)
+        if (url.protocol === 'https:' && ['wa.me', 'api.whatsapp.com'].includes(url.hostname)) safeUrl = url.href
+      } catch { /* El pedido ya está guardado; el enlace alternativo permite contactar a la tienda. */ }
+      setSavedFingerprint(fingerprint)
+      setOrderNote(`Pedido ${order.code} guardado por ${formatPrice(order.total)}. Estado: pendiente de confirmación de la tienda.`)
       openWhatsapp(safeUrl)
     } catch (error) {
       if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
@@ -176,12 +180,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         setOrderError(error.message)
         return
       }
-      setOrderError(
-        'No pudimos confirmar el registro. Continúa por WhatsApp para revisar tu pedido con la tienda.',
-      )
-      openWhatsapp(fallbackUrl)
+      setOrderError('No pudimos confirmar el registro. Consulta con la tienda antes de volver a enviar para evitar un pedido duplicado.')
+      whatsappTab?.close()
     } finally {
       setSubmitting(false)
+      submitLock.current = false
     }
   }
 
@@ -455,24 +458,32 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                   </p>
                 )}
 
-                {orderNote && (
-                  <p className="text-[#25D366] text-xs text-center font-body font-bold">
+                {orderNote && alreadySaved && (
+                  <p role="status" className="text-mora-light text-xs text-center font-body font-bold">
                     {orderNote}
                   </p>
                 )}
                 {orderError && (
-                  <p className="text-amber-400 text-xs text-center font-body">
+                  <p role="alert" className="text-amber-400 text-xs text-center font-body">
                     {orderError}
                   </p>
                 )}
-                {whatsappUrl && (
+                {whatsappUrl && alreadySaved && (
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block text-center text-sand underline text-sm">
                     Abrir WhatsApp para confirmar mi pedido
                   </a>
                 )}
 
                 <button
-                  onClick={handleSubmit}
+                  type="button"
+                  onClick={() => handleSubmit(false)}
+                  disabled={submitting || alreadySaved}
+                  className="w-full py-3 rounded-xl bg-mora hover:bg-mora-dark text-white font-heading font-black text-sm uppercase tracking-wide disabled:opacity-60"
+                >
+                  {submitting ? 'Guardando pedido…' : alreadySaved ? 'Pedido guardado' : 'Enviar pedido sin WhatsApp'}
+                </button>
+                <button
+                  onClick={() => handleSubmit(true)}
                   disabled={submitting}
                   className={[
                     'flex items-center justify-center gap-2 w-full py-3 rounded-xl',

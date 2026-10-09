@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Pencil } from 'lucide-react'
 import { userApi } from '../api/resources'
 import type { AdminUser } from '../api/types'
 import {
@@ -21,6 +21,8 @@ export default function UsersScreen() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
+  const [editing, setEditing] = useState<AdminUser | null>(null)
+  const [enabled, setEditEnabled] = useState(true)
 
   const load = async () => {
     setLoading(true)
@@ -91,11 +93,11 @@ export default function UsersScreen() {
       ) : users.length === 0 ? (
         <EmptyState message="Sin usuarios." />
       ) : (
-        <div className="space-y-2">
+        <div className="admin-mosaic">
           {users.map((u) => (
             <div
               key={u.id}
-              className="flex flex-wrap items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-4 py-3"
+              className="admin-tile"
             >
               <span className="h-9 w-9 rounded-full bg-mora/20 text-[#A5D6A7] flex items-center justify-center font-heading font-black text-sm">
                 {u.username.slice(0, 1).toUpperCase()}
@@ -109,11 +111,31 @@ export default function UsersScreen() {
                 onChange={(v) => setEnabled(u, v)}
                 label={u.enabled ? 'Habilitado' : 'Deshabilitado'}
               />
+              <ActionButton title={`Editar acceso de ${u.username}`} aria-label={`Editar acceso de ${u.username}`} onClick={() => { setEditing(u); setEditEnabled(u.enabled) }}>
+                <Pencil size={16} />
+              </ActionButton>
             </div>
           ))}
         </div>
       )}
 
+      {editing && (
+        <Modal title={`Editar acceso de ${editing.username}`} onClose={() => !busy && setEditing(null)}>
+          <ErrorBox message={error} />
+          <p className="text-sm text-sand/60 mb-4">Rol: {editing.role}</p>
+          <Toggle checked={enabled} onChange={setEditEnabled} label="Acceso habilitado" />
+          <div className="flex justify-end gap-2 mt-6">
+            <ActionButton disabled={busy} onClick={() => setEditing(null)}>Cancelar</ActionButton>
+            <ActionButton variant="primary" disabled={busy} onClick={async () => {
+              setBusy(true)
+              setError('')
+              try { await userApi.setEnabled(editing.id, enabled); setEditing(null); await load() }
+              catch (err) { setError(err instanceof Error ? err.message : 'Error al actualizar') }
+              finally { setBusy(false) }
+            }}>{busy ? 'Guardando…' : 'Guardar'}</ActionButton>
+          </div>
+        </Modal>
+      )}
       {modalOpen && (
         <Modal title="Nuevo administrador" onClose={() => setModalOpen(false)}>
           <div className="space-y-4">

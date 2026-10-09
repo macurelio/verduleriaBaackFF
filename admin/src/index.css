@@ -28,6 +28,15 @@
 }
 
 @layer utilities {
+  .admin-mosaic {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+  .admin-tile {
+    @apply relative min-w-0 flex flex-col gap-3 bg-surface border border-white/10 rounded-2xl p-4;
+  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

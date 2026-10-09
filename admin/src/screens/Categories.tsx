@@ -103,14 +103,14 @@ export default function CategoriesScreen() {
       ) : categories.length === 0 ? (
         <EmptyState message="Sin categorías." />
       ) : (
-        <div className="space-y-2">
+        <div className="admin-mosaic">
           {categories
             .slice()
             .sort((a, b) => a.sortOrder - b.sortOrder)
             .map((c) => (
               <div
                 key={c.id}
-                className="flex flex-wrap items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-4 py-3"
+                className="admin-tile"
               >
                 <span className="text-2xl">{c.emoji}</span>
                 <div className="min-w-0 flex-1">
@@ -118,7 +118,7 @@ export default function CategoriesScreen() {
                     {c.name}{' '}
                     <span className="text-sand/40 text-xs font-normal">orden {c.sortOrder}</span>
                   </p>
-                  <p className="text-sm text-sand/50 truncate">{c.blurb}</p>
+                  <p className="text-sm text-sand/50">{c.blurb}</p>
                 </div>
                 <Toggle
                   checked={c.active}
@@ -145,7 +145,8 @@ export default function CategoriesScreen() {
                     })
                     setModalOpen(true)
                   }}
-                  title="Editar"
+                  title={`Editar ${c.name}`}
+                  aria-label={`Editar ${c.name}`}
                 >
                   <Pencil size={14} />
                 </ActionButton>
