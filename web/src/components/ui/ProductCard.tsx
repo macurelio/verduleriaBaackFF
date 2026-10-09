@@ -9,11 +9,6 @@ import type { ProductCardProps } from '../../types'
 
 const EASE = [0.25, 1, 0.5, 1] as const
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.44, ease: EASE } },
-}
-
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart, incrementQuantity, decrementQuantity, cart } = useCart()
   const [isHovered, setIsHovered] = useState(false)
@@ -39,7 +34,6 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.article
-      variants={cardVariants}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       whileTap={{ scale: 0.97 }}

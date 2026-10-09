@@ -2,20 +2,6 @@ import { motion } from 'framer-motion'
 import ProductCard from './ProductCard'
 import type { Product } from '../../types'
 
-const EASE = [0.25, 1, 0.5, 1] as const
-
-const gridVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.6,
-      ease: EASE,
-      staggerChildren: 0.08,
-    },
-  },
-}
-
 interface ProductGridProps {
   products: Product[]
   emptyMessage?: string
@@ -36,17 +22,11 @@ export default function ProductGrid({ products, emptyMessage }: ProductGridProps
             <p className="text-white/30 font-body text-xs">Prueba cambiando de categoría o selecciona "Todos".</p>
           </motion.div>
         ) : (
-          <motion.div
-            variants={gridVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            className="catalog-grid"
-          >
+          <div className="catalog-grid">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </section>

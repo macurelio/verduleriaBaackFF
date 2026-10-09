@@ -203,7 +203,6 @@ export default function ProductsScreen() {
               <div className="flex-1">
                 <p className="text-xs text-sand/50">{p.category}</p>
                 <h2 className="font-heading font-bold text-sand text-lg">{p.name}</h2>
-                <p className="text-sm text-sand/50 line-clamp-2">{p.description}</p>
               </div>
               <p className="text-xl font-heading font-black text-mora-light">{fmtCLP(p.price)} <span className="text-xs text-sand/50 font-normal">/ {p.unit}</span></p>
               <Toggle checked={p.active !== false} onChange={(v) => toggleActive(p, v)} label={p.active === false ? 'Inactivo' : 'Activo'} />
