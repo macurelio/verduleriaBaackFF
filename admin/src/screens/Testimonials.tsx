@@ -55,6 +55,11 @@ export default function TestimonialsScreen() {
   }, [])
 
   const save = async () => {
+    if (busy) return
+    if (!form.name.trim() || !form.text.trim() || !RATINGS.includes(form.rating)) {
+      setError('Completa el nombre, el testimonio y una calificación entre 1 y 5.')
+      return
+    }
     setBusy(true)
     setError('')
     try {
@@ -182,6 +187,7 @@ export default function TestimonialsScreen() {
           onClose={() => setModalOpen(false)}
           wide
         >
+          <ErrorBox message={error} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Nombre">
               <TextInput

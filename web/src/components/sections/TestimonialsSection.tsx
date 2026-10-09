@@ -1,8 +1,10 @@
 import TestimonialCarousel from '../carousels/TestimonialCarousel'
 import { Instagram } from 'lucide-react'
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
 export default function TestimonialsSection() {
+  const { instagramHandle: INSTAGRAM_HANDLE, instagramUrl: INSTAGRAM_URL } = useSiteConfig()
+
   return (
     <section
       id="testimonios"

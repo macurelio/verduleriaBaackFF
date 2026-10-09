@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ShoppingCart, Instagram, Menu, X } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
-import { INSTAGRAM_URL } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
 const NAV_LINKS = [
   { label: 'Inicio', href: '#inicio' },
@@ -15,6 +15,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onOpenCart }: NavbarProps) {
+  const { instagramUrl: INSTAGRAM_URL, brandName } = useSiteConfig()
+
   const { getCartCount } = useCart()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -52,7 +54,7 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
         <a
           href="#inicio"
           className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal rounded-lg"
-          aria-label="Mora Verduras — volver al inicio"
+          aria-label={`${brandName} — volver al inicio`}
         >
           <span
             className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#14532d] to-[#052e16] flex items-center justify-center text-xl flex-shrink-0"
@@ -61,8 +63,7 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
             🥬
           </span>
           <span className="flex items-baseline gap-1 leading-none">
-            <span className="font-heading font-black text-lg text-white">Mora</span>
-            <span className="font-heading font-black text-lg text-sand">Verduras</span>
+            <span className="font-heading font-black text-lg text-sand">{brandName}</span>
           </span>
         </a>
 
@@ -88,7 +89,7 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Instagram de Mora Verduras"
+            aria-label={`Instagram de ${brandName}`}
             className="p-2 rounded-lg text-sand/80 hover:text-sand hover:bg-white/10 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand"
           >
             <Instagram size={20} />

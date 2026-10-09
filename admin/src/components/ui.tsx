@@ -15,7 +15,7 @@ export function Spinner({ label }: { label?: string }) {
 export function ErrorBox({ message }: { message: string }) {
   if (!message) return null
   return (
-    <div className="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm px-4 py-3">
+    <div role="alert" className="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm px-4 py-3">
       {message}
     </div>
   )
@@ -24,7 +24,7 @@ export function ErrorBox({ message }: { message: string }) {
 export function SuccessBox({ message }: { message: string }) {
   if (!message) return null
   return (
-    <div className="rounded-xl bg-[#1E5631]/40 border border-mora/40 text-[#A5D6A7] text-sm px-4 py-3">
+    <div role="status" className="rounded-xl bg-[#1E5631]/40 border border-mora/40 text-[#A5D6A7] text-sm px-4 py-3">
       {message}
     </div>
   )

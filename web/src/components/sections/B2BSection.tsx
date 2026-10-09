@@ -1,14 +1,16 @@
 import { motion } from 'framer-motion'
 import { MessageCircle } from 'lucide-react'
-import { waLink } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
-const WHATSAPP_MSG = waLink(
-  '¡Hola! Quiero abastecer mi local con verduras de Mora Verduras 🥬',
-)
 
 const EASE = [0.25, 1, 0.5, 1] as const
 
 export default function B2BSection() {
+  const { waLink } = useSiteConfig()
+  const WHATSAPP_MSG = waLink(
+    '¡Hola! Quiero abastecer mi local con verduras de Mora Verduras 🥬',
+  )
+
   return (
     <section id="trabaja" aria-label="Trabaja con nosotros" className="bg-charcoal py-16 sm:py-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6">

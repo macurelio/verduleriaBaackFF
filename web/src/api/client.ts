@@ -36,7 +36,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   let res: Response
   try {
-    res = await fetch(`${API_URL}${path}`, init)
+    res = await fetch(`${API_URL}${path}`, { ...init, signal: init.signal ?? AbortSignal.timeout(25_000) })
   } catch {
     throw new ApiError(0, 'No se pudo conectar con el servidor')
   }

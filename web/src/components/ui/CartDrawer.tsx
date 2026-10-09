@@ -10,28 +10,22 @@ import {
 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { createOrder } from '../../api/orders'
+import { ApiError } from '../../api/client'
 import { getProduceImage } from '../../produce'
-import {
-  COMUNAS,
-  DELIVERY_WINDOWS,
-  DELIVERY_ZONE,
-  FREE_SHIPPING_OVER,
-  PAYMENT_METHODS,
-  SHIPPING_FEE,
-  UNIT_LABELS,
-  waLink,
-} from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
+import { UNIT_LABELS } from '../../config'
 
 const EASE = [0.25, 1, 0.5, 1] as const
 
 const formatPrice = (n: number) => `$${n.toLocaleString('es-CL')}`
 
-const todayISO = (() => {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-    d.getDate(),
-  ).padStart(2, '0')}`
-})()
+const getTodayISO = () => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Santiago', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(new Date())
+  const part = (type: string) => parts.find((p) => p.type === type)?.value
+  return `${part('year')}-${part('month')}-${part('day')}`
+}
 
 const isValidPhone = (raw: string) => {
   const digits = raw.replace(/[\s.-]/g, '')
@@ -51,6 +45,8 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ open, onClose }: CartDrawerProps) {
+  const { comunas: COMUNAS, deliveryWindows: DELIVERY_WINDOWS, deliveryZone: DELIVERY_ZONE, freeShippingOver: FREE_SHIPPING_OVER, paymentMethods: PAYMENT_METHODS, shippingFee: SHIPPING_FEE, waLink } = useSiteConfig()
+
   const { cart, incrementQuantity, decrementQuantity, removeItem, getCartTotal } = useCart()
   const total = getCartTotal()
 
@@ -66,6 +62,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const [submitting, setSubmitting] = useState(false)
   const [orderNote, setOrderNote] = useState('')
   const [orderError, setOrderError] = useState('')
+  const [whatsappUrl, setWhatsappUrl] = useState('')
+  const todayISO = getTodayISO()
 
   useEffect(() => {
     if (!open) return
@@ -92,7 +90,10 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     name: name.trim().length > 1,
     phone: isValidPhone(phone),
     address: address.trim().length > 3,
-    comuna: comuna.length > 0,
+    comuna: COMUNAS.includes(comuna),
+    date: !date || (/^\d{4}-\d{2}-\d{2}$/.test(date) && date >= todayISO),
+    window: !window_ || DELIVERY_WINDOWS.includes(window_),
+    payment: !payment || PAYMENT_METHODS.includes(payment),
     cart: cart.length > 0,
   }
   const isValid = Object.values(fields).every(Boolean)
@@ -132,8 +133,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
 
     const fallbackUrl = waLink(buildWhatsappText())
 
-    const hasPack = cart.some((i) => i.id.startsWith('promo-') || i.id.startsWith('combo-'))
+    const hasPack = cart.some((i) => i.source === 'promotion' || i.id.startsWith('promo-') || i.id.startsWith('combo-'))
     if (hasPack) {
+      setWhatsappUrl(fallbackUrl)
+      setOrderNote('Este pedido incluye packs: confírmalo por WhatsApp. No se registra en el panel de pedidos.')
+      setOrderError('')
       window.open(fallbackUrl, '_blank', 'noopener noreferrer')
       return
     }
@@ -141,6 +145,14 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     setSubmitting(true)
     setOrderNote('')
     setOrderError('')
+    setWhatsappUrl('')
+    // Reserve the tab while the click still has browser user activation.
+    const whatsappTab = window.open('about:blank', '_blank')
+    if (whatsappTab) whatsappTab.opener = null
+    const openWhatsapp = (url: string) => {
+      setWhatsappUrl(url)
+      if (whatsappTab && !whatsappTab.closed) whatsappTab.location.replace(url)
+    }
     try {
       const order = await createOrder({
         customerName: name.trim(),
@@ -153,13 +165,21 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         notes: notes.trim(),
         items: cart.map((i) => ({ productId: i.id, quantity: i.quantity })),
       })
-      setOrderNote(`Pedido ${order.code} registrado. Confírmalo en el WhatsApp que se abrió.`)
-      window.open(order.whatsappUrl, '_blank', 'noopener noreferrer')
-    } catch {
+      const url = new URL(order.whatsappUrl)
+      const safeUrl = url.protocol === 'https:' && ['wa.me', 'api.whatsapp.com'].includes(url.hostname)
+        ? url.href : fallbackUrl
+      setOrderNote(`Pedido ${order.code} registrado por ${formatPrice(order.total)}. Confírmalo por WhatsApp.`)
+      openWhatsapp(safeUrl)
+    } catch (error) {
+      if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+        whatsappTab?.close()
+        setOrderError(error.message)
+        return
+      }
       setOrderError(
-        'No pudimos registrar el pedido. Se abre WhatsApp con tu pedido igualmente.',
+        'No pudimos confirmar el registro. Continúa por WhatsApp para revisar tu pedido con la tienda.',
       )
-      window.open(fallbackUrl, '_blank', 'noopener noreferrer')
+      openWhatsapp(fallbackUrl)
     } finally {
       setSubmitting(false)
     }
@@ -331,6 +351,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                 <div className="space-y-2">
                   <input
                     type="text"
+                    aria-label="Nombre completo"
+                    autoComplete="name"
                     placeholder="Nombre completo *"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -338,6 +360,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                   />
                   <input
                     type="tel"
+                    aria-label="Teléfono"
+                    autoComplete="tel"
                     placeholder="Teléfono (+56 9XXXXXXXX) *"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -345,6 +369,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                   />
                   <input
                     type="text"
+                    aria-label="Dirección y número"
+                    autoComplete="street-address"
                     placeholder="Dirección y número *"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
@@ -372,7 +398,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                       min={todayISO}
                       onChange={(e) => setDate(e.target.value)}
                       aria-label="Fecha de entrega (opcional)"
-                      className={inputClass(false)}
+                      className={inputClass(submitted && !fields.date)}
                     />
                     <select
                       value={window_}
@@ -417,6 +443,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Nota para el repartidor (opcional)"
+                    aria-label="Nota para el repartidor"
                     rows={2}
                     className={inputClass(false) + ' resize-none'}
                   />
@@ -424,7 +451,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
 
                 {submitted && !isValid && (
                   <p className="text-red-400 text-xs font-body">
-                    Completa los campos obligatorios (*)
+                    Revisa los campos obligatorios, la fecha de entrega y las opciones seleccionadas.
                   </p>
                 )}
 
@@ -437,6 +464,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                   <p className="text-amber-400 text-xs text-center font-body">
                     {orderError}
                   </p>
+                )}
+                {whatsappUrl && (
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block text-center text-sand underline text-sm">
+                    Abrir WhatsApp para confirmar mi pedido
+                  </a>
                 )}
 
                 <button

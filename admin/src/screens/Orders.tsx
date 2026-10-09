@@ -5,10 +5,13 @@ import type { Order, OrderStatus } from '../api/types'
 import { EmptyState, ErrorBox, Select, Spinner, StatusPill, fmtCLP } from '../components/ui'
 
 const STATUSES: OrderStatus[] = ['PENDING', 'CONFIRMED', 'DELIVERED', 'CANCELLED']
+const STATUS_LABELS: Record<OrderStatus, string> = {
+  PENDING: 'Pendiente', CONFIRMED: 'Confirmado', DELIVERED: 'Entregado', CANCELLED: 'Cancelado',
+}
 const PAGE_SIZE = 15
 
 const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+  new Date(iso.length === 10 ? `${iso}T12:00:00` : iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
 
 export default function OrdersScreen() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -26,6 +29,7 @@ export default function OrdersScreen() {
     try {
       const res = await orderApi.list(targetStatus || undefined, targetPage, PAGE_SIZE)
       setOrders(res.content)
+      setPage(targetPage)
       setTotalPages(res.totalPages)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar pedidos')
@@ -70,7 +74,7 @@ export default function OrdersScreen() {
             <option value="">Todos los estados</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {STATUS_LABELS[s]}
               </option>
             ))}
           </Select>
@@ -96,6 +100,7 @@ export default function OrdersScreen() {
             <div key={order.id} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
               <button
                 onClick={() => setExpanded(expanded === order.id ? null : order.id)}
+                aria-expanded={expanded === order.id}
                 className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-left hover:bg-white/5 transition-colors"
               >
                 <span className="font-heading font-bold text-[#A5D6A7] text-sm">{order.code}</span>
@@ -175,7 +180,7 @@ export default function OrdersScreen() {
                             : 'border-white/10 text-sand/60 hover:text-sand hover:bg-white/5'
                         }`}
                       >
-                        {s}
+                        {STATUS_LABELS[s]}
                       </button>
                     ))}
                     <a

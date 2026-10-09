@@ -23,6 +23,8 @@ export interface Product {
   badge: string | null
   gradientFrom: string
   gradientTo: string
+  featured?: boolean
+  source?: 'promotion'
 }
 
 // ─── Category ────────────────────────────────────────────────────────────────

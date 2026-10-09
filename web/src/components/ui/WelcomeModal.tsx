@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
 const STORAGE_KEY = 'mora_verduras_welcome_seen'
 
 export default function WelcomeModal() {
+  const { brandName, deliveryZone } = useSiteConfig()
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function WelcomeModal() {
                   🥬
                 </span>
                 <span className="font-heading font-black text-sand text-xl tracking-wide drop-shadow">
-                  Mora Verduras
+                  {brandName}
                 </span>
               </div>
             </div>
@@ -94,8 +96,7 @@ export default function WelcomeModal() {
                 ¡Bienvenido/a!
               </h2>
               <p className="text-sand/70 font-body text-sm leading-relaxed">
-                Verdura fresca del día a domicilio en Gran Santiago. Pide en 30
-                segundos y paga al recibir: efectivo, transferencia o contra entrega.
+                Frutas y verduras a domicilio en {deliveryZone}. Arma tu canasta y confirma la entrega y el pago por WhatsApp.
               </p>
 
               <div className="flex flex-col gap-2 w-full mt-1">

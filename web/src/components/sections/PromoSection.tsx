@@ -6,7 +6,7 @@ import { fetchPromotions } from '../../api/catalog'
 import { useApiResource } from '../../api/useApiResource'
 import { useCart } from '../../context/CartContext'
 import { getPromoImage } from '../../produce'
-import { waLink } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 import type { Product } from '../../types'
 
 const EASE = [0.25, 1, 0.5, 1] as const
@@ -24,6 +24,7 @@ const promoToProduct = (promo: Promo): Product => ({
   badge: promo.badge,
   gradientFrom: promo.gradientFrom,
   gradientTo: promo.gradientTo,
+  source: 'promotion',
 })
 
 const headerVariants = {
@@ -41,6 +42,8 @@ const cardVariants = {
 }
 
 function PromoCard({ promo, index }: { promo: Promo; index: number }) {
+  const { waLink } = useSiteConfig()
+
   const [hovered, setHovered] = useState(false)
   const [added, setAdded] = useState(false)
   const { addToCart } = useCart()

@@ -16,12 +16,19 @@ export default function ConfigScreen() {
   const [error, setError] = useState('')
   const [saved, setSaved] = useState('')
   const [busy, setBusy] = useState(false)
+  const [comunasText, setComunasText] = useState('')
+  const [paymentsText, setPaymentsText] = useState('')
+  const [windowsText, setWindowsText] = useState('')
 
   const load = async () => {
     setLoading(true)
     setError('')
     try {
-      setConfig(await configApi.get())
+      const value = await configApi.get()
+      setConfig(value)
+      setComunasText(textarea(value.comunas))
+      setPaymentsText(textarea(value.paymentMethods))
+      setWindowsText(textarea(value.deliveryWindows))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar configuración')
     } finally {
@@ -34,17 +41,38 @@ export default function ConfigScreen() {
   }, [])
 
   const save = async () => {
-    if (!config) return
+    if (!config || busy) return
+    const whatsapp = config.whatsappNumber.replace(/\D/g, '')
+    if (!config.brandName.trim() || !config.deliveryZone.trim() || !/^569\d{8}$/.test(whatsapp)) {
+      setError('Completa la marca, la zona de reparto y un WhatsApp chileno válido (569XXXXXXXX).')
+      return
+    }
+    if (![config.shippingFee, config.freeShippingOver].every((value) => Number.isSafeInteger(value) && value >= 0)) {
+      setError('Las tarifas deben ser montos enteros en CLP, mayores o iguales a cero.')
+      return
+    }
+    if (![comunasText, paymentsText, windowsText].every((text) => fromTextarea(text).length > 0)) {
+      setError('Ingresa al menos una comuna, un método de pago y un horario de entrega.')
+      return
+    }
+    try {
+      if (new URL(config.instagramUrl).protocol !== 'https:') throw new Error()
+    } catch {
+      setError('Ingresa una URL de Instagram válida que comience con https://.')
+      return
+    }
     setBusy(true)
     setError('')
     setSaved('')
     try {
       const payload: SiteConfig = {
         ...config,
-        comunas: fromTextarea(config.comunas.join('\n')),
-        paymentMethods: fromTextarea(config.paymentMethods.join('\n')),
-        deliveryWindows: fromTextarea(config.deliveryWindows.join('\n')),
-        whatsappNumber: config.whatsappNumber.replace(/\s/g, ''),
+        comunas: [...new Set(fromTextarea(comunasText))],
+        paymentMethods: [...new Set(fromTextarea(paymentsText))],
+        deliveryWindows: [...new Set(fromTextarea(windowsText))],
+        whatsappNumber: whatsapp,
+        brandName: config.brandName.trim(),
+        deliveryZone: config.deliveryZone.trim(),
       }
       const res = await configApi.update(payload)
       setConfig(res)
@@ -133,24 +161,24 @@ export default function ConfigScreen() {
 
         <Field label="Comunas (una por línea)">
           <TextArea
-            value={textarea(config.comunas)}
-            onChange={(e) => setConfig({ ...config, comunas: fromTextarea(e.target.value) })}
+            value={comunasText}
+            onChange={(e) => setComunasText(e.target.value)}
             rows={4}
           />
         </Field>
 
         <Field label="Métodos de pago (uno por línea)">
           <TextArea
-            value={textarea(config.paymentMethods)}
-            onChange={(e) => setConfig({ ...config, paymentMethods: fromTextarea(e.target.value) })}
+            value={paymentsText}
+            onChange={(e) => setPaymentsText(e.target.value)}
             rows={2}
           />
         </Field>
 
         <Field label="Horarios de entrega (uno por línea)">
           <TextArea
-            value={textarea(config.deliveryWindows)}
-            onChange={(e) => setConfig({ ...config, deliveryWindows: fromTextarea(e.target.value) })}
+            value={windowsText}
+            onChange={(e) => setWindowsText(e.target.value)}
             rows={2}
           />
         </Field>

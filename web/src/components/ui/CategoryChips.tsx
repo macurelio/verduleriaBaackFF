@@ -29,6 +29,7 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           <button
             onClick={() => onSelectCategory(null)}
+            aria-pressed={selectedCategory === null}
             className={[
               'whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-bold border transition-colors',
               selectedCategory === null
@@ -43,6 +44,7 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
             <button
               key={name}
               onClick={() => onSelectCategory(name)}
+              aria-pressed={selectedCategory === name}
               className={[
                 'whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-bold border transition-colors',
                 selectedCategory === name

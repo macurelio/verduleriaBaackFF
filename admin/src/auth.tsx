@@ -23,6 +23,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const onSessionChange = () => { if (!getToken()) setUser(null) }
+    window.addEventListener('mv-auth-changed', onSessionChange)
+    window.addEventListener('storage', onSessionChange)
+    return () => {
+      window.removeEventListener('mv-auth-changed', onSessionChange)
+      window.removeEventListener('storage', onSessionChange)
+    }
+  }, [])
+
+  useEffect(() => {
     const token = getToken()
     if (!token) {
       setLoading(false)
@@ -40,8 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function login(username: string, password: string) {
     const res = await apiLogin(username, password)
     setToken(res.accessToken)
-    const info = await apiMe()
-    setUser(info)
+    try {
+      const info = await apiMe()
+      setUser(info)
+    } catch (error) {
+      setToken(null)
+      throw error
+    }
   }
 
   function logout() {

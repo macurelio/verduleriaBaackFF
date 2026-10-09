@@ -12,6 +12,7 @@ export function getToken(): string | null {
 export function setToken(token: string | null) {
   if (token) localStorage.setItem(TOKEN_KEY, token)
   else localStorage.removeItem(TOKEN_KEY)
+  window.dispatchEvent(new Event('mv-auth-changed'))
 }
 
 export class ApiError extends Error {
@@ -41,12 +42,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   let res: Response
   try {
-    res = await fetch(`${API_URL}${path}`, init)
+    res = await fetch(`${API_URL}${path}`, { ...init, signal: init.signal ?? AbortSignal.timeout(25_000) })
   } catch {
     throw new ApiError(0, 'No se pudo conectar con el servidor')
   }
 
-  if (res.status === 401 && getToken()) {
+  if (res.status === 401 && token && token === getToken()) {
     setToken(null)
   }
 

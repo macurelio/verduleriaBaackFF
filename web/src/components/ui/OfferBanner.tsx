@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Zap } from 'lucide-react'
+import { promos } from '../../data/promos'
+import { fetchPromotions } from '../../api/catalog'
+import { useApiResource } from '../../api/useApiResource'
 
 interface OfferBannerProps {
   onOpenOffer: () => void
@@ -8,10 +11,12 @@ interface OfferBannerProps {
 
 export default function OfferBanner({ onOpenOffer }: OfferBannerProps) {
   const [visible, setVisible] = useState(true)
+  const offers = useApiResource('promotions', fetchPromotions, promos)
+  const offer = offers[0]
 
   return (
     <AnimatePresence>
-      {visible && (
+      {visible && offer && (
         <motion.div
           className="relative z-50 bg-gradient-to-r from-[#14532d] via-[#166534] to-[#14532d]"
           initial={{ height: 0, opacity: 0 }}
@@ -22,10 +27,9 @@ export default function OfferBanner({ onOpenOffer }: OfferBannerProps) {
           <div className="flex items-center justify-center gap-2.5 px-10 py-2.5 text-sm">
             <Zap size={13} className="fill-white text-white flex-shrink-0" />
             <p className="text-white/90 font-body text-center leading-snug">
-              <span className="font-heading font-black text-white">⚡ OFERTA DEL DÍA:</span>{' '}
-              Canasta Semanal con{' '}
-              <span className="font-heading font-black text-white">$2.500 de descuento</span>
-              {' '}· Solo por hoy
+              <span className="font-heading font-black text-white">PACK DESTACADO:</span>{' '}
+              {offer.title} ·{' '}
+              <span className="font-heading font-black text-white">${offer.promoPrice.toLocaleString('es-CL')}</span>
             </p>
             <button
               onClick={onOpenOffer}

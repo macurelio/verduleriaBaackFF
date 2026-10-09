@@ -42,17 +42,21 @@ export default function ProductsScreen() {
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState<ProductInput>(emptyForm())
   const [busy, setBusy] = useState(false)
+  const [page, setPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
 
-  const load = async (q = search) => {
+  const load = async (q = search, nextPage = page) => {
     setLoading(true)
     setError('')
     try {
       const [pageRes, catRes] = await Promise.all([
-        productApi.list(q || undefined, 0, 100),
+        productApi.list(q || undefined, nextPage, 20),
         categoryApi.list(),
       ])
       setProducts(pageRes.content)
       setCategories(catRes)
+      setPage(nextPage)
+      setTotalPages(pageRes.totalPages)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar productos')
     } finally {
@@ -66,11 +70,27 @@ export default function ProductsScreen() {
   }, [])
 
   const save = async () => {
+    if (busy) return
+    if (!form.id.trim() || !form.name.trim() || !form.category.trim() || !form.description.trim()) {
+      setError('Completa el código, nombre, categoría y descripción del producto.')
+      return
+    }
+    if (!Number.isSafeInteger(form.price) || form.price <= 0) {
+      setError('El precio debe ser un monto entero en CLP mayor a cero.')
+      return
+    }
+    if (![form.gradientFrom, form.gradientTo].every((color) => /^#[\da-f]{6}$/i.test(color))) {
+      setError('Los colores deben tener formato hexadecimal, por ejemplo #2F7A3F.')
+      return
+    }
     setBusy(true)
     setError('')
     try {
       const payload: ProductInput = {
         ...form,
+        id: form.id.trim(),
+        name: form.name.trim(),
+        description: form.description.trim(),
         badge: String(form.badge ?? '').trim() || null,
         emoji: form.emoji.trim() || '🥬',
       }
@@ -146,16 +166,18 @@ export default function ProductsScreen() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="font-heading font-black text-sand text-2xl">Productos</h1>
-          <p className="text-sand/50 text-sm">Catálogo visible en la tienda (emoji + gradiente).</p>
+          <p className="text-sand/50 text-sm">Administra precios, categorías y visibilidad del catálogo.</p>
         </div>
         <div className="flex items-center gap-2">
           <TextInput
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && load()}
+            onKeyDown={(e) => e.key === 'Enter' && load(search, 0)}
+            aria-label="Buscar productos"
             placeholder="Buscar…"
             className="w-48"
           />
+          <ActionButton onClick={() => load(search, 0)} disabled={loading}>Buscar</ActionButton>
           <ActionButton variant="primary" onClick={openCreate}>
             <Plus size={14} /> Nuevo
           </ActionButton>
@@ -236,12 +258,21 @@ export default function ProductsScreen() {
         </div>
       )}
 
+      {totalPages > 1 && !loading && (
+        <div className="flex justify-center items-center gap-3 mt-5">
+          <ActionButton disabled={page === 0} onClick={() => load(search, page - 1)}>Anterior</ActionButton>
+          <span className="text-sm text-sand/60">Página {page + 1} de {totalPages}</span>
+          <ActionButton disabled={page >= totalPages - 1} onClick={() => load(search, page + 1)}>Siguiente</ActionButton>
+        </div>
+      )}
+
       {modalOpen && (
         <Modal
           title={editing ? `Editar ${editing.name}` : 'Nuevo producto'}
           onClose={() => setModalOpen(false)}
           wide
         >
+          <ErrorBox message={error} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="ID (código corto, ej. h1)">
               <TextInput

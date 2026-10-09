@@ -1,35 +1,51 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
- * Caché en módulo: mientras una key esté en vuelo (o ya resuelta) no se vuelve a
- * pedir al servidor. Si falla, se limpia para reintentar en el próximo montaje.
+ * Comparte peticiones entre componentes y revalida al minuto o al volver a la
+ * pestaña. Si falla, conserva el último dato válido y permite reintentar.
  */
 const inFlight = new Map<string, Promise<unknown>>()
+const resolvedAt = new Map<string, number>()
+const REFRESH_MS = 60_000
 
 /**
- * Carga un recurso remoto una sola vez (cacheado durante la sesión) y usa
- * `fallback` mientras carga o si la API no responde.
+ * Usa el fallback inicial mientras carga. Los fallos posteriores no reemplazan
+ * datos remotos ya cargados por el catálogo estático.
  */
 export function useApiResource<T>(key: string, loader: () => Promise<T>, fallback: T): T {
   const [data, setData] = useState<T>(fallback)
+  const loaderRef = useRef(loader)
+  loaderRef.current = loader
 
   useEffect(() => {
     let alive = true
-    let pending = inFlight.get(key) as Promise<T> | undefined
-    if (!pending) {
-      pending = loader()
-        .catch(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'hidden') return
+      if (Date.now() - (resolvedAt.get(key) ?? 0) >= REFRESH_MS) {
+        inFlight.delete(key)
+        resolvedAt.set(key, Date.now())
+      }
+      let pending = inFlight.get(key) as Promise<T> | undefined
+      if (!pending) {
+        pending = loaderRef.current().catch((error: unknown) => {
           inFlight.delete(key)
-          return fallback
+          resolvedAt.delete(key)
+          throw error
         })
-        .then((value) => value as T)
-      inFlight.set(key, pending as Promise<unknown>)
+        inFlight.set(key, pending)
+        resolvedAt.set(key, Date.now())
+      }
+      pending.then((value) => { if (alive) setData(value) }).catch(() => { /* Keep the last successful data or initial fallback. */ })
     }
-    pending.then((value) => {
-      if (alive) setData(value)
-    })
+    refresh()
+    const timer = window.setInterval(refresh, REFRESH_MS)
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
     return () => {
       alive = false
+      window.clearInterval(timer)
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', refresh)
     }
   }, [key])
 

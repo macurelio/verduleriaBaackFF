@@ -11,7 +11,7 @@ export const CartProvider = ({ children }) => {
       const existing = currentCart.find(item => item.cartItemId === cartItemId);
       if (existing) {
         return currentCart.map(item =>
-          item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
+          item.cartItemId === cartItemId ? { ...item, ...product, quantity: Math.min(99, item.quantity + 1) } : item
         );
       }
       return [...currentCart, { ...product, cartItemId, quantity: 1 }];
@@ -21,18 +21,15 @@ export const CartProvider = ({ children }) => {
   const incrementQuantity = (cartItemId) => {
     setCart(currentCart =>
       currentCart.map(item =>
-        item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
+        item.cartItemId === cartItemId ? { ...item, quantity: Math.min(99, item.quantity + 1) } : item
       )
     );
   };
 
   const decrementQuantity = (cartItemId) => {
     setCart(currentCart =>
-      currentCart.map(item =>
-        item.cartItemId === cartItemId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
+      currentCart.flatMap(item => item.cartItemId !== cartItemId ? [item]
+        : item.quantity > 1 ? [{ ...item, quantity: item.quantity - 1 }] : [])
     );
   };
 

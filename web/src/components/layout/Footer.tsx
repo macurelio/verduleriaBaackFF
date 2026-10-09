@@ -1,5 +1,5 @@
 import { Instagram, MessageCircle, Heart } from 'lucide-react'
-import { BRAND_NAME, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
 const FOOTER_LINKS = [
   { label: 'Inicio', href: '#inicio' },
@@ -8,9 +8,11 @@ const FOOTER_LINKS = [
   { label: 'Contacto', href: '#contacto' },
 ]
 
-const WHATSAPP_URL = waLink('¡Hola! Quiero hacer un pedido de verduras 🥬')
 
 export default function Footer() {
+  const { brandName: BRAND_NAME, deliveryZone, instagramHandle: INSTAGRAM_HANDLE, instagramUrl: INSTAGRAM_URL, waLink } = useSiteConfig()
+  const WHATSAPP_URL = waLink('¡Hola! Quiero hacer un pedido de verduras 🥬')
+
   const year = new Date().getFullYear()
 
   return (
@@ -26,15 +28,11 @@ export default function Footer() {
                 🥬
               </span>
               <span className="font-heading font-black text-2xl text-white leading-none">
-                Mora
-              </span>
-              <span className="font-heading font-black text-2xl leading-none text-sand">
-                Verduras
+                {BRAND_NAME}
               </span>
             </a>
             <p className="text-sm leading-relaxed max-w-xs">
-              Verdura fresca del día a domicilio en Gran Santiago. Pide por WhatsApp y
-              paga al recibir.
+              Verdura fresca del día a domicilio en {deliveryZone}. Arma tu canasta y confirma por WhatsApp.
             </p>
           </div>
 

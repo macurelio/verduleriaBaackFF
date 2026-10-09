@@ -1,10 +1,12 @@
 import { MessageCircle, Instagram, ArrowRight } from 'lucide-react'
 import Button from '../ui/Button'
-import { DELIVERY_ZONE, INSTAGRAM_URL, waLink } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
-const WHATSAPP_MSG = waLink('¡Hola! Quiero hacer un pedido de verduras 🥬')
 
 export default function CTASection() {
+  const { deliveryZone: DELIVERY_ZONE, instagramUrl: INSTAGRAM_URL, waLink } = useSiteConfig()
+  const WHATSAPP_MSG = waLink('¡Hola! Quiero hacer un pedido de verduras 🥬')
+
   return (
     <section
       id="contacto"

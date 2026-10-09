@@ -64,6 +64,19 @@ export default function PromotionsScreen() {
   }, [])
 
   const save = async () => {
+    if (busy) return
+    if (!form.id.trim() || !form.title.trim() || !form.description.trim()) {
+      setError('Completa el código, título y descripción de la promoción.')
+      return
+    }
+    if (![form.originalPrice, form.promoPrice].every((price) => Number.isSafeInteger(price) && price > 0) || form.promoPrice > form.originalPrice) {
+      setError('Ingresa precios enteros positivos. El precio promocional no puede superar al original.')
+      return
+    }
+    if (form.validFrom && form.validTo && form.validFrom > form.validTo) {
+      setError('La fecha de término debe ser igual o posterior a la fecha de inicio.')
+      return
+    }
     setBusy(true)
     setError('')
     try {
@@ -73,6 +86,8 @@ export default function PromotionsScreen() {
         .filter(Boolean)
       const payload: PromotionInput = {
         ...form,
+        id: form.id.trim(),
+        title: form.title.trim(),
         items,
         tag: form.tag.trim() || 'OFERTA',
         emoji: form.emoji.trim() || '🛒',
@@ -192,6 +207,7 @@ export default function PromotionsScreen() {
           onClose={() => setModalOpen(false)}
           wide
         >
+          <ErrorBox message={error} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="ID (código, ej. combo-verde)">
               <TextInput
@@ -280,6 +296,12 @@ export default function PromotionsScreen() {
                 onChange={(e) => setForm({ ...form, gradientTo: e.target.value })}
                 placeholder="#1E5631"
               />
+            </Field>
+            <Field label="Vigente desde (opcional)">
+              <TextInput type="date" value={form.validFrom?.slice(0, 10) ?? ''} onChange={(e) => setForm({ ...form, validFrom: e.target.value || null })} />
+            </Field>
+            <Field label="Vigente hasta (opcional)">
+              <TextInput type="date" value={form.validTo?.slice(0, 10) ?? ''} min={form.validFrom?.slice(0, 10)} onChange={(e) => setForm({ ...form, validTo: e.target.value || null })} />
             </Field>
             <Field label="Orden (sortOrder)">
               <TextInput

@@ -47,6 +47,11 @@ export default function CategoriesScreen() {
   }, [])
 
   const save = async () => {
+    if (busy) return
+    if (!form.name.trim() || !Number.isSafeInteger(form.sortOrder)) {
+      setError('Ingresa un nombre de categoría y un orden entero.')
+      return
+    }
     setBusy(true)
     setError('')
     try {
@@ -157,6 +162,7 @@ export default function CategoriesScreen() {
           title={editing ? `Editar ${editing.name}` : 'Nueva categoría'}
           onClose={() => setModalOpen(false)}
         >
+          <ErrorBox message={error} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Nombre">
               <TextInput

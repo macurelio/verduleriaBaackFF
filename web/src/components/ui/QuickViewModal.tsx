@@ -21,6 +21,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
 
   // Reset state when product changes
   useEffect(() => {
+    if (!product) return
     if (product) {
       setQty(1)
       setAdded(false)
@@ -29,22 +30,21 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
 
   // Close on Escape
   useEffect(() => {
+    if (!product) return
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [onClose])
+  }, [product, onClose])
 
   // Prevent body scroll while open
   useEffect(() => {
-    if (product) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    if (!product) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     return () => {
-      document.body.style.overflow = ''
+      document.body.style.overflow = previous
     }
   }, [product])
 
@@ -179,7 +179,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                       {qty}
                     </span>
                     <button
-                      onClick={() => setQty((q) => q + 1)}
+                      onClick={() => setQty((q) => Math.min(99, q + 1))}
                       aria-label="Aumentar cantidad"
                       className="w-9 h-9 flex items-center justify-center text-charcoal hover:bg-cream transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-mora"
                     >

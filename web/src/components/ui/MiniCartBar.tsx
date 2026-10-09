@@ -1,6 +1,6 @@
 import { ShoppingCart } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
-import { SHIPPING_FEE, FREE_SHIPPING_OVER } from '../../config'
+import { useSiteConfig } from '../../hooks/useSiteConfig'
 
 interface MiniCartBarProps {
   onOpenCart: () => void
@@ -9,6 +9,8 @@ interface MiniCartBarProps {
 const formatPrice = (n: number) => `$${n.toLocaleString('es-CL')}`
 
 export default function MiniCartBar({ onOpenCart }: MiniCartBarProps) {
+  const { shippingFee: SHIPPING_FEE, freeShippingOver: FREE_SHIPPING_OVER } = useSiteConfig()
+
   const { getCartCount, getCartTotal } = useCart()
   const count = getCartCount()
   const total = getCartTotal()

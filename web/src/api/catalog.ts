@@ -68,15 +68,21 @@ export interface SiteConfigResponse {
 const PRODUCTS_SIZE = 100
 
 export async function fetchProducts(): Promise<Product[]> {
-  const page = await api.get<PageResponse<ApiProductResponse>>(
-    `/products?page=0&size=${PRODUCTS_SIZE}&active=true`,
-  )
-  return page.content.map(
-    ({ category, featured: _featured, ...product }) => ({
-      ...product,
-      category: category as Product['category'],
-    }),
-  )
+  const products: ApiProductResponse[] = []
+  let pageNumber = 0
+  let totalPages = 1
+  do {
+    const page = await api.get<PageResponse<ApiProductResponse>>(
+      `/products?page=${pageNumber}&size=${PRODUCTS_SIZE}&active=true`,
+    )
+    products.push(...page.content)
+    totalPages = page.totalPages
+    pageNumber += 1
+  } while (pageNumber < totalPages)
+  return products.map((product) => ({
+    ...product,
+    category: product.category as Product['category'],
+  }))
 }
 
 export async function fetchCategories(): Promise<CategoryMeta[]> {
@@ -90,7 +96,9 @@ export async function fetchCategories(): Promise<CategoryMeta[]> {
 export async function fetchPromotions(): Promise<Promo[]> {
   const list = await api.get<ApiPromotionResponse[]>('/promotions')
   return list
-    .filter((p) => p.active)
+    .filter((p) => p.active &&
+      (!p.validFrom || new Date(p.validFrom).getTime() <= Date.now()) &&
+      (!p.validTo || new Date(p.validTo.length === 10 ? `${p.validTo}T23:59:59` : p.validTo).getTime() >= Date.now()))
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(({ subtitle: _subtitle, targetCategory: _tc, primaryLabel: _pl, validFrom: _vf, validTo: _vt, sortOrder: _so, active: _a, ...promo }) => promo)
 }
@@ -103,10 +111,6 @@ export async function fetchTestimonials(): Promise<Testimonial[]> {
     .map(({ sortOrder: _sortOrder, active: _active, ...testimonial }) => testimonial)
 }
 
-export async function fetchSiteConfig(): Promise<SiteConfigResponse | null> {
-  try {
-    return await api.get<SiteConfigResponse>('/config')
-  } catch {
-    return null
-  }
+export function fetchSiteConfig(): Promise<SiteConfigResponse> {
+  return api.get<SiteConfigResponse>('/config')
 }

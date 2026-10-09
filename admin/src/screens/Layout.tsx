@@ -91,6 +91,7 @@ export default function Layout() {
         </nav>
 
         <div className="border-t border-white/10 pt-3 mt-3 space-y-2">
+          <a href={import.meta.env.BASE_URL.replace(/admin\/$/, '')} target="_blank" rel="noopener noreferrer" className="block px-3 py-2 text-sm text-sand hover:underline">Ver tienda ↗</a>
           <p className="px-3 text-xs text-sand/40 truncate">@{user?.username}</p>
           <button
             onClick={logout}
@@ -115,7 +116,7 @@ export default function Layout() {
         </header>
 
         <main className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
-          <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4">
+          <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4" aria-label="Secciones del panel">
             {NAV.map(({ key, label, icon }) => (
               <button
                 key={key}
