@@ -150,11 +150,14 @@ const PROMO_SVG: Record<string, string> = {
 export interface ProduceLike {
   id?: string
   emoji?: string
+  image?: string
 }
 
 export function getProduceImage(item: ProduceLike | null | undefined): string | undefined {
   if (!item) return undefined
-  if (item.id) return PHOTO_BY_ID[item.id] ?? SVG_BY_ID[item.id]
+  if (item.image) return item.image
+  if (item.id && PHOTO_BY_ID[item.id]) return PHOTO_BY_ID[item.id]
+  if (item.id && SVG_BY_ID[item.id]) return SVG_BY_ID[item.id]
   if (item.emoji) return PHOTO_BY_EMOJI[item.emoji] ?? SVG_BY_EMOJI[item.emoji]
   return undefined
 }

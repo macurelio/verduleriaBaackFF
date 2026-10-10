@@ -1,74 +1,152 @@
 import { useState } from 'react'
-import { Search, Truck, MessageCircle } from 'lucide-react'
-import { useSiteConfig } from '../../hooks/useSiteConfig'
+import { Search, X, SlidersHorizontal } from 'lucide-react'
 import { products } from '../../data/products'
 import { fetchProducts } from '../../api/catalog'
 import { useApiResource } from '../../api/useApiResource'
 import CategoryChips from '../ui/CategoryChips'
 import ProductGrid from '../ui/ProductGrid'
-import FreeShippingBanner from '../ui/FreeShippingBanner'
+import FreeShippingProgressBar from '../ui/FreeShippingProgressBar'
+import { useCart } from '../../context/CartContext'
 
 interface ProductsShowcaseProps {
   selectedCategory: string | null
   onSelectCategory: (category: string | null) => void
+  searchQuery?: string
+  onSearchChange?: (q: string) => void
 }
 
-export default function ProductsShowcaseSection({ selectedCategory, onSelectCategory }: ProductsShowcaseProps) {
-  const [search, setSearch] = useState('')
-  const [sort, setSort] = useState('default')
-  const config = useSiteConfig()
+export default function ProductsShowcaseSection({
+  selectedCategory,
+  onSelectCategory,
+  searchQuery: externalSearch = '',
+  onSearchChange: externalSetSearch,
+}: ProductsShowcaseProps) {
+  const [internalSearch, setInternalSearch] = useState('')
+  const [sort, setSort] = useState('popular')
+  const { getCartTotal } = useCart()
+  const cartSubtotal = getCartTotal()
+
+  const search = externalSetSearch ? externalSearch : internalSearch
+  const setSearch = externalSetSearch || setInternalSearch
+
   const productList = useApiResource('products', fetchProducts, products)
 
-  const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-CL')
+  const normalize = (value: string) =>
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('es-CL')
+
   const query = normalize(search.trim())
-  const filtered = productList.filter((p) =>
-    (!selectedCategory || p.category === selectedCategory) &&
-    normalize(`${p.name} ${p.description} ${p.category}`).includes(query),
-  )
+
+  const filtered = productList.filter((p) => {
+    const matchesCategory = !selectedCategory || p.category === selectedCategory
+    const matchesSearch =
+      !query ||
+      normalize(`${p.name} ${p.description} ${p.category} ${p.harvest || ''} ${p.nutrition || ''}`).includes(
+        query,
+      )
+    return matchesCategory && matchesSearch
+  })
+
+  // Sort logic
   if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price)
-  if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price)
-  if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name, 'es-CL'))
-  if (sort === 'featured') filtered.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
+  else if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price)
+  else if (sort === 'rating') filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+  else if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name, 'es-CL'))
+  else if (sort === 'popular') {
+    filtered.sort((a, b) => Number(Boolean(b.badge)) - Number(Boolean(a.badge)))
+  }
 
   return (
-    <section id="productos" aria-label="Productos" className="bg-canvas pb-8 md:pb-12">
-      <div className="store-container pt-6 pb-4">
-        <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
-          <div>
-            <p className="text-mora-dark font-heading font-bold text-sm mb-2">Tu compra de la semana</p>
-            <h2 className="text-ink font-heading font-black text-3xl sm:text-4xl">Arma tu canasta</h2>
-            <p className="text-muted text-sm mt-2">Frutas, verduras y packs. Elige tus productos y envía tu pedido desde la tienda.</p>
-          </div>
-          <div className="flex flex-wrap gap-3 text-xs text-muted">
-            <span className="inline-flex items-center gap-2"><Truck size={16} /> Reparto en {config.deliveryZone}</span>
-            <span className="inline-flex items-center gap-2"><MessageCircle size={16} /> WhatsApp opcional</span>
-          </div>
+    <section id="productos" aria-label="Productos" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
+      {/* Free Shipping Progress Indicator */}
+      <FreeShippingProgressBar currentSubtotal={cartSubtotal} threshold={20000} />
+
+      {/* Header & Sort Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200/80 pb-4">
+        <div>
+          <span className="text-xs uppercase font-bold tracking-wider text-emerald-600 font-heading">
+            Catálogo Individual
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black font-heading tracking-tight text-stone-900">
+            Verduras y Frutas Sueltas
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-500 font-body">
+            Selecciona kilo por kilo con maduración y frescura garantizada.
+          </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <label className="relative flex-1">
-            <span className="sr-only">Buscar productos</span>
-            <Search size={18} className="absolute left-4 top-3.5 text-muted" aria-hidden="true" />
-            <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Busca tomate, palta, lechuga…" className="w-full rounded-xl bg-surface border border-border pl-11 pr-4 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:border-mora" />
-          </label>
-          <label>
-            <span className="sr-only">Ordenar productos</span>
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="w-full sm:w-auto rounded-xl bg-canvas border border-border p-3 text-sm text-ink focus:outline-none focus:border-mora">
-              <option value="default">Orden del catálogo</option>
-              <option value="featured">Destacados primero</option>
-              <option value="price-asc">Menor precio</option>
-              <option value="price-desc">Mayor precio</option>
+
+        {/* Search & Sort Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Quick search input */}
+          <div className="relative min-w-[200px] sm:min-w-[240px]">
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Filtrar verdura o fruta..."
+              className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition font-body text-stone-800"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
+                aria-label="Limpiar filtro"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="flex items-center gap-1.5 text-xs text-stone-500">
+            <SlidersHorizontal size={14} className="text-stone-400" />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs text-stone-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer shadow-sm"
+              aria-label="Ordenar productos"
+            >
+              <option value="popular">Más Populares</option>
+              <option value="price-asc">Menor Precio</option>
+              <option value="price-desc">Mayor Precio</option>
+              <option value="rating">Mejor Calificación</option>
               <option value="name">Nombre: A a Z</option>
             </select>
-          </label>
-        </div>
-        <div className="mt-3 flex justify-between items-center gap-3 text-xs text-muted">
-          <p role="status">{filtered.length} producto{filtered.length === 1 ? '' : 's'}</p>
-          {(search || selectedCategory) && <button onClick={() => { setSearch(''); onSelectCategory(null) }} className="text-ink hover:underline">Limpiar filtros</button>}
+          </div>
         </div>
       </div>
-      <div className="store-container pb-5"><FreeShippingBanner /></div>
+
+      {/* Category Chips Filter */}
       <CategoryChips selectedCategory={selectedCategory} onSelectCategory={onSelectCategory} />
-      <ProductGrid products={filtered} emptyMessage="No encontramos productos con estos filtros. Prueba otra búsqueda." />
+
+      {/* Product Results Status */}
+      <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+        <span>
+          Mostrando <strong className="text-stone-800">{filtered.length}</strong> producto{filtered.length === 1 ? '' : 's'}
+        </span>
+        {(search || selectedCategory) && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearch('')
+              onSelectCategory(null)
+            }}
+            className="text-emerald-700 font-semibold hover:underline"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
+      {/* Products Grid */}
+      <ProductGrid
+        products={filtered}
+        emptyMessage="No encontramos productos con estos filtros. Prueba buscar con otro término."
+      />
     </section>
   )
 }

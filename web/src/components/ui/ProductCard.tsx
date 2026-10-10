@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Minus, Plus, Eye } from 'lucide-react'
+import { Minus, Plus, Eye, MapPin } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import QuickViewModal from './QuickViewModal'
 import { UNIT_LABELS } from '../../config'
@@ -8,11 +7,8 @@ import { getProduceImage } from '../../produce'
 import type { ProductCardProps } from '../../types'
 import { formatPrice } from '../../utils/cart'
 
-const EASE = [0.25, 1, 0.5, 1] as const
-
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart, incrementQuantity, decrementQuantity, cart } = useCart()
-  const [isHovered, setIsHovered] = useState(false)
   const [quickViewOpen, setQuickViewOpen] = useState(false)
 
   const cartItem = cart.find((i) => i.cartItemId === product.id)
@@ -34,128 +30,134 @@ export default function ProductCard({ product }: ProductCardProps) {
   const produceImage = getProduceImage(product)
 
   return (
-    <motion.article
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      whileTap={{ scale: 0.97 }}
-      animate={{
-        y: isHovered ? -4 : 0,
-        boxShadow: isHovered
-          ? '0 24px 56px -12px rgba(26,26,26,0.2), 0 8px 20px -8px rgba(26,26,26,0.08)'
-          : '0 2px 8px rgba(26,26,26,0.04)',
-      }}
-      transition={{ duration: 0.35, ease: EASE }}
-      className="min-w-0 h-full flex flex-col bg-surface border border-border rounded-2xl overflow-hidden"
-      role="group"
-      aria-label={product.name}
-    >
-      <div
-        className="relative shrink-0 overflow-hidden aspect-square"
-        style={{
-          background: `linear-gradient(135deg, ${product.gradientFrom} 0%, ${product.gradientTo} 100%)`,
-        }}
+    <>
+      <article
+        className="rounded-2xl border border-stone-200/90 bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+        aria-label={product.name}
       >
-        {produceImage ? (
-          <motion.img
-            src={produceImage}
-            alt=""
-            className="absolute inset-0 w-full h-full object-contain p-3 select-none pointer-events-none"
-            animate={{ scale: isHovered ? 1.1 : 1 }}
-            transition={{ duration: 0.38, ease: EASE }}
-            loading="lazy"
-            draggable={false}
-          />
-        ) : (
-          <motion.span
-            className="absolute inset-0 flex items-center justify-center text-7xl select-none"
-            animate={{ scale: isHovered ? 1.12 : 1 }}
-            transition={{ duration: 0.38, ease: EASE }}
-            aria-hidden="true"
+        <div>
+          {/* Image + Quick View trigger + Harvest pill */}
+          <div
+            className="relative h-44 overflow-hidden flex items-center justify-center select-none"
+            style={{
+              background: `linear-gradient(135deg, ${product.gradientFrom} 0%, ${product.gradientTo} 100%)`,
+            }}
           >
-            {product.emoji}
-          </motion.span>
-        )}
+            {produceImage ? (
+              <img
+                src={produceImage}
+                alt={product.name}
+                className="w-32 h-32 object-contain group-hover:scale-108 transition-transform duration-500 drop-shadow-md select-none pointer-events-none"
+                loading="lazy"
+                draggable={false}
+              />
+            ) : (
+              <span className="text-7xl drop-shadow-md select-none" aria-hidden="true">
+                {product.emoji}
+              </span>
+            )}
 
-        {product.badge && (
-          <div className="absolute top-3 left-3 bg-cocoa text-sand text-[10px] font-heading font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
-            {product.badge}
+            {/* Top-left Badge */}
+            {product.badge && (
+              <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-heading font-black uppercase px-2 py-0.5 rounded-full shadow-sm">
+                {product.badge}
+              </div>
+            )}
+
+            {/* Quick View Button (hover desktop, always accessible via tap/click) */}
+            <button
+              type="button"
+              onClick={() => setQuickViewOpen(true)}
+              className="absolute top-2.5 right-2.5 p-2 rounded-xl bg-white/90 hover:bg-white text-stone-700 shadow-md backdrop-blur-md opacity-90 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-105 active:scale-95"
+              aria-label={`Vista rápida de ${product.name}`}
+              title="Vista rápida"
+            >
+              <Eye size={15} />
+            </button>
+
+            {/* Harvest Location Origin */}
+            {product.harvest && (
+              <div className="absolute bottom-2.5 left-2.5 bg-stone-950/80 backdrop-blur-md text-stone-200 text-[10px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shadow">
+                <MapPin size={11} className="text-emerald-400" />
+                <span className="truncate max-w-[150px]">{product.harvest}</span>
+              </div>
+            )}
           </div>
-        )}
 
-        <motion.div
-          className="absolute inset-x-3 bottom-3 z-10"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: EASE }}
-        >
-          <button
-            type="button"
-            aria-label={`Vista rápida de ${product.name}`}
-            className={[
-              'w-full flex items-center justify-center gap-2 py-2.5 rounded-xl',
-              'font-heading font-bold text-xs uppercase tracking-widest text-white',
-              'bg-charcoal/80 backdrop-blur-sm hover:bg-charcoal/95',
-              'transition-colors duration-200 cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
-            ].join(' ')}
-            onClick={() => setQuickViewOpen(true)}
-          >
-            <Eye size={14} aria-hidden="true" />
-            Vista Rápida
-          </button>
-        </motion.div>
-      </div>
+          {/* Content info */}
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-stone-400 font-medium">
+              <span className="truncate">{product.category}</span>
+              {product.unitDetail ? (
+                <span className="font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px]">
+                  {product.unitDetail}
+                </span>
+              ) : (
+                <span className="capitalize">{UNIT_LABELS[product.unit] || product.unit}</span>
+              )}
+            </div>
 
-      <div className="flex flex-col flex-1 p-2.5 sm:p-3 gap-2">
-        <div className="flex flex-col items-start gap-1.5">
-          <span className="text-[10px] font-heading font-bold text-muted uppercase tracking-wide">
-            {product.category}
-          </span>
-          <span className="font-heading font-black text-mora-dark text-lg leading-none whitespace-nowrap tabular-nums">
-            {formatPrice(product.price)}
-          </span>
+            <h3
+              onClick={() => setQuickViewOpen(true)}
+              className="font-heading font-black text-base text-stone-900 leading-snug cursor-pointer hover:text-emerald-700 transition"
+            >
+              {product.name}
+            </h3>
+
+            <p className="text-[11px] text-stone-500 font-body line-clamp-1 leading-relaxed">
+              {product.nutrition || product.description}
+            </p>
+          </div>
         </div>
 
-        <h3 className="min-h-[2.5em] line-clamp-2 font-heading font-black text-charcoal text-sm sm:text-base leading-tight" title={product.name}>
-          {product.name}
-        </h3>
+        {/* Stepper / Add button Footer */}
+        <div className="p-4 pt-0 border-t border-stone-100 mt-2 flex items-center justify-between">
+          <div>
+            <div className="text-lg font-heading font-black text-stone-900 tabular-nums">
+              {formatPrice(product.price)}
+            </div>
+            <div className="text-[10px] text-stone-400 uppercase font-semibold">
+              por {UNIT_LABELS[product.unit] || product.unit}
+            </div>
+          </div>
 
-        <p className="text-xs font-heading font-bold text-muted uppercase tracking-widest">
-          {UNIT_LABELS[product.unit]}
-        </p>
-
-        <div className="flex items-center gap-3 mt-auto pt-1">
-          <div className="flex items-center gap-1 border border-cream-border rounded-xl overflow-hidden">
+          {qty > 0 ? (
+            <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-300 rounded-xl p-0.5">
+              <button
+                type="button"
+                onClick={handleDecrement}
+                className="w-7 h-7 rounded-lg bg-white text-stone-800 hover:bg-stone-100 flex items-center justify-center font-bold text-xs shadow-sm active:scale-95 transition"
+                aria-label={`Disminuir ${product.name}`}
+              >
+                <Minus size={13} />
+              </button>
+              <span className="font-heading font-bold text-xs text-emerald-900 w-5 text-center tabular-nums">
+                {qty}
+              </span>
+              <button
+                type="button"
+                onClick={handleIncrement}
+                className="w-7 h-7 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 flex items-center justify-center font-bold text-xs shadow-sm active:scale-95 transition"
+                aria-label={`Aumentar ${product.name}`}
+              >
+                <Plus size={13} />
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={handleDecrement}
-              aria-label="Reducir cantidad"
-              className="quantity-button border-0 rounded-none"
-              disabled={qty === 0}
-            >
-              <Minus size={13} />
-            </button>
-            <span
-              className="w-7 text-center text-sm font-heading font-bold text-charcoal select-none tabular-nums"
-              aria-live="polite"
-              aria-label={`Cantidad: ${qty}`}
-            >
-              {qty}
-            </span>
-            <button
+              type="button"
               onClick={handleIncrement}
-              disabled={qty >= 99}
-              aria-label="Aumentar cantidad"
-              className="quantity-button border-0 rounded-none"
+              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-emerald-700 text-white font-heading font-bold text-xs transition active:scale-95 flex items-center gap-1.5 shadow-sm"
+              aria-label={`Añadir ${product.name} al carrito`}
             >
-              <Plus size={13} />
+              <Plus size={14} />
+              <span>Añadir</span>
             </button>
-          </div>
+          )}
         </div>
-      </div>
-      <QuickViewModal
-        product={quickViewOpen ? product : null}
-        onClose={() => setQuickViewOpen(false)}
-      />
-    </motion.article>
+      </article>
+
+      <QuickViewModal product={quickViewOpen ? product : null} onClose={() => setQuickViewOpen(false)} />
+    </>
   )
 }

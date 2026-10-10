@@ -24,38 +24,36 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
   const totalCount = productList.length
 
   return (
-    <section aria-label="Filtro por categorías" className="sticky top-16 z-40 bg-surface/95 backdrop-blur border-y border-border">
-      <div className="store-container py-2 md:py-3">
-        <div className="flex items-center gap-2 overflow-x-auto py-1">
-          <button
-            onClick={() => onSelectCategory(null)}
-            aria-pressed={selectedCategory === null}
-            className={[
-              'whitespace-nowrap px-3 py-2.5 min-h-11 rounded-full text-sm font-heading font-bold border transition-colors',
-              selectedCategory === null
-                ? 'bg-mora border-mora text-white'
-                : 'border-border text-muted hover:text-ink hover:bg-surface',
-            ].join(' ')}
-          >
-            Todos {totalCount ? `(${totalCount})` : ''}
-          </button>
+    <section aria-label="Filtro por categorías" className="py-2">
+      <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-1">
+        <button
+          type="button"
+          onClick={() => onSelectCategory(null)}
+          aria-pressed={selectedCategory === null}
+          className={`px-3.5 py-2 rounded-xl text-xs font-heading font-bold transition whitespace-nowrap ${
+            selectedCategory === null
+              ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20'
+              : 'border border-stone-200 bg-white hover:bg-stone-100 text-stone-600'
+          }`}
+        >
+          Todos los productos {totalCount ? `(${totalCount})` : ''}
+        </button>
 
-          {categoryList.map(({ name }) => (
-            <button
-              key={name}
-              onClick={() => onSelectCategory(name)}
-              aria-pressed={selectedCategory === name}
-              className={[
-                'whitespace-nowrap px-3 py-2.5 min-h-11 rounded-full text-sm font-heading font-bold border transition-colors',
-                selectedCategory === name
-                  ? 'bg-mora border-mora text-white'
-                  : 'border-border text-muted hover:text-ink hover:bg-surface',
-              ].join(' ')}
-            >
-              {name} {counts[name] ? `(${counts[name]})` : ''}
-            </button>
-          ))}
-        </div>
+        {categoryList.map(({ name }) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => onSelectCategory(name)}
+            aria-pressed={selectedCategory === name}
+            className={`px-3.5 py-2 rounded-xl text-xs font-heading font-bold transition whitespace-nowrap ${
+              selectedCategory === name
+                ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20'
+                : 'border border-stone-200 bg-white hover:bg-stone-100 text-stone-600'
+            }`}
+          >
+            {name} {counts[name] ? `(${counts[name]})` : ''}
+          </button>
+        ))}
       </div>
     </section>
   )

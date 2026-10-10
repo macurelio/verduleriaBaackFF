@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSiteConfig } from './hooks/useSiteConfig'
-import { CartProvider } from './context/CartContext'
+import { CartProvider, useCart } from './context/CartContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import HeroSection from './components/sections/HeroSection'
 import ProductsShowcaseSection from './components/sections/ProductsShowcaseSection'
-
 import PromoSection from './components/sections/PromoSection'
 import PackBuilder from './components/sections/PackBuilder'
 import B2BSection from './components/sections/B2BSection'
@@ -15,6 +14,8 @@ import OfferModal from './components/ui/OfferModal'
 import MiniCartBar from './components/ui/MiniCartBar'
 import CartDrawer from './components/ui/CartDrawer'
 import ChatAssistant from './components/ui/ChatAssistant'
+import PackPromoCallout from './components/ui/PackPromoCallout'
+import PackBuilderModal from './components/ui/PackBuilderModal'
 import { MotionConfig } from 'framer-motion'
 
 function useSessionRedirects() {
@@ -27,32 +28,122 @@ function useSessionRedirects() {
 
 function AppContent() {
   const { brandName, deliveryZone } = useSiteConfig()
+  const { setCouponCode } = useCart()
+
   const [offerOpen, setOfferOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const [packBuilderOpen, setPackBuilderOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
   useSessionRedirects()
+
+  const showToast = (message: string) => {
+    setToastMessage(message)
+    clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => {
+      setToastMessage(null)
+    }, 3200)
+  }
 
   useEffect(() => {
     document.title = `${brandName} — Frutas y verduras a domicilio`
-    document.querySelector('meta[name="description"]')?.setAttribute('content', `${brandName}: frutas, verduras y packs a domicilio en ${deliveryZone}. Arma tu canasta y confirma por WhatsApp.`)
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `${brandName}: frutas, verduras y packs a domicilio en ${deliveryZone}. Arma tu canasta y confirma por WhatsApp.`,
+      )
   }, [brandName, deliveryZone])
 
+  const handleApplyCoupon = (code: string) => {
+    setCouponCode(code)
+    showToast(`¡Cupón ${code} aplicado al pedido!`)
+  }
+
   return (
-    <div className="min-h-screen bg-canvas pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
-      <a href="#productos" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-surface focus:p-3 focus:rounded-xl">Ir a productos</a>
-      <OfferBanner onOpenOffer={() => setOfferOpen(true)} />
-      <Navbar onOpenCart={() => setCartOpen(true)} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+    <div className="min-h-screen bg-stone-50/50 text-stone-900 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 font-body selection:bg-emerald-500 selection:text-white">
+      <a
+        href="#productos"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-stone-900 focus:p-3 focus:rounded-xl focus:shadow-lg focus:border focus:border-stone-300"
+      >
+        Ir a productos
+      </a>
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed top-24 right-4 sm:right-6 z-50 flex items-center gap-3 px-4 py-3 bg-stone-950 text-white rounded-2xl shadow-2xl border border-stone-800 text-xs sm:text-sm font-medium animate-bounce"
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0 animate-ping" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Top Announcement Bar */}
+      <OfferBanner
+        onOpenOffer={() => setOfferOpen(true)}
+        onApplyCoupon={handleApplyCoupon}
+      />
+
+      {/* Main Header / Navbar */}
+      <Navbar
+        onOpenCart={() => setCartOpen(true)}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onOpenPackBuilder={() => setPackBuilderOpen(true)}
+      />
+
       <main>
-        <HeroSection />
-        <ProductsShowcaseSection selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
-        <PromoSection />
+        {/* Hero Section */}
+        <HeroSection onOpenPackBuilder={() => setPackBuilderOpen(true)} />
+
+        {/* Callout Banner: Custom Pack Promotion */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <PackPromoCallout onOpenPackBuilder={() => setPackBuilderOpen(true)} />
+        </div>
+
+        {/* Pre-made Packs Showcase */}
+        <PromoSection onOpenPackBuilder={() => setPackBuilderOpen(true)} />
+
+        {/* Loose Produce Showcase with Filters & Search */}
+        <ProductsShowcaseSection
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+
+        {/* Inline Pack Builder Section */}
         <PackBuilder />
+
+        {/* B2B / Wholesale Section */}
         <B2BSection />
+
+        {/* CTA / Final WhatsApp Conversion */}
         <CTASection />
       </main>
+
+      {/* Footer */}
       <Footer />
+
+      {/* Modals & Overlays */}
       <OfferModal open={offerOpen} onClose={() => setOfferOpen(false)} />
-      <MiniCartBar onOpenCart={() => setCartOpen(true)} />
+      <PackBuilderModal
+        open={packBuilderOpen}
+        onClose={() => setPackBuilderOpen(false)}
+        onSuccess={showToast}
+      />
+      <MiniCartBar
+        onOpenCart={() => setCartOpen(true)}
+        onOpenPackBuilder={() => setPackBuilderOpen(true)}
+      />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       <ChatAssistant />
     </div>

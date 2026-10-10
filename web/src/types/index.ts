@@ -25,6 +25,13 @@ export interface Product {
   gradientTo: string
   featured?: boolean
   source?: 'promotion' | 'custom-pack'
+  harvest?: string
+  nutrition?: string
+  recipeTip?: string
+  unitDetail?: string
+  rating?: number
+  reviewsCount?: number
+  image?: string
 }
 
 // ─── Category ────────────────────────────────────────────────────────────────
