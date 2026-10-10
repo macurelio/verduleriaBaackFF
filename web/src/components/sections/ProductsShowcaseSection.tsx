@@ -7,6 +7,7 @@ import CategoryChips from '../ui/CategoryChips'
 import ProductGrid from '../ui/ProductGrid'
 import FreeShippingProgressBar from '../ui/FreeShippingProgressBar'
 import { useCart } from '../../context/CartContext'
+import { useTheme } from '../../context/ThemeContext'
 
 interface ProductsShowcaseProps {
   selectedCategory: string | null
@@ -24,6 +25,7 @@ export default function ProductsShowcaseSection({
   const [internalSearch, setInternalSearch] = useState('')
   const [sort, setSort] = useState('popular')
   const { getCartTotal } = useCart()
+  const { theme } = useTheme()
   const cartSubtotal = getCartTotal()
 
   const search = externalSetSearch ? externalSearch : internalSearch
@@ -64,15 +66,15 @@ export default function ProductsShowcaseSection({
       <FreeShippingProgressBar currentSubtotal={cartSubtotal} threshold={20000} />
 
       {/* Header & Sort Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200/80 pb-4">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b ${theme.border} pb-4`}>
         <div>
           <span className="text-xs uppercase font-bold tracking-wider text-emerald-600 font-heading">
             Catálogo Individual
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black font-heading tracking-tight text-stone-900">
+          <h2 className={`text-2xl sm:text-3xl font-black font-heading tracking-tight ${theme.textMain}`}>
             Verduras y Frutas Sueltas
           </h2>
-          <p className="text-xs sm:text-sm text-stone-500 font-body">
+          <p className={`text-xs sm:text-sm ${theme.textMuted} font-body`}>
             Selecciona kilo por kilo con maduración y frescura garantizada.
           </p>
         </div>
@@ -87,7 +89,7 @@ export default function ProductsShowcaseSection({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filtrar verdura o fruta..."
-              className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition font-body text-stone-800"
+              className={`w-full pl-9 pr-8 py-2 text-xs rounded-xl border ${theme.border} ${theme.cardBg} ${theme.textMain} placeholder:${theme.textMuted} focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition font-body`}
             />
             {search && (
               <button
@@ -107,7 +109,7 @@ export default function ProductsShowcaseSection({
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs text-stone-800 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer shadow-sm"
+              className={`border ${theme.border} ${theme.cardBg} ${theme.textMain} rounded-xl px-2.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer shadow-sm`}
               aria-label="Ordenar productos"
             >
               <option value="popular">Más Populares</option>
@@ -124,9 +126,9 @@ export default function ProductsShowcaseSection({
       <CategoryChips selectedCategory={selectedCategory} onSelectCategory={onSelectCategory} />
 
       {/* Product Results Status */}
-      <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+      <div className={`flex items-center justify-between text-xs ${theme.textMuted} px-1`}>
         <span>
-          Mostrando <strong className="text-stone-800">{filtered.length}</strong> producto{filtered.length === 1 ? '' : 's'}
+          Mostrando <strong className={theme.textMain}>{filtered.length}</strong> producto{filtered.length === 1 ? '' : 's'}
         </span>
         {(search || selectedCategory) && (
           <button
@@ -135,7 +137,7 @@ export default function ProductsShowcaseSection({
               setSearch('')
               onSelectCategory(null)
             }}
-            className="text-emerald-700 font-semibold hover:underline"
+            className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
           >
             Limpiar filtros
           </button>

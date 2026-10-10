@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSiteConfig } from './hooks/useSiteConfig'
 import { CartProvider, useCart } from './context/CartContext'
+import { ThemeProvider, useTheme } from './context/ThemeContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import HeroSection from './components/sections/HeroSection'
@@ -29,6 +30,7 @@ function useSessionRedirects() {
 function AppContent() {
   const { brandName, deliveryZone } = useSiteConfig()
   const { setCouponCode } = useCart()
+  const { theme } = useTheme()
 
   const [offerOpen, setOfferOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
@@ -64,7 +66,9 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50/50 text-stone-900 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 font-body selection:bg-emerald-500 selection:text-white">
+    <div
+      className={`min-h-screen ${theme.bg} ${theme.textMain} pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 font-body selection:bg-emerald-500 selection:text-white transition-colors duration-300`}
+    >
       <a
         href="#productos"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-stone-900 focus:p-3 focus:rounded-xl focus:shadow-lg focus:border focus:border-stone-300"
@@ -153,9 +157,11 @@ function AppContent() {
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <CartProvider>
-        <AppContent />
-      </CartProvider>
+      <ThemeProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </ThemeProvider>
     </MotionConfig>
   )
 }

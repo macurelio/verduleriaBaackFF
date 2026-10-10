@@ -1,5 +1,6 @@
 import { Instagram, MessageCircle, Heart } from 'lucide-react'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
+import ThemeSwitcher from '../ui/ThemeSwitcher'
 
 const FOOTER_LINKS = [
   { label: 'Inicio', href: '#inicio' },
@@ -82,13 +83,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <p className="flex items-center gap-2">
             &copy; {year} {BRAND_NAME}. Todos los derechos reservados.
           </p>
-          <p className="flex items-center gap-1">
-            Hecho con <Heart size={12} className="fill-sand text-sand mx-0.5" /> en Chile
-          </p>
+          <div className="flex items-center gap-4">
+            <ThemeSwitcher />
+            <p className="flex items-center gap-1 text-white/70">
+              Hecho con <Heart size={12} className="fill-sand text-sand mx-0.5" /> en Chile
+            </p>
+          </div>
         </div>
       </div>
     </footer>

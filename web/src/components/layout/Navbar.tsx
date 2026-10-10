@@ -3,6 +3,8 @@ import { Leaf, Search, ShoppingBag, Sparkles, X, Menu } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
 import { formatPrice } from '../../utils/cart'
+import { useTheme } from '../../context/ThemeContext'
+import ThemeSwitcher from '../ui/ThemeSwitcher'
 
 interface NavbarProps {
   onOpenCart: () => void
@@ -23,14 +25,12 @@ export default function Navbar({
 }: NavbarProps) {
   const { brandName } = useSiteConfig()
   const { getCartCount, getCartTotal } = useCart()
-  const [scrolled, setScrolled] = useState(false)
+  const { theme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    // Keep header state synchronized
   }, [])
 
   const cartCount = getCartCount()
@@ -49,11 +49,7 @@ export default function Navbar({
   return (
     <header
       ref={headerRef}
-      className={`sticky top-0 z-40 transition-all duration-200 border-b ${
-        scrolled
-          ? 'bg-white/95 backdrop-blur-md border-stone-200 shadow-sm'
-          : 'bg-white/90 backdrop-blur-md border-stone-200/70'
-      }`}
+      className={`sticky top-0 z-40 transition-colors duration-200 border-b ${theme.headerBg} ${theme.border} shadow-sm`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand / Logo */}
@@ -67,14 +63,14 @@ export default function Navbar({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="font-heading font-black text-lg sm:text-xl text-stone-900 tracking-tight">
+              <span className={`font-heading font-black text-lg sm:text-xl ${theme.textMain} tracking-tight`}>
                 {brandName}
               </span>
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                 Gran Santiago
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-stone-500 flex items-center gap-1.5 font-medium">
+            <p className={`text-[11px] sm:text-xs ${theme.textMuted} flex items-center gap-1.5 font-medium`}>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Cosecha de hoy • Directo a tu puerta
             </p>
@@ -92,7 +88,7 @@ export default function Navbar({
               placeholder="Buscar palta, espinaca, lechuga, tomates..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 text-sm rounded-xl border border-stone-200 bg-stone-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition text-stone-800 placeholder:text-stone-400 font-body"
+              className={`w-full pl-10 pr-9 py-2.5 text-sm rounded-xl border ${theme.border} ${theme.cardBg} ${theme.textMain} placeholder:${theme.textMuted} focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition font-body`}
             />
             {searchQuery && (
               <button
@@ -107,8 +103,10 @@ export default function Navbar({
           </div>
         )}
 
-        {/* Actions: Pack Builder Button & Cart */}
+        {/* Actions: Theme Switcher, Pack Builder Button & Cart */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeSwitcher className="hidden lg:inline-flex" />
+
           <button
             type="button"
             onClick={handlePackClick}
@@ -142,7 +140,7 @@ export default function Navbar({
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition"
+            className={`md:hidden p-2 rounded-xl ${theme.textMain} hover:bg-stone-100 dark:hover:bg-zinc-800 transition`}
             aria-label="Abrir menú"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -152,7 +150,7 @@ export default function Navbar({
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-stone-200 bg-white px-4 py-4 space-y-3 shadow-lg">
+        <div className={`md:hidden border-t ${theme.border} ${theme.cardBg} px-4 py-4 space-y-3 shadow-lg`}>
           {onSearchChange && (
             <div className="relative">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
@@ -161,7 +159,7 @@ export default function Navbar({
                 placeholder="Buscar frutas o verduras..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 text-sm rounded-xl border border-stone-200 bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+                className={`w-full pl-10 pr-9 py-2.5 text-sm rounded-xl border ${theme.border} ${theme.cardBg} ${theme.textMain} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
               />
               {searchQuery && (
                 <button
@@ -187,13 +185,13 @@ export default function Navbar({
             <a
               href="#packs"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center py-2.5 px-3 rounded-xl bg-stone-100 text-stone-800 text-xs font-heading font-bold hover:bg-stone-200 text-center"
+              className="flex items-center justify-center py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-zinc-800 text-stone-800 dark:text-zinc-100 text-xs font-heading font-bold text-center"
             >
               Ver Packs Listos
             </a>
           </div>
 
-          <div className="flex flex-col gap-1 text-sm font-semibold text-stone-700 pt-2 border-t border-stone-100">
+          <div className="flex flex-col gap-1 text-sm font-semibold pt-2 border-t border-stone-200/50">
             <a
               href="#productos"
               onClick={() => {
@@ -201,7 +199,7 @@ export default function Navbar({
                 setMobileMenuOpen(false)
               }}
               className={`py-2 px-3 rounded-lg ${
-                selectedCategory === null ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-stone-50'
+                selectedCategory === null ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-stone-50 dark:hover:bg-zinc-800'
               }`}
             >
               Todos los Productos
@@ -209,17 +207,22 @@ export default function Navbar({
             <a
               href="#trabaja"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-3 rounded-lg hover:bg-stone-50"
+              className="py-2 px-3 rounded-lg hover:bg-stone-50 dark:hover:bg-zinc-800"
             >
               Ventas Mayoristas & Empresas
             </a>
             <a
               href="#contacto"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-3 rounded-lg hover:bg-stone-50"
+              className="py-2 px-3 rounded-lg hover:bg-stone-50 dark:hover:bg-zinc-800"
             >
               Preguntas & Despacho
             </a>
+          </div>
+
+          <div className="pt-3 border-t border-stone-200/50 flex items-center justify-between">
+            <span className={`text-xs font-bold ${theme.textMuted}`}>Tema visual:</span>
+            <ThemeSwitcher />
           </div>
         </div>
       )}

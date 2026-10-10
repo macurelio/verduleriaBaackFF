@@ -3,6 +3,7 @@ import { products } from '../../data/products'
 import { CATEGORIES } from '../../data/categories'
 import { fetchProducts, fetchCategories } from '../../api/catalog'
 import { useApiResource } from '../../api/useApiResource'
+import { useTheme } from '../../context/ThemeContext'
 
 interface CategoryChipsProps {
   selectedCategory: string | null
@@ -12,6 +13,7 @@ interface CategoryChipsProps {
 export default function CategoryChips({ selectedCategory, onSelectCategory }: CategoryChipsProps) {
   const categoryList = useApiResource('categories', fetchCategories, CATEGORIES)
   const productList = useApiResource('products', fetchProducts, products)
+  const { theme } = useTheme()
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {}
@@ -33,7 +35,7 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
           className={`px-3.5 py-2 rounded-xl text-xs font-heading font-bold transition whitespace-nowrap ${
             selectedCategory === null
               ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20'
-              : 'border border-stone-200 bg-white hover:bg-stone-100 text-stone-600'
+              : `border ${theme.border} ${theme.cardBg} ${theme.textMuted} hover:bg-stone-100 dark:hover:bg-zinc-800`
           }`}
         >
           Todos los productos {totalCount ? `(${totalCount})` : ''}
@@ -48,7 +50,7 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
             className={`px-3.5 py-2 rounded-xl text-xs font-heading font-bold transition whitespace-nowrap ${
               selectedCategory === name
                 ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20'
-                : 'border border-stone-200 bg-white hover:bg-stone-100 text-stone-600'
+                : `border ${theme.border} ${theme.cardBg} ${theme.textMuted} hover:bg-stone-100 dark:hover:bg-zinc-800`
             }`}
           >
             {name} {counts[name] ? `(${counts[name]})` : ''}
