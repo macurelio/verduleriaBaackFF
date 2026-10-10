@@ -34,9 +34,19 @@ export default function OfferBanner({ onOpenOffer, onApplyCoupon }: OfferBannerP
           <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 pr-10">
             {/* Left promo info */}
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-heading font-bold text-[10px] sm:text-[11px] border border-emerald-500/30 uppercase tracking-wider">
-                <Sparkles size={11} className="text-emerald-400" /> Oferta Especial
-              </span>
+              {onOpenOffer ? (
+                <button
+                  type="button"
+                  onClick={onOpenOffer}
+                  className="inline-flex items-center gap-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded-full font-heading font-bold text-[10px] sm:text-[11px] border border-emerald-500/30 uppercase tracking-wider transition-colors cursor-pointer"
+                >
+                  <Sparkles size={11} className="text-emerald-400" /> Oferta Especial
+                </button>
+              ) : (
+                <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-heading font-bold text-[10px] sm:text-[11px] border border-emerald-500/30 uppercase tracking-wider">
+                  <Sparkles size={11} className="text-emerald-400" /> Oferta Especial
+                </span>
+              )}
               <span className="hidden md:inline text-emerald-600">•</span>
               <p className="text-center sm:text-left text-[11px] sm:text-xs text-emerald-100">
                 10% DCTO en tu compra con el cupón{' '}
@@ -53,7 +63,7 @@ export default function OfferBanner({ onOpenOffer, onApplyCoupon }: OfferBannerP
                 <button
                   type="button"
                   onClick={onOpenOffer}
-                  className="hidden lg:inline-flex items-center text-[11px] font-semibold text-emerald-300 hover:text-white underline underline-offset-2 ml-1"
+                  className="inline-flex items-center text-[11px] font-semibold text-emerald-300 hover:text-white underline underline-offset-2 ml-1 cursor-pointer"
                 >
                   Ver packs en oferta →
                 </button>

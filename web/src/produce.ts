@@ -39,12 +39,8 @@ import zapalloSvg from './assets/produce/zapallo.svg'
 // ─────────────────────────────────────────────────────────────────────────────
 // Imágenes de frutas y verduras.
 //  - Fuente principal: fotos PNG fotorrealistas generadas con IA (768×768).
-//  - Fallback: ilustraciones SVG ("Open Crop Icons" de openfarmcc, CC0 /
-//    dominio público, https://github.com/openfarmcc/open-crop-icons; palta y
-//    limón son ilustraciones propias en el mismo estilo).
-//  - Último recurso: el emoji del producto (ver componentes).
-// El mapeo prioriza el id del producto (catálogo fijo) y cae al emoji como
-// fallback para productos nuevos creados desde el admin.
+//  - Fallback: ilustraciones SVG ("Open Crop Icons").
+//  - Fallback contextual por nombre de producto y por emoji.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PHOTO_BY_ID: Record<string, string> = {
@@ -84,7 +80,7 @@ const SVG_BY_ID: Record<string, string> = {
 const PHOTO_BY_EMOJI: Record<string, string> = {
   '🥬': lechuga,
   '🍃': espinaca,
-  '🥗': ensalada,
+  '🥗': acelga,
   '🌿': cilantro,
   '🥔': papa,
   '🧅': cebolla,
@@ -98,12 +94,16 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🧺': canasta,
   '🍓': frutilla,
   '🎃': zapallo,
+  '🧄': cebolla,
+  '🥜': papa,
+  '🫐': frutilla,
+  '🍠': papa,
 }
 
 const SVG_BY_EMOJI: Record<string, string> = {
   '🥬': lechugaSvg,
   '🍃': espinacaSvg,
-  '🥗': ensaladaSvg,
+  '🥗': acelgaSvg,
   '🌿': cilantroSvg,
   '🥔': papaSvg,
   '🧅': cebollaSvg,
@@ -117,6 +117,10 @@ const SVG_BY_EMOJI: Record<string, string> = {
   '🧺': canastaSvg,
   '🍓': frutillaSvg,
   '🎃': zapalloSvg,
+  '🧄': cebollaSvg,
+  '🥜': papaSvg,
+  '🫐': frutillaSvg,
+  '🍠': papaSvg,
 }
 
 const CATEGORY_PHOTO: Record<string, string> = {
@@ -147,8 +151,34 @@ const PROMO_SVG: Record<string, string> = {
   'promo-4': zapalloSvg,
 }
 
+const NAME_KEYWORDS: [RegExp, string][] = [
+  [/lechuga/i, lechuga],
+  [/espinaca/i, espinaca],
+  [/acelga/i, acelga],
+  [/rucula|rúcula/i, rucula],
+  [/papa/i, papa],
+  [/cebolla/i, cebolla],
+  [/zanahoria/i, zanahoria],
+  [/betarraga|remolacha/i, betarraga],
+  [/tomate/i, tomate],
+  [/palta|aguacate/i, palta],
+  [/limon|limón/i, limon],
+  [/platano|plátano|banana/i, platano],
+  [/cilantro/i, cilantro],
+  [/perejil/i, perejil],
+  [/albahaca/i, cilantro],
+  [/frutilla|fresa/i, frutilla],
+  [/zapallo|calabaza/i, zapallo],
+  [/camote/i, papa],
+  [/arandano|arándano/i, frutilla],
+  [/aceituna/i, betarraga],
+  [/ajo/i, cebolla],
+  [/almendra/i, papa],
+]
+
 export interface ProduceLike {
   id?: string
+  name?: string
   emoji?: string
   image?: string
 }
@@ -158,6 +188,11 @@ export function getProduceImage(item: ProduceLike | null | undefined): string | 
   if (item.image) return item.image
   if (item.id && PHOTO_BY_ID[item.id]) return PHOTO_BY_ID[item.id]
   if (item.id && SVG_BY_ID[item.id]) return SVG_BY_ID[item.id]
+  if (item.name) {
+    for (const [pattern, img] of NAME_KEYWORDS) {
+      if (pattern.test(item.name)) return img
+    }
+  }
   if (item.emoji) return PHOTO_BY_EMOJI[item.emoji] ?? SVG_BY_EMOJI[item.emoji]
   return undefined
 }

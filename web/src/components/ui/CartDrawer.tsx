@@ -11,6 +11,7 @@ import Dialog from './Dialog'
 import CartItems from './CartItems'
 import DeliveryFields from './DeliveryFields'
 import FreeShippingBanner from './FreeShippingBanner'
+import FreeShippingAlertModal from './FreeShippingAlertModal'
 
 const emptyForm: DeliveryForm = { name: '', phone: '', address: '', comuna: '', date: '', window: '', payment: '', notes: '' }
 
@@ -24,6 +25,9 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   const [form, setForm] = useState<DeliveryForm>(emptyForm)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [shippingAlertOpen, setShippingAlertOpen] = useState(false)
+  const [confirmedWithoutFreeShipping, setConfirmedWithoutFreeShipping] = useState(false)
+  const [pendingWhatsappChoice, setPendingWhatsappChoice] = useState(true)
   const [orderNote, setOrderNote] = useState('')
   const [orderError, setOrderError] = useState('')
   const [whatsappUrl, setWhatsappUrl] = useState('')
@@ -60,6 +64,18 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
       }
       return
     }
+
+    // Si no alcanza el mínimo para envío gratis ($20.000) y aún no lo ha confirmado, mostrar modal de alerta
+    if (!amounts.isFreeShipping && !confirmedWithoutFreeShipping && amounts.amountNeeded > 0 && !alreadySaved) {
+      setPendingWhatsappChoice(withWhatsapp)
+      setShippingAlertOpen(true)
+      return
+    }
+
+    await executeSubmit(withWhatsapp)
+  }
+
+  const executeSubmit = async (withWhatsapp: boolean) => {
     if (submitLock.current) return
     if (alreadySaved) {
       if (withWhatsapp && whatsappUrl) window.open(whatsappUrl, '_blank', 'noopener noreferrer')
@@ -103,7 +119,9 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
     }
   }
 
-  return <Dialog open={open} onClose={onClose} titleId="cart-title" drawer>
+  return (
+    <>
+      <Dialog open={open} onClose={onClose} titleId="cart-title" drawer>
     <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
       <h2 id="cart-title" className="flex gap-2 items-center font-heading font-bold text-xl"><ShoppingCart size={20} aria-hidden="true" /> Tu pedido</h2>
       <button type="button" onClick={onClose} aria-label="Cerrar carrito" className="quantity-button"><X size={20} /></button>
@@ -143,4 +161,26 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
       <p className="text-xs text-muted text-center">No se cobra en línea. En WhatsApp debes enviar el mensaje.</p>
     </div>}
   </Dialog>
+
+  <FreeShippingAlertModal
+    open={shippingAlertOpen}
+    onClose={() => setShippingAlertOpen(false)}
+    amountNeeded={amounts.amountNeeded}
+    currentSubtotal={amounts.subtotal}
+    threshold={config.freeShippingOver}
+    shippingFee={amounts.shipping}
+    onAddMoreItems={() => {
+      setShippingAlertOpen(false)
+      onClose()
+      const el = document.getElementById('productos')
+      el?.scrollIntoView({ behavior: 'smooth' })
+    }}
+    onProceedAnyway={() => {
+      setConfirmedWithoutFreeShipping(true)
+      setShippingAlertOpen(false)
+      executeSubmit(pendingWhatsappChoice)
+    }}
+    />
+  </>
+  )
 }
