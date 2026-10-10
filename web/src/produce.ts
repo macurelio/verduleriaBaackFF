@@ -17,6 +17,22 @@ import canasta from './assets/photos/canasta.png'
 import frutilla from './assets/photos/frutilla.png'
 import zapallo from './assets/photos/zapallo.png'
 
+// Nuevas fotos reales fotorrealistas de verduras, frutos secos y condimentos
+import ajo from './assets/photos/ajo.jpg'
+import aceituna from './assets/photos/aceituna.jpg'
+import albahaca from './assets/photos/albahaca.jpg'
+import almendra from './assets/photos/almendra.jpg'
+import arandano from './assets/photos/arandano.jpg'
+import camote from './assets/photos/camote.jpg'
+import pimiento from './assets/photos/pimiento.jpg'
+import choclo from './assets/photos/choclo.jpg'
+
+// Fotos reales dedicadas para categorías del mercado
+import catHojasVerdes from './assets/photos/cat_hojas_verdes.jpg'
+import catRaices from './assets/photos/cat_raices.jpg'
+import catFrutas from './assets/photos/cat_frutas.jpg'
+import catAromaticas from './assets/photos/cat_aromaticas.jpg'
+
 import lechugaSvg from './assets/produce/lechuga.svg'
 import espinacaSvg from './assets/produce/espinaca.svg'
 import acelgaSvg from './assets/produce/acelga.svg'
@@ -38,7 +54,7 @@ import zapalloSvg from './assets/produce/zapallo.svg'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Imágenes de frutas y verduras.
-//  - Fuente principal: fotos PNG fotorrealistas generadas con IA (768×768).
+//  - Fuente principal: fotos reales fotorrealistas de estudio (calidad 8k).
 //  - Fallback: ilustraciones SVG ("Open Crop Icons").
 //  - Fallback contextual por nombre de producto y por emoji.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -52,12 +68,20 @@ const PHOTO_BY_ID: Record<string, string> = {
   r2: cebolla,
   r3: zanahoria,
   r4: betarraga,
+  r5: camote,
   f1: tomate,
   f2: palta,
   f3: limon,
   f4: platano,
+  f5: arandano,
   a1: cilantro,
   a2: perejil,
+  a3: albahaca,
+  a4: ajo,
+  d1: aceituna,
+  d2: almendra,
+  v1: pimiento,
+  v2: choclo,
 }
 
 const SVG_BY_ID: Record<string, string> = {
@@ -81,11 +105,11 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🥬': lechuga,
   '🍃': espinaca,
   '🥗': acelga,
-  '🌿': cilantro,
+  '🌿': albahaca,
   '🥔': papa,
   '🧅': cebolla,
   '🥕': zanahoria,
-  '🫒': betarraga,
+  '🫒': aceituna,
   '🍅': tomate,
   '🥑': palta,
   '🍋': limon,
@@ -94,10 +118,12 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🧺': canasta,
   '🍓': frutilla,
   '🎃': zapallo,
-  '🧄': cebolla,
-  '🥜': papa,
-  '🫐': frutilla,
-  '🍠': papa,
+  '🧄': ajo,
+  '🥜': almendra,
+  '🫐': arandano,
+  '🍠': camote,
+  '🫑': pimiento,
+  '🌽': choclo,
 }
 
 const SVG_BY_EMOJI: Record<string, string> = {
@@ -124,10 +150,14 @@ const SVG_BY_EMOJI: Record<string, string> = {
 }
 
 const CATEGORY_PHOTO: Record<string, string> = {
-  'Hojas Verdes': ensalada,
-  'Raíces y Tubérculos': zanahoria,
-  Frutas: tomate,
-  'Hierbas y Aromáticas': perejil,
+  'Hojas Verdes': catHojasVerdes,
+  'Raíces y Tubérculos': catRaices,
+  Frutas: catFrutas,
+  'Hierbas y Aromáticas': catAromaticas,
+  'Frutos Secos': almendra,
+  Despensa: aceituna,
+  Packs: canasta,
+  Promociones: canasta,
 }
 
 const CATEGORY_SVG: Record<string, string> = {
@@ -156,6 +186,7 @@ const NAME_KEYWORDS: [RegExp, string][] = [
   [/espinaca/i, espinaca],
   [/acelga/i, acelga],
   [/rucula|rúcula/i, rucula],
+  [/camote|batata/i, camote],
   [/papa/i, papa],
   [/cebolla/i, cebolla],
   [/zanahoria/i, zanahoria],
@@ -164,16 +195,17 @@ const NAME_KEYWORDS: [RegExp, string][] = [
   [/palta|aguacate/i, palta],
   [/limon|limón/i, limon],
   [/platano|plátano|banana/i, platano],
+  [/albahaca/i, albahaca],
   [/cilantro/i, cilantro],
   [/perejil/i, perejil],
-  [/albahaca/i, cilantro],
+  [/ajo/i, ajo],
+  [/aceituna/i, aceituna],
+  [/almendra/i, almendra],
+  [/arandano|arándano|blueberry/i, arandano],
+  [/pimiento|morron|morrón/i, pimiento],
+  [/choclo|maiz|maíz/i, choclo],
   [/frutilla|fresa/i, frutilla],
   [/zapallo|calabaza/i, zapallo],
-  [/camote/i, papa],
-  [/arandano|arándano/i, frutilla],
-  [/aceituna/i, betarraga],
-  [/ajo/i, cebolla],
-  [/almendra/i, papa],
 ]
 
 export interface ProduceLike {
