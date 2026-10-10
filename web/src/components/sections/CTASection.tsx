@@ -23,7 +23,7 @@ export default function CTASection() {
       </div>
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        <span className="inline-block bg-white/10 text-white/60 text-xs font-heading font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5">
+        <span className="inline-block bg-white/10 text-white/90 text-xs font-heading font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5">
           ¿Listo para cocinar hoy?
         </span>
 
@@ -33,8 +33,8 @@ export default function CTASection() {
         </h2>
 
         <p className="font-body text-sand/80 text-sm sm:text-base max-w-xl mx-auto mb-6 leading-relaxed">
-          Entregamos en {DELIVERY_ZONE} el mismo día. Arma tu canasta, elige el
-          horario y te la llevamos a la puerta.
+          Despachamos en {DELIVERY_ZONE}. Arma tu canasta y solicita tu entrega;
+          la tienda confirmará disponibilidad, horario y forma de pago.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -65,12 +65,12 @@ export default function CTASection() {
           </Button>
         </div>
 
-        <div className="mt-6 flex flex-wrap justify-center gap-3 text-sand/70 text-xs font-heading font-bold uppercase tracking-wide">
+        <div className="mt-6 flex flex-wrap justify-center gap-3 text-sand/90 text-xs font-heading font-bold uppercase tracking-wide">
           {[
             `✓ Envío en ${DELIVERY_ZONE}`,
-            '✓ Pedido en 30 segundos',
-            '✓ Pagas al recibir',
-            '✓ Frescura garantizada',
+            '✓ Sin registro de cuenta',
+            '✓ Pago coordinado con la tienda',
+            '✓ WhatsApp disponible',
           ].map((badge) => (
             <span key={badge}>{badge}</span>
           ))}

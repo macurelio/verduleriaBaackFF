@@ -1,3 +1,4 @@
+import { theme } from '../theme';
 import React from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
@@ -39,7 +40,7 @@ export default function WorkWithUsModal({ visible, onClose }) {
         <View style={styles.topBar}>
           <View style={styles.handle} />
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <X color="#FFFFFF" size={20} />
+            <X color={theme.text} size={20} />
           </TouchableOpacity>
         </View>
 
@@ -62,7 +63,7 @@ export default function WorkWithUsModal({ visible, onClose }) {
           {BENEFITS.map(({ Icon, title, desc }) => (
             <View key={title} style={styles.benefitRow}>
               <View style={styles.benefitIcon}>
-                <Icon color="#80C45B" size={20} />
+                <Icon color={theme.accent} size={20} />
               </View>
               <View style={styles.benefitText}>
                 <Text style={styles.benefitTitle}>{title}</Text>
@@ -86,7 +87,7 @@ export default function WorkWithUsModal({ visible, onClose }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0E2C1C' },
+  container: { flex: 1, backgroundColor: theme.canvas },
   topBar: {
     paddingTop: 16, paddingHorizontal: 20, paddingBottom: 8,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
@@ -97,28 +98,28 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: '#1E1E1E', justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: theme.soft, justifyContent: 'center', alignItems: 'center',
+    borderWidth: 1, borderColor: theme.border,
   },
   content: { paddingHorizontal: 28, paddingBottom: 48, paddingTop: 12 },
   logoBadge: {
     width: 80, height: 80, borderRadius: 22,
-    backgroundColor: '#163D27',
+    backgroundColor: theme.surface,
     justifyContent: 'center', alignItems: 'center',
     marginBottom: 24, marginTop: 8,
     borderWidth: 1, borderColor: 'rgba(124,179,66,0.3)',
   },
   logoEmoji: { fontSize: 40 },
   eyebrow: {
-    color: '#80C45B', fontSize: 10, fontWeight: '800',
+    color: theme.accent, fontSize: 10, fontWeight: '800',
     letterSpacing: 2.5, marginBottom: 10,
   },
   headline: {
-    color: '#FFFFFF', fontSize: 28, fontWeight: '900',
+    color: theme.text, fontSize: 28, fontWeight: '900',
     letterSpacing: -0.5, lineHeight: 34, marginBottom: 14,
   },
   body: {
-    color: '#777777', fontSize: 15, lineHeight: 24, marginBottom: 28,
+    color: theme.muted, fontSize: 15, lineHeight: 24, marginBottom: 28,
   },
   divider: {
     height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginBottom: 28,
@@ -134,15 +135,15 @@ const styles = StyleSheet.create({
   },
   benefitText: { flex: 1 },
   benefitTitle: {
-    color: '#FFFFFF', fontSize: 15, fontWeight: '800', marginBottom: 4,
+    color: theme.text, fontSize: 15, fontWeight: '800', marginBottom: 4,
   },
-  benefitDesc: { color: '#666666', fontSize: 13, lineHeight: 20 },
+  benefitDesc: { color: theme.muted, fontSize: 13, lineHeight: 20 },
   cta: {
-    backgroundColor: '#80C45B',
+    backgroundColor: theme.accentSoft,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     paddingVertical: 16, borderRadius: 16, gap: 10, marginBottom: 16,
   },
-  ctaText: { color: '#0E2C1C', fontSize: 16, fontWeight: '900' },
+  ctaText: { color: theme.text, fontSize: 16, fontWeight: '900' },
   emailNote: {
     color: '#444444', fontSize: 12, textAlign: 'center',
   },

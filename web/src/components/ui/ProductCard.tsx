@@ -6,6 +6,7 @@ import QuickViewModal from './QuickViewModal'
 import { UNIT_LABELS } from '../../config'
 import { getProduceImage } from '../../produce'
 import type { ProductCardProps } from '../../types'
+import { formatPrice } from '../../utils/cart'
 
 const EASE = [0.25, 1, 0.5, 1] as const
 
@@ -44,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           : '0 2px 8px rgba(26,26,26,0.04)',
       }}
       transition={{ duration: 0.35, ease: EASE }}
-      className="min-w-0 h-full flex flex-col bg-cream border border-cream-border rounded-xl overflow-hidden will-change-transform"
+      className="min-w-0 h-full flex flex-col bg-surface border border-border rounded-2xl overflow-hidden"
       role="group"
       aria-label={product.name}
     >
@@ -84,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <motion.div
           className="absolute inset-x-3 bottom-3 z-10"
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 16 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: EASE }}
         >
           <button
@@ -97,7 +98,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               'transition-colors duration-200 cursor-pointer',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
             ].join(' ')}
-            tabIndex={isHovered ? 0 : -1}
             onClick={() => setQuickViewOpen(true)}
           >
             <Eye size={14} aria-hidden="true" />
@@ -111,8 +111,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-[10px] font-heading font-bold text-muted uppercase tracking-wide">
             {product.category}
           </span>
-          <span className="font-heading font-black text-mora-dark text-lg leading-none whitespace-nowrap">
-            ${product.price.toLocaleString('es-CL')}
+          <span className="font-heading font-black text-mora-dark text-lg leading-none whitespace-nowrap tabular-nums">
+            {formatPrice(product.price)}
           </span>
         </div>
 
@@ -129,13 +129,13 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button
               onClick={handleDecrement}
               aria-label="Reducir cantidad"
-              className="w-8 h-8 flex items-center justify-center text-charcoal hover:bg-cream-warm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-mora disabled:opacity-30"
+              className="quantity-button border-0 rounded-none"
               disabled={qty === 0}
             >
               <Minus size={13} />
             </button>
             <span
-              className="w-7 text-center text-sm font-heading font-bold text-charcoal select-none"
+              className="w-7 text-center text-sm font-heading font-bold text-charcoal select-none tabular-nums"
               aria-live="polite"
               aria-label={`Cantidad: ${qty}`}
             >
@@ -143,8 +143,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
             <button
               onClick={handleIncrement}
+              disabled={qty >= 99}
               aria-label="Aumentar cantidad"
-              className="w-8 h-8 flex items-center justify-center text-charcoal hover:bg-cream-warm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-mora"
+              className="quantity-button border-0 rounded-none"
             >
               <Plus size={13} />
             </button>

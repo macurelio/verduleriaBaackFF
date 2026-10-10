@@ -51,15 +51,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem(CART_KEY, JSON.stringify(cart)) } catch { /* Storage may be disabled. */ }
   }, [cart])
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, quantity = 1) => {
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return
     setCart((prev) => {
       const existing = prev.find((i) => i.cartItemId === product.id)
       if (existing) {
         return prev.map((i) =>
-          i.cartItemId === product.id ? { ...i, ...product, quantity: Math.min(99, i.quantity + 1) } : i,
+          i.cartItemId === product.id ? { ...i, ...product, quantity: Math.min(99, i.quantity + quantity) } : i,
         )
       }
-      return [...prev, { ...product, cartItemId: product.id, quantity: 1 } as CartItem]
+      return [...prev, { ...product, cartItemId: product.id, quantity: Math.min(99, quantity) } as CartItem]
     })
   }
 

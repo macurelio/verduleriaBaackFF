@@ -15,7 +15,7 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-charcoal text-white/60" aria-label="Pie de página">
+    <footer className="bg-charcoal text-white/90" aria-label="Pie de página">
       <div className="store-container py-8">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="sm:col-span-1">
@@ -75,7 +75,7 @@ export default function Footer() {
                 className="flex items-center gap-2 text-sm hover:text-white transition-colors duration-150"
                 aria-label={`Instagram ${BRAND_NAME}`}
               >
-                <Instagram size={16} className="text-sand/60 flex-shrink-0" />
+                <Instagram size={16} className="text-sand/90 flex-shrink-0" />
                 {INSTAGRAM_HANDLE}
               </a>
             </div>

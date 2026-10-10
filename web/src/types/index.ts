@@ -110,7 +110,7 @@ export interface CartItem extends Product {
 
 export interface CartContextType {
   cart: CartItem[]
-  addToCart: (product: Product) => void
+  addToCart: (product: Product, quantity?: number) => void
   incrementQuantity: (cartItemId: string) => void
   decrementQuantity: (cartItemId: string) => void
   removeItem: (cartItemId: string) => void

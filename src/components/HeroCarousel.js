@@ -9,12 +9,13 @@ import {
 } from 'react-native';
 import { PRODUCT_CATEGORIES } from '../data/categories';
 import { BRAND_NAME } from '../config';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const SLIDES = [
   {
     id: '1',
     title: 'Verduras del día',
-    subtitle: 'Hojas frescas cosechadas hoy.\nDirecto del campo a tu cocina.',
+    subtitle: 'Hojas verdes para tu mesa.\nDirecto del campo a tu cocina.',
     cta: 'Ver Hojas Verdes',
     ctaCategory: PRODUCT_CATEGORIES.GREENS,
     emoji: '🥬',
@@ -23,7 +24,7 @@ const SLIDES = [
   {
     id: '2',
     title: 'La base de tu cocina',
-    subtitle: 'Papas, cebolla, zanahoria y más.\nAl peso justo, sin intermediarios.',
+    subtitle: 'Papas, cebolla, zanahoria y más.\nElige tus productos favoritos.',
     cta: 'Ver Raíces',
     ctaCategory: PRODUCT_CATEGORIES.ROOTS,
     emoji: '🥕',
@@ -43,17 +44,21 @@ const SLIDES = [
 const AUTO_SCROLL_INTERVAL = 4000;
 
 export default function HeroCarousel({ onCategoryPress }) {
+  const reducedMotion = useReducedMotion();
+  const [paused, setPaused] = useState(false);
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef(null);
   const timerRef = useRef(null);
 
   const goToSlide = (index) => {
-    scrollRef.current?.scrollTo({ x: index * width, animated: true });
+    scrollRef.current?.scrollTo({ x: index * width, animated: !reducedMotion });
     setActiveIndex(index);
   };
 
   const startAutoScroll = useCallback(() => {
+    clearInterval(timerRef.current);
+    if (reducedMotion || paused) return;
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => {
         const next = (prev + 1) % SLIDES.length;
@@ -61,7 +66,7 @@ export default function HeroCarousel({ onCategoryPress }) {
         return next;
       });
     }, AUTO_SCROLL_INTERVAL);
-  }, [width]);
+  }, [width, reducedMotion, paused]);
 
   useEffect(() => {
     startAutoScroll();
@@ -116,8 +121,11 @@ export default function HeroCarousel({ onCategoryPress }) {
       </ScrollView>
 
       <View style={styles.dotsContainer}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={paused ? 'Reanudar carrusel' : 'Pausar carrusel'} onPress={() => setPaused(value => !value)} style={styles.dotTouchable}>
+          <Text style={{ color: '#FFFFFF', fontSize: 12 }}>{paused ? 'Reanudar' : 'Pausar'}</Text>
+        </TouchableOpacity>
         {SLIDES.map((_, i) => (
-          <TouchableOpacity key={i} onPress={() => goToSlide(i)} style={styles.dotTouchable}>
+          <TouchableOpacity key={i} accessibilityRole="button" accessibilityLabel={`Ir a la diapositiva ${i + 1}`} accessibilityState={{ selected: i === activeIndex }} onPress={() => goToSlide(i)} style={styles.dotTouchable}>
             <View style={[styles.dot, i === activeIndex && styles.dotActive]} />
           </TouchableOpacity>
         ))}
@@ -195,7 +203,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   dotTouchable: {
-    padding: 3,
+    minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center',
   },
   dot: {
     width: 6,

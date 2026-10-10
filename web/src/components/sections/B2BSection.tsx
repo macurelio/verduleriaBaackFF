@@ -12,7 +12,7 @@ export default function B2BSection() {
   )
 
   return (
-    <section id="trabaja" aria-label="Trabaja con nosotros" className="bg-charcoal py-8 sm:py-10">
+    <section id="trabaja" aria-label="Trabaja con nosotros" className="bg-canvas py-8 sm:py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
 
         {/* ── Hero card: fondo + texto centrado ── */}
@@ -25,7 +25,7 @@ export default function B2BSection() {
         >
           {/* Background gradient */}
           <div
-            className="absolute inset-0 bg-gradient-to-br from-mora-dark via-surface to-charcoal"
+            className="absolute inset-0 bg-gradient-to-br from-mora-dark via-cocoa to-charcoal"
             aria-hidden="true"
           />
           <span
@@ -37,7 +37,7 @@ export default function B2BSection() {
 
           {/* Content */}
           <div className="relative z-10 text-center px-4 py-7 flex flex-col items-center gap-5">
-            <span className="text-[10px] font-heading font-bold uppercase tracking-[0.28em] text-white/50 border border-white/15 px-4 py-1.5 rounded-full">
+            <span className="text-[10px] font-heading font-bold uppercase tracking-[0.28em] text-white/90 border border-white/15 px-4 py-1.5 rounded-full">
               Para restaurantes, almacenes y cafeterías
             </span>
 
@@ -46,7 +46,7 @@ export default function B2BSection() {
               <span className="text-sand">con nosotros</span>
             </h2>
 
-            <p className="text-white/65 text-base sm:text-lg max-w-md leading-relaxed">
+            <p className="text-white/90 text-base sm:text-lg max-w-md leading-relaxed">
               Verdura fresca a precios por volumen, entregas programadas y sin quedar
               con stock.{' '}
               <span className="text-white/90 font-medium">Conversemos.</span>
@@ -70,12 +70,12 @@ export default function B2BSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.65, ease: EASE, delay: 0.12 }}
-          className="rounded-3xl bg-white/[0.05] border border-white/10 px-5 py-6 sm:px-8 sm:py-8"
+          className="rounded-3xl bg-surface border border-border px-5 py-6 sm:px-8 sm:py-8"
         >
-          <h3 className="font-heading font-black text-sand text-xl sm:text-2xl uppercase tracking-wide mb-5">
+          <h3 className="font-heading font-black text-ink text-xl sm:text-2xl uppercase tracking-wide mb-5">
             La Propuesta
           </h3>
-          <p className="text-white/65 font-body text-base sm:text-lg leading-relaxed">
+          <p className="text-muted font-body text-base sm:text-lg leading-relaxed">
             Trabajamos directamente con productores del Valle del Maipo y la Zona
             Central, lo que nos permite ofrecer precios por volumen sin sacrificar
             frescura. Armamos pedidos programados (diarios o semanales) según el

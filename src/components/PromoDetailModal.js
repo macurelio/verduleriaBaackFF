@@ -1,3 +1,4 @@
+import { theme } from '../theme';
 import React from 'react';
 import {
   Modal,
@@ -36,7 +37,7 @@ export default function PromoDetailModal({
       <View style={styles.overlay}>
         <View style={[styles.modalCard, { width: modalWidth, maxHeight: modalMaxHeight }]}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.85}>
-            <X color="#FFFFFF" size={18} />
+            <X color={theme.text} size={18} />
           </TouchableOpacity>
 
           <ScrollView showsVerticalScrollIndicator={false}>
@@ -98,11 +99,11 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   modalCard: {
-    backgroundColor: '#163D27',
+    backgroundColor: theme.surface,
     borderRadius: 24,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: theme.border,
   },
   closeButton: {
     position: 'absolute',
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.45)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: theme.border,
   },
   hero: {
     width: '100%',
@@ -131,33 +132,33 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   badge: {
-    color: '#80C45B',
+    color: theme.accent,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 2.2,
     marginBottom: 8,
   },
   title: {
-    color: '#FFFFFF',
+    color: theme.text,
     fontSize: 28,
     fontWeight: '900',
     letterSpacing: -0.6,
     marginBottom: 6,
   },
   subtitle: {
-    color: '#D1D5DB',
+    color: theme.muted,
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 8,
   },
   priceLabel: {
-    color: '#80C45B',
+    color: theme.accent,
     fontSize: 16,
     fontWeight: '900',
     marginBottom: 14,
   },
   description: {
-    color: '#A3A3A3',
+    color: theme.muted,
     fontSize: 14,
     lineHeight: 22,
   },
@@ -174,12 +175,12 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: '#80C45B',
+    backgroundColor: theme.accentSoft,
     marginTop: 7,
   },
   listText: {
     flex: 1,
-    color: '#E5E7EB',
+    color: theme.text,
     fontSize: 14,
     lineHeight: 21,
   },
@@ -188,34 +189,34 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 18,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopColor: theme.border,
   },
   cartButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: '#80C45B',
+    backgroundColor: theme.accentSoft,
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 13,
   },
   cartButtonText: {
-    color: '#0E2C1C',
+    color: theme.text,
     fontSize: 14,
     fontWeight: '900',
   },
   primaryButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
+    borderColor: theme.border,
     borderRadius: 14,
     paddingVertical: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: theme.text,
     fontSize: 14,
     fontWeight: '800',
   },

@@ -9,7 +9,7 @@
   }
 
   body {
-    @apply bg-charcoal font-body text-sand antialiased;
+    @apply bg-canvas font-body text-ink antialiased;
     margin: 0;
     min-width: 280px;
     overflow-wrap: break-word;
@@ -21,7 +21,13 @@
 
   input, select, textarea { min-width: 0; }
 
-  select option { @apply bg-charcoal text-sand; }
+  select option { @apply bg-surface text-ink; }
+
+  .field-label { @apply block mb-1.5 text-sm font-bold text-ink; }
+  .quantity-button { @apply inline-flex items-center justify-center min-w-11 min-h-11 rounded-xl border border-border bg-surface text-ink hover:bg-cream-warm disabled:opacity-40 disabled:cursor-not-allowed; }
+  .dialog-panel { outline: none; }
+  .dialog-drawer { animation: drawer-in 180ms ease-out; }
+  @keyframes drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
@@ -36,6 +42,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;

@@ -1,48 +1,14 @@
 import { ShoppingCart } from 'lucide-react'
-import { useCart } from '../../context/CartContext'
-import { useSiteConfig } from '../../hooks/useSiteConfig'
+import { useCartCalculations } from '../../hooks/useCartCalculations'
+import { formatPrice } from '../../utils/cart'
 
-interface MiniCartBarProps {
-  onOpenCart: () => void
-}
-
-const formatPrice = (n: number) => `$${n.toLocaleString('es-CL')}`
-
-export default function MiniCartBar({ onOpenCart }: MiniCartBarProps) {
-  const { shippingFee: SHIPPING_FEE, freeShippingOver: FREE_SHIPPING_OVER } = useSiteConfig()
-
-  const { getCartCount, getCartTotal } = useCart()
-  const count = getCartCount()
-  const total = getCartTotal()
-
-  if (count === 0) return null
-
-  const shipping = total >= FREE_SHIPPING_OVER ? 0 : SHIPPING_FEE
-  const grandTotal = total + shipping
-
-  return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-charcoal/95 backdrop-blur shadow-lg">
-      <button
-        onClick={onOpenCart}
-        className="w-full flex items-center justify-between px-4 py-3"
-        aria-label="Ver carrito"
-      >
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <ShoppingCart size={18} className="text-sand" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center rounded-full bg-sand text-charcoal text-[9px] font-bold leading-none">
-              {count > 9 ? '9+' : count}
-            </span>
-          </div>
-          <span className="text-sand font-heading font-bold text-sm">
-            {count} producto{count !== 1 ? 's' : ''}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sand font-heading font-black text-sm">{formatPrice(grandTotal)}</span>
-          <span className="px-2 py-1 rounded-lg bg-mora text-white text-xs font-heading font-bold">Ver carrito</span>
-        </div>
-      </button>
-    </div>
-  )
+export default function MiniCartBar({ onOpenCart }: { onOpenCart: () => void }) {
+  const { itemCount, total } = useCartCalculations()
+  if (itemCount === 0) return null
+  return <div className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-surface shadow-lg pb-[env(safe-area-inset-bottom)]">
+    <button type="button" onClick={onOpenCart} className="w-full min-h-16 flex justify-between items-center gap-3 px-4 py-3 text-ink" aria-label={`Ver carrito con ${itemCount} productos, total estimado ${formatPrice(total)}`}>
+      <span className="flex items-center gap-2 text-sm"><ShoppingCart size={20} aria-hidden="true" /><span className="tabular-nums">{itemCount} {itemCount === 1 ? 'producto' : 'productos'}</span></span>
+      <span className="text-right"><span className="block text-xs text-muted">Total estimado con despacho</span><span className="font-bold text-mora-dark tabular-nums">{formatPrice(total)} · Ver pedido</span></span>
+    </button>
+  </div>
 }

@@ -1,3 +1,4 @@
+import { theme } from '../theme';
 import React, { useContext } from 'react';
 import {
   View,
@@ -13,7 +14,7 @@ import { featuredProducts } from '../data/products';
 import { UNIT_LABELS } from '../config';
 
 export default function FeaturedProductsCarousel() {
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, cart } = useContext(CartContext);
   const { width } = useWindowDimensions();
 
   const CARD_WIDTH = Math.min(width * 0.72, 260);
@@ -43,6 +44,8 @@ export default function FeaturedProductsCarousel() {
 
         <TouchableOpacity
           style={styles.addButton}
+          disabled={(cart.find(product => product.id === item.id)?.quantity || 0) >= 99}
+          accessibilityLabel={`Añadir ${item.name} al carrito`}
           onPress={() => handleAdd(item)}
           activeOpacity={0.85}
         >
@@ -92,20 +95,20 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 2.5,
-    color: '#80C45B',
+    color: theme.accent,
     marginBottom: 2,
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.text,
     letterSpacing: -0.5,
   },
   listContent: {
     paddingBottom: 4,
   },
   card: {
-    backgroundColor: '#1E1E1E',
+    backgroundColor: theme.soft,
     borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: theme.border,
   },
   imageWrapper: {
     position: 'relative',
@@ -136,8 +139,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(124,179,66,0.45)',
   },
-  priceBadgeText: {
-    color: '#80C45B',
+  priceBadgeText: { fontVariant: ['tabular-nums'],
+    color: theme.accent,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -146,7 +149,7 @@ const styles = StyleSheet.create({
   },
   categoryTag: {
     backgroundColor: 'rgba(124,179,66,0.12)',
-    color: '#80C45B',
+    color: theme.accent,
     fontSize: 9,
     fontWeight: '800',
     paddingHorizontal: 7,
@@ -160,14 +163,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(124,179,66,0.25)',
   },
   productName: {
-    color: '#FFFFFF',
+    color: theme.text,
     fontSize: 16,
     fontWeight: '900',
     marginBottom: 4,
     letterSpacing: -0.3,
   },
   productDesc: {
-    color: '#666666',
+    color: theme.muted,
     fontSize: 11,
     lineHeight: 16,
     marginBottom: 12,
@@ -175,16 +178,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   addButton: {
-    backgroundColor: '#80C45B',
+    backgroundColor: theme.accentSoft,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
+    minHeight: 44,
     borderRadius: 12,
     gap: 6,
   },
   addButtonText: {
-    color: '#0E2C1C',
+    color: theme.text,
     fontSize: 12,
     fontWeight: '900',
   },

@@ -9,7 +9,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
     'border-2 border-charcoal text-charcoal hover:bg-charcoal hover:text-white',
   ghost: 'text-charcoal hover:bg-cream-warm active:bg-cream-border',
   whatsapp:
-    'bg-[#25D366] text-white hover:bg-[#1da851] active:bg-[#189a4a] shadow-md hover:shadow-lg',
+    'bg-whatsapp text-white hover:bg-mora-dark active:bg-mora-dark shadow-md hover:shadow-lg',
 }
 
 const SIZES: Record<ButtonSize, string> = {
@@ -29,7 +29,7 @@ export default function Button({
   return (
     <Tag
       className={[
-        'inline-flex items-center justify-center font-heading font-bold rounded-xl',
+        'inline-flex min-h-11 items-center justify-center font-heading font-bold rounded-xl',
         'transition-all duration-200 ease-out cursor-pointer select-none',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mora focus-visible:ring-offset-2',
         'disabled:opacity-50 disabled:pointer-events-none',

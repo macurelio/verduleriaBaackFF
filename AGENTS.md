@@ -1,6 +1,6 @@
 # AGENTS.md
 
-## Two separate apps in one repo
+## Storefront apps and admin panel
 
 | | Root app | `web/` app |
 |---|---|---|
@@ -11,13 +11,14 @@
 - Each has its own `package.json` + lockfile. Always run commands **inside the right directory**; `node_modules` is not installed by default (`npm install` first).
 - Product data and UI features are duplicated across both apps and are edited in the **same commit**. Unless told otherwise, a catalog/content change means both apps.
   - Root: catalog `src/data/{products,combos,categories}.js`, shared config `src/config.js`
-  - Web: catalog `web/src/data/{products,promos,testimonials,categories}.ts`, shared config `web/src/config.ts`
-- This is **Mora Verduras** (vegetable/fruit box store). Products use **emoji + gradient** instead of photos — there are no product images (the old branding assets under `web/public/images/` were removed; `assets/` now only holds app icons). Orders are placed by **WhatsApp only**; there is no backend and no online payment.
+  - Web: catalog `web/src/data/{products,promos,categories}.ts`, shared config `web/src/config.ts`
+- This is **Mora Verduras** (vegetable/fruit box store). Web product visuals are resolved by `web/src/produce.ts` (AI PNGs, SVGs, emoji fallback); Expo uses emoji + gradient. Web records orders through an external API, with or without continuing to WhatsApp; Expo requests orders through WhatsApp. Neither app collects online payment.
+- `admin/` is a separate Vite/React TypeScript app for catalog, configuration and order management. The backend lives in `C:/verduleriaBaack`, outside this frontend repository. See `FLUJO_PEDIDOS.md` for the order contract.
 
 ## Commands (there is no lint/test/formatter — do not invent one)
 
 - Web dev server: `cd web && npm run dev` → http://localhost:5173/verduleriaBaackFF/ (base path is part of the URL)
-- Web build: `cd web && npm run build`; deploy prep `npm run predeploy` (build + `cp dist/index.html dist/404.html` — the `cp` step fails on plain Windows shell; CI runs Ubuntu)
+- Web build: `cd web && npm run build`; deploy prep `npm run predeploy` (build + Node copy of `dist/index.html` to `dist/404.html`, compatible with Windows)
 - Typecheck: `cd web && npx tsc --noEmit` (no npm script exists; only `web/tsconfig.json` has real settings — the root `tsconfig.json` just extends `expo/tsconfig.base` and the root app is JS anyway)
 - Expo app: `npm start` / `npm run android|ios|web` from repo root
 
@@ -31,14 +32,16 @@ Verify changes with the web build and/or `tsc --noEmit`.
 ## `web/` specifics
 
 - Base path `/verduleriaBaackFF/` is hardcoded in `web/vite.config.js` **and** `app.json`. The favicon is an emoji SVG (`web/public/favicon.svg`) referenced via `%BASE_URL%` in `web/index.html`. Never hardcode `/images/...`.
-- Tailwind design tokens live only in `web/tailwind.config.js`: colors `mora` (green accent, `DEFAULT #2F7A3F`), `cream`, `sand`, `muted`, `cocoa`, `charcoal`; fonts `heading` (Outfit) / `body` (Inter); easings `smooth`, `premium`, `out-expo`. Use tokens instead of raw hex (`bg-charcoal`, `text-sand`, …).
+- Tailwind design tokens live only in `web/tailwind.config.js`: semantic colors `canvas`, `surface`, `ink`, `border`, `error`, `whatsapp`; brand `mora` (`DEFAULT #2F7D32`), plus `cream`, `sand`, `muted`, `cocoa`, `charcoal`; fonts `heading` (Outfit) / `body` (Inter); easings `smooth`, `premium`, `out-expo`. Use tokens instead of raw hex (`bg-charcoal`, `text-sand`, …).
 - TS is strict with `noUnusedLocals` / `noUnusedParameters`. The `@/*` path alias is declared in `web/tsconfig.json` but **not** configured in `vite.config.js` — it would break at runtime; all existing code uses relative imports.
-- No Webpay/backend: the checkout (`web/src/components/ui/CartDrawer.tsx`) validates the delivery form and opens a `wa.me` link from `waLink()` in `web/src/config.ts`.
+- Checkout (`web/src/components/ui/CartDrawer.tsx`) validates the form and calls `createOrder` in `web/src/api/orders.ts`. Payload lines are `{productId, quantity}`; the server calculates authoritative prices/totals. Preserve duplicate-click protection and uncertain-result handling. `useSiteConfig` supplies API overrides, including the WhatsApp number.
+- Local previews share calculations in `web/src/utils/cart.ts` through `useCartCalculations`; Expo mirrors the policy in `src/utils/cart.js`. No discounts or per-comuna rates are supported in this initial UI refactor.
+- Web overlays use `Dialog.tsx` for focus, Escape, backdrop, inert background and coordinated scroll locking. Reuse it for new modals.
 - `web/package.json` mixes React 18 runtime with `@types/react` 19 — don't "fix" versions without checking.
 
 ## Root Expo app specifics
 
-- Dark theme colors (`#0A0A0A` bg, `#7CB342` green accent) are set centrally in `App.js` `screenOptions`; screens/components are JS with inline `StyleSheet`. New screens must be registered in the `Stack.Navigator` in `App.js` (currently only `Home` and `Cart`).
+- The light theme palette lives in `src/theme.js`, used by `App.js` and JS screens/components with `StyleSheet`. New screens must be registered in the `Stack.Navigator` in `App.js` (currently only `Home` and `Cart`).
 - Navigation is React Navigation native-stack; state via `src/context/CartContext.js` (root) and `web/src/context/CartContext.tsx` (web) — separate implementations.
 
 ## Conventions

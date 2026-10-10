@@ -8,10 +8,9 @@ import { useCart } from '../../context/CartContext'
 import { getPromoImage } from '../../produce'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
 import type { Product } from '../../types'
+import { formatPrice } from '../../utils/cart'
 
 const EASE = [0.25, 1, 0.5, 1] as const
-
-const formatPrice = (n: number) => `$${n.toLocaleString('es-CL')}`
 
 const promoToProduct = (promo: Promo): Product => ({
   id: promo.id,
@@ -69,7 +68,7 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
       onMouseLeave={() => setHovered(false)}
       animate={{ y: hovered ? -6 : 0 }}
       transition={{ duration: 0.3, ease: EASE }}
-      className="relative flex flex-col rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-xl"
+      className="relative flex flex-col rounded-2xl overflow-hidden bg-surface border border-border shadow-xl"
     >
       {/* Badge */}
       <span className="absolute top-3 left-3 z-20 bg-sand text-charcoal text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow">
@@ -77,7 +76,7 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
       </span>
 
       {/* Tag pill top-right */}
-      <span className="absolute top-3 right-3 z-20 bg-white/10 text-sand/80 text-[10px] font-heading font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+      <span className="absolute top-3 right-3 z-20 bg-charcoal text-sand text-[10px] font-heading font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
         {promo.tag}
       </span>
 
@@ -102,7 +101,7 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
           </span>
         )}
         <div className="absolute bottom-3 left-4">
-          <span className="text-sand/80 text-xs font-heading font-bold">
+          <span className="text-sand text-xs font-heading font-bold">
             {promo.label}
           </span>
         </div>
@@ -110,32 +109,32 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
 
       {/* Body */}
       <div className="flex flex-col flex-1 p-5 gap-3">
-        <h3 className="font-heading font-black text-sand text-xl leading-tight">
+        <h3 className="font-heading font-black text-ink text-xl leading-tight">
           {promo.title}
         </h3>
-        <p className="text-sand/60 text-sm leading-relaxed">{promo.description}</p>
+        <p className="text-muted text-sm leading-relaxed">{promo.description}</p>
 
         {/* Items list */}
         <ul className="space-y-1.5 mt-1">
           {promo.items.map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sand/70 text-xs">
-              <Check size={12} className="text-sand mt-0.5 flex-shrink-0" />
+            <li key={item} className="flex items-start gap-2 text-muted text-xs">
+              <Check size={12} className="text-ink mt-0.5 flex-shrink-0" />
               {item}
             </li>
           ))}
         </ul>
 
         {/* Pricing */}
-        <div className="flex items-end gap-3 mt-auto pt-4 border-t border-white/10">
+        <div className="flex items-end gap-3 mt-auto pt-4 border-t border-border">
           <div>
-            <p className="text-sand/40 text-xs line-through">
+            <p className="text-muted text-xs line-through tabular-nums">
               {formatPrice(promo.originalPrice)}
             </p>
-            <p className="text-sand font-heading font-black text-2xl leading-none">
+            <p className="text-mora-dark font-heading font-black text-2xl tabular-nums leading-none">
               {formatPrice(promo.promoPrice)}
             </p>
           </div>
-          <span className="mb-0.5 flex items-center gap-1 text-[#25D366] text-xs font-heading font-bold">
+          <span className="mb-0.5 flex items-center gap-1 text-mora-dark text-xs font-heading font-bold">
             <Tag size={11} />
             {formatPrice(promo.savings)} off
           </span>
@@ -148,7 +147,7 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
             onClick={handleAdd}
             className={[
               'flex items-center justify-center gap-2 w-full py-3 rounded-xl',
-              added ? 'bg-[#25D366]' : 'bg-charcoal hover:bg-cocoa',
+              added ? 'bg-mora' : 'bg-mora hover:bg-mora-dark',
               'active:scale-[0.98] text-white font-heading font-black text-sm uppercase tracking-wide',
               'transition-all duration-150 shadow-lg',
             ].join(' ')}
@@ -170,7 +169,7 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-sand/60 hover:text-sand text-xs font-heading font-bold transition-colors"
+            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-muted hover:text-mora-dark text-xs font-heading font-bold transition-colors"
           >
             <MessageCircle size={13} />
             Consultar por WhatsApp
@@ -182,13 +181,13 @@ function PromoCard({ promo, index }: { promo: Promo; index: number }) {
 }
 
 export default function PromoSection() {
-  const promoList = useApiResource('promos', fetchPromotions, promos)
+  const promoList = useApiResource('promotions', fetchPromotions, promos)
 
   return (
     <section
       id="promociones"
       aria-label="Promociones y packs más vendidos"
-      className="py-10 sm:py-12 bg-charcoal"
+      className="py-10 sm:py-12 bg-canvas"
     >
       <div className="store-container">
         {/* Header */}
@@ -199,14 +198,14 @@ export default function PromoSection() {
           viewport={{ once: true, margin: '-40px' }}
           variants={headerVariants}
         >
-          <span className="inline-flex items-center gap-1.5 bg-white/10 text-sand/70 text-xs font-heading font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">
+          <span className="inline-flex items-center gap-1.5 bg-cream-warm text-muted text-xs font-heading font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">
             <Tag size={12} />
             Packs
           </span>
-          <h2 className="font-heading font-black text-sand text-3xl sm:text-4xl leading-tight">
+          <h2 className="font-heading font-black text-ink text-3xl sm:text-4xl leading-tight">
             Packs armados
           </h2>
-          <p className="mt-4 text-white/50 font-body text-base max-w-md mx-auto">
+          <p className="mt-4 text-muted font-body text-base max-w-md mx-auto">
             Combos para ahorrar tiempo y dinero. Agrega el tuyo, completa tus datos
             y te lo llevamos a domicilio.
           </p>

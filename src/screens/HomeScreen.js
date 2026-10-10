@@ -1,15 +1,20 @@
+import { theme } from '../theme';
 import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, Linking, useWindowDimensions,
-  Animated, Modal,
+  Animated, TextInput,
 } from 'react-native';
 import { ShoppingCart, Instagram, Briefcase, Plus } from 'lucide-react-native';
 
 import { products } from '../data/products';
 import { PRODUCT_CATEGORY_LIST } from '../data/categories';
 import { comboPromotions, comboToCartProduct } from '../data/combos';
-import { UNIT_LABELS } from '../config';
+import { UNIT_LABELS, SHIPPING_FEE, FREE_SHIPPING_OVER } from '../config';
+import FreeShippingBanner from '../components/FreeShippingBanner';
+import { calculateCart, formatPrice } from '../utils/cart';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CartContext } from '../context/CartContext';
 import HeroCarousel from '../components/HeroCarousel';
 import FeaturedProductsCarousel from '../components/FeaturedProductsCarousel';
@@ -23,19 +28,23 @@ const fmt = (n) => '$' + Number(n).toLocaleString('es-CL');
 const CATEGORY_NAMES = PRODUCT_CATEGORY_LIST.map(c => c.name);
 
 export default function HomeScreen({ navigation }) {
-  const { addToCart, getCartCount } = useContext(CartContext);
+  const insets = useSafeAreaInsets();
+  const reducedMotion = useReducedMotion();
+  const { cart, addToCart, getCartCount } = useContext(CartContext);
   const { width } = useWindowDimensions();
   const scrollRef = useRef(null);
 
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [workWithUsVisible, setWorkWithUsVisible] = useState(false);
-  const [adPopupVisible, setAdPopupVisible] = useState(false);
+  const [search, setSearch] = useState('');
+  const amounts = calculateCart(cart, SHIPPING_FEE, FREE_SHIPPING_OVER);
+  const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-CL');
+  const query = normalize(search.trim());
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [activeModal, setActiveModal] = useState(null);
-  const hasShownPopup = useRef(false);
 
   // Card entrance animation
   const cardAnims = useRef(
@@ -46,6 +55,10 @@ export default function HomeScreen({ navigation }) {
   ).current;
 
   useEffect(() => {
+    if (reducedMotion) {
+      products.forEach(product => { cardAnims[product.id].opacity.setValue(1); cardAnims[product.id].translateY.setValue(0); });
+      return;
+    }
     const animations = products.map(p =>
       Animated.parallel([
         Animated.timing(cardAnims[p.id].opacity, { toValue: 1, duration: 380, useNativeDriver: true }),
@@ -56,7 +69,7 @@ export default function HomeScreen({ navigation }) {
       Animated.stagger(55, animations).start();
     }, 600);
     return () => clearTimeout(timer);
-  }, []);
+  }, [reducedMotion, cardAnims]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -68,13 +81,6 @@ export default function HomeScreen({ navigation }) {
     addToCart(item);
     showToast(`¡${item.name} al carrito!`);
   }, [addToCart]);
-
-  const handleScroll = useCallback(() => {
-    if (!hasShownPopup.current) {
-      hasShownPopup.current = true;
-      setTimeout(() => setAdPopupVisible(true), 400);
-    }
-  }, []);
 
   const selectCategory = (cat) => {
     setActiveCategory(cat);
@@ -95,7 +101,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const numCols = width >= 1200 ? 5 : width >= 900 ? 4 : width >= 640 ? 3 : 2;
-  const cardWidth = Math.floor((width - 24 - (numCols - 1) * 10) / numCols);
+  const cardWidth = Math.floor((width - 48 - (numCols - 1) * 10) / numCols);
 
   const renderComboBanner = (combo) => (
     <TouchableOpacity
@@ -169,25 +175,26 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(16, insets.top) }]}>
         <View style={styles.headerTop}>
           <View style={styles.logoContainer}>
-            <Text style={styles.brandMora}>Mora<Text style={styles.brandVerduras}>Verduras</Text></Text>
+              <Text style={[styles.brandMora, { fontSize: width < 420 ? 18 : 22 }]}>Mora<Text style={[styles.brandVerduras, { fontSize: width < 420 ? 18 : 22 }]}>Verduras</Text></Text>
           </View>
           <View style={styles.headerIcons}>
-            <TouchableOpacity style={styles.workBtn} onPress={() => setWorkWithUsVisible(true)}>
-              <Briefcase color="#80C45B" size={14} />
-              <Text style={styles.workBtnText}>Mayoristas</Text>
+            <TouchableOpacity accessibilityLabel="Consultar compras mayoristas" style={styles.workBtn} onPress={() => setWorkWithUsVisible(true)}>
+              <Briefcase color={theme.accent} size={14} />
+              {width >= 420 && <Text style={styles.workBtnText}>Mayoristas</Text>}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => Linking.openURL('https://www.instagram.com/mora.verduras')}
               style={styles.iconButton}
+              accessibilityLabel="Instagram de Mora Verduras"
             >
-              <Instagram color="#FFFFFF" size={22} />
+              <Instagram color={theme.text} size={22} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.iconButton}>
+            <TouchableOpacity accessibilityLabel="Ver carrito" onPress={() => navigation.navigate('Cart')} style={styles.iconButton}>
               <View>
-                <ShoppingCart color="#FFFFFF" size={22} />
+                <ShoppingCart color={theme.text} size={22} />
                 {getCartCount() > 0 && (
                   <View style={styles.badgeContainer}>
                     <Text style={styles.badgeText}>{getCartCount()}</Text>
@@ -216,7 +223,6 @@ export default function HomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         style={styles.scrollView}
-        onScrollBeginDrag={handleScroll}
         scrollEventThrottle={16}
       >
         {activeCategory === 'Todos' && (
@@ -250,10 +256,17 @@ export default function HomeScreen({ navigation }) {
           </>
         )}
 
+        <View style={{ marginHorizontal: 20 }}>
+          <FreeShippingBanner />
+          <Text style={{ color: theme.text, fontWeight: '700', marginBottom: 8 }}>Buscar productos</Text>
+          <TextInput accessibilityLabel="Buscar productos" value={search} onChangeText={setSearch} placeholder="Busca tomate, palta, lechuga…" placeholderTextColor={theme.muted} style={{ backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border, borderRadius: 12, color: theme.text, padding: 12, minHeight: 44, marginBottom: 16 }} />
+          {query && !products.some(p => (activeCategory === 'Todos' || p.category === activeCategory) && normalize(`${p.name} ${p.description}`).includes(query)) && <Text style={{ color: theme.muted }}>No encontramos productos. Prueba otra búsqueda.</Text>}
+        </View>
         {PRODUCT_CATEGORY_LIST.map(category => {
           const catName = category.name;
           if (activeCategory !== 'Todos' && activeCategory !== catName) return null;
-          const catProducts = products.filter(p => p.category === catName);
+          const catProducts = products.filter(p => p.category === catName && normalize(`${p.name} ${p.description}`).includes(query));
+          if (catProducts.length === 0) return null;
           return (
             <View key={catName} style={[styles.categorySection, activeCategory !== 'Todos' && { marginTop: 20 }]}>
               <View style={styles.categoryHeader}>
@@ -277,7 +290,7 @@ export default function HomeScreen({ navigation }) {
             style={styles.footerInstagram}
             onPress={() => Linking.openURL('https://www.instagram.com/mora.verduras')}
           >
-            <Instagram color="#80C45B" size={18} />
+            <Instagram color={theme.accent} size={18} />
             <Text style={styles.footerInstagramText}>@mora.verduras</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerWa} onPress={() => navigation.navigate('Cart')}>
@@ -286,6 +299,10 @@ export default function HomeScreen({ navigation }) {
         </View>
       </ScrollView>
 
+      {amounts.itemCount > 0 && <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Ver pedido con ${amounts.itemCount} productos`} onPress={() => navigation.navigate('Cart')} style={{ backgroundColor: theme.surface, borderTopWidth: 1, borderTopColor: theme.border, padding: 16, paddingBottom: Math.max(16, insets.bottom), minHeight: 64, flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Text style={{ color: theme.text, fontWeight: '700' }}>{amounts.itemCount} productos</Text>
+        <Text style={{ color: theme.accent, fontWeight: '700', fontVariant: ['tabular-nums'] }}>{formatPrice(amounts.total)} · Ver pedido</Text>
+      </TouchableOpacity>}
       <ToastMessage visible={toastVisible} message={toastMessage} />
       <ProductDetailModal
         product={selectedProduct}
@@ -301,115 +318,98 @@ export default function HomeScreen({ navigation }) {
         onPrimaryAction={handleComboAction}
         onAddToCart={handleComboAdd}
       />
-      <Modal visible={adPopupVisible} transparent animationType="fade" onRequestClose={() => setAdPopupVisible(false)}>
-        <View style={styles.popupOverlay}>
-          <View style={styles.popupCard}>
-            <TouchableOpacity style={styles.popupClose} onPress={() => setAdPopupVisible(false)}><Text style={styles.popupCloseText}>✕</Text></TouchableOpacity>
-            <Text style={styles.popupEyebrow}>🚚 DESPACHO GRATIS</Text>
-            <Text style={styles.popupTitle}>Envío gratis{'\n'}sobre $20.000</Text>
-            <Text style={styles.popupBody}>Armamos tu pedido el mismo día y lo llevamos a tu casa.</Text>
-            <TouchableOpacity style={styles.popupBtn} onPress={() => { setAdPopupVisible(false); navigation.navigate('Cart'); }}><Text style={styles.popupBtnText}>Ver mi pedido →</Text></TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: '#0E2C1C' },
-  scrollView: { flex: 1, backgroundColor: '#0E2C1C' },
+  mainContainer: { flex: 1, backgroundColor: theme.canvas },
+  scrollView: { flex: 1, backgroundColor: theme.canvas },
   header: {
-    paddingTop: 50, backgroundColor: '#163D27',
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', zIndex: 10,
+    paddingTop: 50, backgroundColor: theme.surface,
+    borderBottomWidth: 1, borderBottomColor: theme.border, zIndex: 10,
   },
   headerTop: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, marginBottom: 14,
+    paddingHorizontal: 12, marginBottom: 14,
   },
   logoContainer: {
-    backgroundColor: '#1E1E1E', paddingHorizontal: 10, paddingVertical: 5,
+    backgroundColor: theme.soft, paddingHorizontal: 10, paddingVertical: 5,
     borderRadius: 6, borderWidth: 1, borderColor: 'rgba(124,179,66,0.3)',
   },
-  brandMora: { color: '#FFFFFF', fontWeight: '900', fontSize: 22, letterSpacing: -0.5 },
-  brandVerduras: { color: '#80C45B', fontWeight: '900', fontSize: 22, letterSpacing: -0.5 },
+  brandMora: { color: theme.text, fontWeight: '900', fontSize: 22, letterSpacing: -0.5 },
+  brandVerduras: { color: theme.accent, fontWeight: '900', fontSize: 22, letterSpacing: -0.5 },
   headerIcons: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   workBtn: {
+    minWidth: 44, minHeight: 44, justifyContent: 'center',
     flexDirection: 'row', alignItems: 'center', gap: 5,
     borderWidth: 1, borderColor: 'rgba(124,179,66,0.4)',
     paddingHorizontal: 10, paddingVertical: 7, borderRadius: 20,
   },
-  workBtnText: { color: '#80C45B', fontSize: 11, fontWeight: '800' },
-  iconButton: { padding: 8 },
+  workBtnText: { color: theme.accent, fontSize: 11, fontWeight: '800' },
+  iconButton: { padding: 8, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   badgeContainer: {
     position: 'absolute', right: -6, top: -6,
-    backgroundColor: '#80C45B', borderRadius: 10, width: 18, height: 18,
+    backgroundColor: theme.accentSoft, borderRadius: 10, width: 18, height: 18,
     justifyContent: 'center', alignItems: 'center',
   },
-  badgeText: { color: '#0E2C1C', fontSize: 10, fontWeight: '900' },
+  badgeText: { color: theme.text, fontSize: 10, fontWeight: '900' },
   categoryNav: { paddingHorizontal: 20, paddingBottom: 14, gap: 8 },
   navButton: {
     backgroundColor: 'transparent', paddingHorizontal: 16, paddingVertical: 7,
-    borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 20, borderWidth: 1, borderColor: theme.border,
   },
-  navButtonActive: { backgroundColor: '#80C45B', borderColor: '#80C45B' },
-  navButtonText: { fontSize: 11, fontWeight: '700', color: '#FFFFFF', textTransform: 'uppercase', letterSpacing: 0.5 },
-  navButtonTextActive: { color: '#0E2C1C' },
+  navButtonActive: { backgroundColor: theme.accentSoft, borderColor: theme.accent },
+  navButtonText: { fontSize: 11, fontWeight: '700', color: theme.text, textTransform: 'uppercase', letterSpacing: 0.5 },
+  navButtonTextActive: { color: theme.text },
   scrollContent: { paddingBottom: 40 },
   carouselSection: { marginTop: 28 },
   divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginHorizontal: 20, marginBottom: 10, marginTop: 4 },
   titleContainer: { marginHorizontal: 20, marginTop: 25, marginBottom: 20 },
-  mainTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '900', marginBottom: 5 },
-  subtitle: { color: '#666666', fontSize: 14 },
+  mainTitle: { color: theme.text, fontSize: 28, fontWeight: '900', marginBottom: 5 },
+  subtitle: { color: theme.muted, fontSize: 14 },
   comboSection: { marginTop: 28 },
   comboSectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 20, marginBottom: 16, gap: 10 },
-  comboSectionLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 2.5, color: '#80C45B', marginBottom: 4 },
-  comboSectionTitle: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
+  comboSectionLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 2.5, color: theme.accent, marginBottom: 4 },
+  comboSectionTitle: { color: theme.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
   comboSectionHint: { color: '#6B7280', fontSize: 11, fontWeight: '700' },
   comboScrollContent: { paddingHorizontal: 20, gap: 14 },
-  comboBanner: { width: 288, borderRadius: 22, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', position: 'relative' },
+  comboBanner: { width: 288, borderRadius: 22, overflow: 'hidden', borderWidth: 1, borderColor: theme.border, position: 'relative' },
   comboEmoji: { position: 'absolute', right: -6, top: -10, fontSize: 130, opacity: 0.18 },
   comboBannerOverlay: { padding: 18, minHeight: 190, justifyContent: 'flex-end' },
   comboBadge: { color: '#A5D6A7', fontSize: 10, fontWeight: '800', letterSpacing: 2.2, marginBottom: 8 },
-  comboTitle: { color: '#FFFFFF', fontSize: 24, fontWeight: '900', letterSpacing: -0.7, marginBottom: 6 },
+  comboTitle: { color: theme.onAccent, fontSize: 24, fontWeight: '900', letterSpacing: -0.7, marginBottom: 6 },
   comboSubtitle: { color: 'rgba(255,255,255,0.8)', fontSize: 14, lineHeight: 20, marginBottom: 14 },
-  comboCta: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  categorySection: { marginBottom: 40, backgroundColor: '#141414', paddingVertical: 20, borderRadius: 20, marginHorizontal: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  comboCta: { color: theme.onAccent, fontSize: 12, fontWeight: '800' },
+  categorySection: { marginBottom: 40, backgroundColor: theme.surface, paddingVertical: 20, borderRadius: 20, marginHorizontal: 12, borderWidth: 1, borderColor: theme.border },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 15, marginBottom: 20 },
   categoryTitleContainer: { flexDirection: 'row', alignItems: 'center', gap: 10, marginRight: 15 },
-  categoryTitle: { color: '#80C45B', fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2 },
+  categoryTitle: { color: theme.accent, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2 },
   categoryBadge: { backgroundColor: 'rgba(124,179,66,0.15)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(124,179,66,0.3)' },
-  categoryBadgeText: { fontSize: 12, fontWeight: '800', color: '#80C45B' },
+  categoryBadgeText: { fontSize: 12, fontWeight: '800', color: theme.accent },
   categoryLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, gap: 10, paddingBottom: 8 },
-  card: { backgroundColor: '#1E1E1E', borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 6, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
+  card: { backgroundColor: theme.surface, borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 6, overflow: 'hidden', borderWidth: 1, borderColor: theme.border },
   imageContainer: { width: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', position: 'relative' },
   productEmoji: { fontSize: 64 },
   imageBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(10,10,10,0.75)', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 8 },
   imageBadgeText: { color: '#A5D6A7', fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
-  imagePricePill: { position: 'absolute', bottom: 8, right: 8, backgroundColor: '#80C45B', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
-  imagePriceText: { color: '#0E2C1C', fontWeight: '900', fontSize: 12 },
+  imagePricePill: { position: 'absolute', bottom: 8, right: 8, backgroundColor: theme.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
+  imagePriceText: { fontVariant: ['tabular-nums'], color: theme.text, fontWeight: '900', fontSize: 12 },
   cardContent: { padding: 10 },
-  productCategory: { color: '#80C45B', fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
-  productName: { color: '#FFFFFF', fontSize: 13, fontWeight: '900', height: 36, marginBottom: 3, letterSpacing: -0.2, lineHeight: 18 },
-  productDescription: { color: '#777777', fontSize: 11, lineHeight: 15, marginBottom: 10, textTransform: 'uppercase' },
-  addToCartButton: { backgroundColor: '#80C45B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 9, borderRadius: 10, gap: 5 },
-  addToCartText: { color: '#0E2C1C', fontSize: 12, fontWeight: '900' },
-  footer: { marginTop: 20, marginHorizontal: 20, padding: 28, backgroundColor: '#141414', borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', marginBottom: 20 },
-  footerBrand: { color: '#FFFFFF', fontWeight: '900', fontSize: 24, letterSpacing: -0.5, marginBottom: 8 },
-  footerBrandAccent: { color: '#80C45B' },
-  footerText: { color: '#555555', fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 14 },
+  productCategory: { color: theme.accent, fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
+  productName: { color: theme.text, fontSize: 13, fontWeight: '900', height: 36, marginBottom: 3, letterSpacing: -0.2, lineHeight: 18 },
+  productDescription: { color: theme.muted, fontSize: 11, lineHeight: 15, marginBottom: 10, textTransform: 'uppercase' },
+  addToCartButton: { minHeight: 44, backgroundColor: theme.accentSoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 9, borderRadius: 10, gap: 5 },
+  addToCartText: { color: theme.text, fontSize: 12, fontWeight: '900' },
+  footer: { marginTop: 20, marginHorizontal: 20, padding: 28, backgroundColor: theme.surface, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: theme.border, marginBottom: 20 },
+  footerBrand: { color: theme.text, fontWeight: '900', fontSize: 24, letterSpacing: -0.5, marginBottom: 8 },
+  footerBrandAccent: { color: theme.accent },
+  footerText: { color: theme.muted, fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 14 },
   footerInstagram: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
-  footerInstagramText: { color: '#80C45B', fontSize: 14, fontWeight: '700' },
-  footerWa: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14 },
-  footerWaText: { color: '#888888', fontSize: 12, fontWeight: '600' },
-  popupOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center', padding: 32 },
-  popupCard: { backgroundColor: '#141414', borderRadius: 24, padding: 28, width: '100%', maxWidth: 380, borderWidth: 1, borderColor: 'rgba(124,179,66,0.3)', shadowColor: '#80C45B', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.2, shadowRadius: 30, elevation: 20 },
-  popupClose: { alignSelf: 'flex-end', marginBottom: 12 },
-  popupCloseText: { color: '#555555', fontSize: 18, fontWeight: '700' },
-  popupEyebrow: { color: '#80C45B', fontSize: 12, fontWeight: '800', letterSpacing: 1, marginBottom: 8 },
-  popupTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '900', letterSpacing: -0.5, lineHeight: 34, marginBottom: 12 },
-  popupBody: { color: '#666666', fontSize: 14, marginBottom: 18, lineHeight: 20 },
-  popupBtn: { backgroundColor: '#80C45B', paddingVertical: 14, borderRadius: 14, alignItems: 'center' },
-  popupBtnText: { color: '#0E2C1C', fontSize: 15, fontWeight: '900' },
+  footerInstagramText: { color: theme.accent, fontSize: 14, fontWeight: '700' },
+  footerWa: { borderWidth: 1, borderColor: theme.border, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 14 },
+  footerWaText: { color: theme.muted, fontSize: 12, fontWeight: '600' },
+
 });

@@ -1,7 +1,8 @@
+import { theme } from '../theme';
 import React, { useState, useContext, useMemo } from 'react';
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity,
-  FlatList, ScrollView,
+  FlatList, ScrollView, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { Check, MessageCircle, Trash2, Plus, Minus, AlertCircle } from 'lucide-react-native';
 import { CartContext } from '../context/CartContext';
@@ -16,7 +17,9 @@ import {
   openWhatsApp,
 } from '../config';
 
-const fmt = (n) => '$' + Number(n).toLocaleString('es-CL');
+import { calculateCart, formatPrice as fmt } from '../utils/cart';
+import FreeShippingBanner from '../components/FreeShippingBanner';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const DELIVERY_DAYS = Array.from({ length: 7 }, (_, i) => {
   const d = new Date();
@@ -30,6 +33,7 @@ const DELIVERY_DAYS = Array.from({ length: 7 }, (_, i) => {
 const isPhoneValid = (phone) => /^(\+?56)?9\d{8}$/.test(phone.replace(/[\s-]/g, ''));
 
 export default function CartScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   const { cart, incrementQuantity, decrementQuantity, removeItem, clearCart } = useContext(CartContext);
 
   const [name, setName] = useState('');
@@ -42,9 +46,7 @@ export default function CartScreen({ navigation }) {
   const [notes, setNotes] = useState('');
   const [touched, setTouched] = useState(false);
 
-  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-  const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_OVER ? 0 : SHIPPING_FEE;
-  const total = subtotal + shipping;
+  const { subtotal, shipping, total } = calculateCart(cart, SHIPPING_FEE, FREE_SHIPPING_OVER);
 
   const errors = useMemo(() => ({
     name: name.trim().length < 2,
@@ -99,11 +101,11 @@ export default function CartScreen({ navigation }) {
       <View style={styles.itemFooter}>
         <View style={styles.qtyControl}>
           <TouchableOpacity style={styles.qtyBtn} onPress={() => decrementQuantity(item.cartItemId)}>
-            <Minus color="#FFFFFF" size={15} />
+            <Minus color={theme.text} size={15} />
           </TouchableOpacity>
           <Text style={styles.qtyText}>{item.quantity}</Text>
-          <TouchableOpacity style={styles.qtyBtn} onPress={() => incrementQuantity(item.cartItemId)}>
-            <Plus color="#FFFFFF" size={15} />
+          <TouchableOpacity accessibilityLabel={`Aumentar cantidad de ${item.name}`} disabled={item.quantity >= 99} style={styles.qtyBtn} onPress={() => incrementQuantity(item.cartItemId)}>
+            <Plus color={theme.text} size={15} />
           </TouchableOpacity>
         </View>
         <Text style={styles.itemTotal}>{fmt(item.price * item.quantity)}</Text>
@@ -135,8 +137,8 @@ export default function CartScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: Math.max(24, insets.bottom) }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Tu pedido</Text>
 
         <FlatList
@@ -151,6 +153,7 @@ export default function CartScreen({ navigation }) {
           <Text style={styles.clearBtnText}>Vaciar pedido</Text>
         </TouchableOpacity>
 
+        <FreeShippingBanner />
         {/* Delivery form */}
         <Text style={styles.formTitle}>Datos de despacho</Text>
 
@@ -158,31 +161,34 @@ export default function CartScreen({ navigation }) {
         <TextInput
           style={[styles.input, touched && errors.name && styles.inputError]}
           placeholder="Tu nombre"
-          placeholderTextColor="#555"
+          placeholderTextColor={theme.muted}
           value={name}
           onChangeText={setName}
         />
 
+        {touched && errors.name && <Text style={styles.errorBannerText}>Escribe tu nombre completo.</Text>}
         <Text style={styles.fieldLabel}>Teléfono</Text>
         <TextInput
           style={[styles.input, touched && errors.phone && styles.inputError]}
           placeholder="+56 9 1234 5678"
-          placeholderTextColor="#555"
+          placeholderTextColor={theme.muted}
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
           autoCapitalize="none"
         />
 
+        {touched && errors.phone && <Text style={styles.errorBannerText}>Ingresa un celular chileno: +56 9 y 8 dígitos.</Text>}
         <Text style={styles.fieldLabel}>Dirección</Text>
         <TextInput
           style={[styles.input, touched && errors.address && styles.inputError]}
           placeholder="Calle, número, depto/casa"
-          placeholderTextColor="#555"
+          placeholderTextColor={theme.muted}
           value={address}
           onChangeText={setAddress}
         />
 
+        {touched && errors.address && <Text style={styles.errorBannerText}>Indica calle y número.</Text>}
         <Text style={styles.fieldLabel}>Comuna</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
           {COMUNAS.map(c => (
@@ -215,7 +221,7 @@ export default function CartScreen({ navigation }) {
         <TextInput
           style={[styles.input, styles.textarea]}
           placeholder="Referencias, horarios, etc."
-          placeholderTextColor="#555"
+          placeholderTextColor={theme.muted}
           value={notes}
           onChangeText={setNotes}
           multiline
@@ -223,7 +229,7 @@ export default function CartScreen({ navigation }) {
 
         {touched && hasErrors && (
           <View style={styles.errorBanner}>
-            <AlertCircle color="#F87171" size={15} />
+            <AlertCircle color={theme.error} size={15} />
             <Text style={styles.errorBannerText}>Completa los datos marcados para continuar.</Text>
           </View>
         )}
@@ -241,7 +247,7 @@ export default function CartScreen({ navigation }) {
           <Text style={styles.shippingHint}>
             {subtotal >= FREE_SHIPPING_OVER
               ? '¡Felicidades! Tienes envío gratis.'
-              : `Envío gratis sobre ${fmt(FREE_SHIPPING_OVER)}`}
+              : `Envío gratis desde ${fmt(FREE_SHIPPING_OVER)}`}
           </Text>
           <View style={[styles.totalRow, styles.totalRowFinal]}>
             <Text style={styles.totalFinalLabel}>TOTAL</Text>
@@ -250,47 +256,47 @@ export default function CartScreen({ navigation }) {
         </View>
 
         <TouchableOpacity style={styles.waBtn} onPress={sendOrderWhatsapp} activeOpacity={0.85}>
-          <MessageCircle color="#fff" size={22} />
-          <Text style={styles.waBtnText}>Confirmar pedido por WhatsApp</Text>
+          <MessageCircle color={theme.onAccent} size={22} />
+          <Text style={styles.waBtnText}>Solicitar pedido por WhatsApp</Text>
         </TouchableOpacity>
-        <Text style={styles.waNote}>Te contactaremos para coordinar el despacho.</Text>
+        <Text style={styles.waNote}>Envía el mensaje en WhatsApp. La tienda confirmará disponibilidad y entrega.</Text>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#0E2C1C' },
+  screen: { flex: 1, backgroundColor: theme.canvas },
   content: { padding: 20, paddingBottom: 50 },
-  title: { color: '#FFFFFF', fontSize: 24, fontWeight: '900', marginBottom: 20, marginTop: 8 },
+  title: { color: theme.text, fontSize: 24, fontWeight: '900', marginBottom: 20, marginTop: 8 },
 
   emptyContainer: {
-    flex: 1, backgroundColor: '#0E2C1C',
+    flex: 1, backgroundColor: theme.canvas,
     justifyContent: 'center', alignItems: 'center', padding: 40,
   },
   emptyEmoji: { fontSize: 52, marginBottom: 16 },
-  emptyTitle: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', marginBottom: 8 },
-  emptySubtitle: { color: '#666666', fontSize: 14, marginBottom: 28, textAlign: 'center' },
+  emptyTitle: { color: theme.text, fontSize: 22, fontWeight: '900', marginBottom: 8 },
+  emptySubtitle: { color: theme.muted, fontSize: 14, marginBottom: 28, textAlign: 'center' },
   emptyBtn: {
-    backgroundColor: '#80C45B', paddingHorizontal: 28, paddingVertical: 14, borderRadius: 14,
+    backgroundColor: theme.accentSoft, paddingHorizontal: 28, paddingVertical: 14, borderRadius: 14,
   },
-  emptyBtnText: { color: '#0E2C1C', fontSize: 15, fontWeight: '900' },
+  emptyBtnText: { color: theme.text, fontSize: 15, fontWeight: '900' },
 
   cartItem: {
-    backgroundColor: '#141414', borderRadius: 14, padding: 14,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: theme.surface, borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: theme.border,
   },
   itemTop: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 12,
   },
   itemEmojiWrap: {
-    width: 46, height: 46, borderRadius: 12, backgroundColor: '#1E1E1E',
+    width: 46, height: 46, borderRadius: 12, backgroundColor: theme.soft,
     justifyContent: 'center', alignItems: 'center',
   },
   itemEmoji: { fontSize: 26 },
   itemInfo: { flex: 1 },
-  itemName: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', marginBottom: 2 },
-  itemUnit: { color: '#80C45B', fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
+  itemName: { color: theme.text, fontSize: 15, fontWeight: '800', marginBottom: 2 },
+  itemUnit: { color: theme.accent, fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
   removeBtn: {
     padding: 6, backgroundColor: 'rgba(239,68,68,0.1)',
     borderRadius: 8, borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)',
@@ -298,25 +304,25 @@ const styles = StyleSheet.create({
   itemFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   qtyControl: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#1E1E1E', borderRadius: 10,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: theme.soft, borderRadius: 10,
+    borderWidth: 1, borderColor: theme.border,
   },
-  qtyBtn: { padding: 8, paddingHorizontal: 12 },
-  qtyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900', marginHorizontal: 8 },
-  itemTotal: { color: '#FFFFFF', fontSize: 17, fontWeight: '900' },
+  qtyBtn: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  qtyText: { fontVariant: ['tabular-nums'], color: theme.text, fontSize: 16, fontWeight: '900', marginHorizontal: 8 },
+  itemTotal: { fontVariant: ['tabular-nums'], color: theme.text, fontSize: 17, fontWeight: '900' },
 
   clearBtn: { alignSelf: 'flex-end', marginTop: 12, paddingVertical: 6, paddingHorizontal: 10 },
   clearBtnText: { color: '#EF4444', fontSize: 12, fontWeight: '700' },
 
-  formTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '900', marginTop: 28, marginBottom: 14 },
+  formTitle: { color: theme.text, fontSize: 18, fontWeight: '900', marginTop: 28, marginBottom: 14 },
   fieldLabel: {
-    color: '#888888', fontSize: 11, fontWeight: '800', textTransform: 'uppercase',
+    color: theme.muted, fontSize: 11, fontWeight: '800', textTransform: 'uppercase',
     letterSpacing: 1, marginBottom: 8, marginTop: 12,
   },
   input: {
-    backgroundColor: '#141414', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 13,
-    color: '#FFFFFF', fontSize: 14, fontWeight: '600',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: theme.surface, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 13,
+    color: theme.text, fontSize: 14, fontWeight: '600',
+    borderWidth: 1, borderColor: theme.border,
   },
   inputError: { borderColor: '#EF4444' },
   textarea: { minHeight: 72, textAlignVertical: 'top' },
@@ -324,41 +330,41 @@ const styles = StyleSheet.create({
   wrapRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', backgroundColor: '#141414',
+    borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface,
   },
-  chipActive: { backgroundColor: '#80C45B', borderColor: '#80C45B' },
-  chipText: { color: '#AAAAAA', fontSize: 12, fontWeight: '700' },
-  chipTextActive: { color: '#0E2C1C' },
+  chipActive: { backgroundColor: theme.accentSoft, borderColor: theme.accent },
+  chipText: { color: theme.muted, fontSize: 12, fontWeight: '700' },
+  chipTextActive: { color: theme.text },
 
   errorBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 10, padding: 12, marginTop: 16,
     borderWidth: 1, borderColor: 'rgba(239,68,68,0.25)',
   },
-  errorBannerText: { color: '#F87171', fontSize: 12, fontWeight: '700', flex: 1 },
+  errorBannerText: { color: theme.error, fontSize: 12, fontWeight: '700', flex: 1 },
 
   totalsSection: {
-    backgroundColor: '#141414', borderRadius: 16, padding: 18,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', marginTop: 20,
+    backgroundColor: theme.surface, borderRadius: 16, padding: 18,
+    borderWidth: 1, borderColor: theme.border, marginTop: 20,
   },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   totalRowFinal: {
-    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopWidth: 1, borderTopColor: theme.border,
     paddingTop: 14, marginBottom: 0,
   },
-  totalLabelText: { color: '#888888', fontSize: 14 },
-  totalValueSm: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  shippingHint: { color: '#80C45B', fontSize: 11, fontWeight: '700', marginBottom: 10 },
-  totalFinalLabel: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
-  totalFinalValue: { color: '#80C45B', fontSize: 24, fontWeight: '900' },
+  totalLabelText: { color: theme.muted, fontSize: 14 },
+  totalValueSm: { fontVariant: ['tabular-nums'], color: theme.text, fontSize: 14, fontWeight: '700' },
+  shippingHint: { color: theme.accent, fontSize: 11, fontWeight: '700', marginBottom: 10 },
+  totalFinalLabel: { color: theme.text, fontSize: 18, fontWeight: '900' },
+  totalFinalValue: { fontVariant: ['tabular-nums'], color: theme.accent, fontSize: 24, fontWeight: '900' },
 
   waBtn: {
-    backgroundColor: '#25D366', flexDirection: 'row', alignItems: 'center',
+    backgroundColor: theme.accent, flexDirection: 'row', alignItems: 'center',
     justifyContent: 'center', gap: 10, paddingVertical: 17,
     borderRadius: 16, marginTop: 16,
     shadowColor: '#25D366', shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35, shadowRadius: 12, elevation: 8,
   },
-  waBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 16 },
-  waNote: { color: '#555555', fontSize: 12, textAlign: 'center', marginTop: 10 },
+  waBtnText: { color: theme.onAccent, fontWeight: '900', fontSize: 16 },
+  waNote: { color: theme.muted, fontSize: 12, textAlign: 'center', marginTop: 10 },
 });

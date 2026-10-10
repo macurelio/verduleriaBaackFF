@@ -24,17 +24,17 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
   const totalCount = productList.length
 
   return (
-    <section aria-label="Filtro por categorías" className="sticky top-16 z-40 bg-charcoal/95 backdrop-blur border-y border-white/10">
+    <section aria-label="Filtro por categorías" className="sticky top-16 z-40 bg-surface/95 backdrop-blur border-y border-border">
       <div className="store-container py-2 md:py-3">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 overflow-x-auto py-1">
           <button
             onClick={() => onSelectCategory(null)}
             aria-pressed={selectedCategory === null}
             className={[
-              'whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-bold border transition-colors',
+              'whitespace-nowrap px-3 py-2.5 min-h-11 rounded-full text-sm font-heading font-bold border transition-colors',
               selectedCategory === null
                 ? 'bg-mora border-mora text-white'
-                : 'border-white/10 text-sand/70 hover:text-sand hover:bg-white/5',
+                : 'border-border text-muted hover:text-ink hover:bg-surface',
             ].join(' ')}
           >
             Todos {totalCount ? `(${totalCount})` : ''}
@@ -46,10 +46,10 @@ export default function CategoryChips({ selectedCategory, onSelectCategory }: Ca
               onClick={() => onSelectCategory(name)}
               aria-pressed={selectedCategory === name}
               className={[
-                'whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-bold border transition-colors',
+                'whitespace-nowrap px-3 py-2.5 min-h-11 rounded-full text-sm font-heading font-bold border transition-colors',
                 selectedCategory === name
                   ? 'bg-mora border-mora text-white'
-                  : 'border-white/10 text-sand/70 hover:text-sand hover:bg-white/5',
+                  : 'border-border text-muted hover:text-ink hover:bg-surface',
               ].join(' ')}
             >
               {name} {counts[name] ? `(${counts[name]})` : ''}

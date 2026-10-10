@@ -1,3 +1,5 @@
+import { theme } from './src/theme';
+import { useReducedMotion } from './src/hooks/useReducedMotion';
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,6 +14,7 @@ import { BRAND_NAME } from './src/config';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const reducedMotion = useReducedMotion();
   const [showSplash, setShowSplash] = useState(true);
 
   return (
@@ -20,10 +23,10 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator
             screenOptions={{
-              headerStyle: { backgroundColor: '#163D27' },
-              headerTintColor: '#FFFFFF',
-              headerTitleStyle: { fontWeight: '900', color: '#FFFFFF' },
-              contentStyle: { backgroundColor: '#0E2C1C' },
+              headerStyle: { backgroundColor: theme.surface },
+              headerTintColor: theme.text,
+              headerTitleStyle: { fontWeight: '900', color: theme.text },
+              contentStyle: { backgroundColor: theme.canvas },
             }}
           >
             <Stack.Screen
@@ -36,16 +39,16 @@ export default function App() {
               component={CartScreen}
               options={{
                 title: 'Tu pedido',
-                headerStyle: { backgroundColor: '#0E2C1C' },
-                headerTintColor: '#80C45B',
-                headerTitleStyle: { fontWeight: '900', color: '#FFFFFF' },
+                headerStyle: { backgroundColor: theme.canvas },
+                headerTintColor: theme.accent,
+                headerTitleStyle: { fontWeight: '900', color: theme.text },
               }}
             />
           </Stack.Navigator>
         </NavigationContainer>
 
         {/* Splash banner rendered on top of everything */}
-        {showSplash && (
+        {showSplash && !reducedMotion && (
           <SplashBanner onFinish={() => setShowSplash(false)} />
         )}
       </CartProvider>

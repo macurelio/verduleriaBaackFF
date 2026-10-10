@@ -18,8 +18,8 @@ export default function ProductGrid({ products, emptyMessage }: ProductGridProps
             className="flex flex-col items-center justify-center gap-4 text-center py-16"
           >
             <div className="text-5xl">🧺</div>
-            <p className="text-white/50 font-body text-sm">{emptyMessage || 'No hay productos para esta categoría.'}</p>
-            <p className="text-white/30 font-body text-xs">Prueba cambiando de categoría o selecciona "Todos".</p>
+            <p className="text-muted font-body text-sm">{emptyMessage || 'No hay productos para esta categoría.'}</p>
+            <p className="text-muted font-body text-xs">Prueba cambiando de categoría o selecciona "Todos".</p>
           </motion.div>
         ) : (
           <div className="catalog-grid">

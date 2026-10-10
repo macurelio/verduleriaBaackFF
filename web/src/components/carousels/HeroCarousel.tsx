@@ -1,12 +1,13 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import {
   motion,
   AnimatePresence,
   useMotionValue,
   useTransform,
   useSpring,
+  useReducedMotion,
 } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 import { useCarousel } from '../../hooks/useCarousel'
 import Button from '../ui/Button'
 import type { HeroSlide } from '../../types'
@@ -17,7 +18,7 @@ const slides: HeroSlide[] = [
     badge: 'Fresco del campo',
     title: 'Verdura fresca\na tu puerta.',
     subtitle:
-      'Frutas y verduras seleccionadas a mano, directo desde el campo. Pide hoy y recíbelo hoy mismo en Gran Santiago.',
+      'Frutas y verduras seleccionadas a mano, directo desde el campo. Arma tu pedido y consulta la entrega en Gran Santiago.',
     cta: 'Ver verduras',
     ctaHref: '#productos',
     ctaVariant: 'secondary',
@@ -30,10 +31,10 @@ const slides: HeroSlide[] = [
   },
   {
     id: 2,
-    badge: 'Pedido en 30 segundos',
+    badge: 'Tu canasta, a tu ritmo',
     title: 'El pedido que\nahorra tiempo.',
     subtitle:
-      'Arma tu canasta, completa tus datos y envía tu pedido por WhatsApp. Pagas al recibir: efectivo, transferencia o contra entrega.',
+      'Elige tus productos y completa tus datos. Registra tu pedido y, si prefieres, continúa por WhatsApp. La tienda confirmará entrega y pago.',
     cta: 'Armar mi canasta',
     ctaHref: '#productos',
     ctaVariant: 'secondary',
@@ -109,11 +110,14 @@ const GRAIN_URL =
  * Full-width, auto-playing banner with Framer Motion parallax + staggered text.
  */
 export default function HeroCarousel() {
+  const reducedMotion = useReducedMotion()
+  const [paused, setPaused] = useState(false)
+  const [focused, setFocused] = useState(false)
   const dirRef = useRef(1)
   const prevIndexRef = useRef(0)
 
   const { current, go, prev, next, pause, resume } = useCarousel(slides.length, {
-    autoPlay: true,
+    autoPlay: !reducedMotion && !paused && !focused,
     interval: 5000,
   })
 
@@ -182,7 +186,9 @@ export default function HeroCarousel() {
       className="compact-hero relative w-full overflow-hidden select-none"
       onMouseEnter={pause}
       onMouseLeave={() => { resume(); handleMouseLeave(); }}
-      onMouseMove={handleMouseMove}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false) }}
+      onMouseMove={reducedMotion ? undefined : handleMouseMove}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       aria-roledescription="carousel"
@@ -304,7 +310,7 @@ export default function HeroCarousel() {
           {/* Decorative diamond / sparkle — bottom right */}
           <motion.div
             className="absolute bottom-12 right-14 z-10 pointer-events-none"
-            animate={{ rotate: [0, 15, 0, -15, 0], scale: [1, 1.08, 1] }}
+            animate={reducedMotion ? {} : { rotate: [0, 15, 0, -15, 0], scale: [1, 1.08, 1] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             aria-hidden
           >
@@ -325,7 +331,7 @@ export default function HeroCarousel() {
         whileTap={{ scale: 0.94 }}
         transition={{ duration: 0.18, ease: EASE_PREMIUM }}
         aria-label="Diapositiva anterior"
-        className="absolute left-3 bottom-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
+        className="absolute left-3 bottom-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
       >
         <ChevronLeft size={20} />
       </motion.button>
@@ -336,36 +342,36 @@ export default function HeroCarousel() {
         whileTap={{ scale: 0.94 }}
         transition={{ duration: 0.18, ease: EASE_PREMIUM }}
         aria-label="Siguiente diapositiva"
-        className="absolute right-3 bottom-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
+        className="absolute right-3 bottom-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20"
       >
         <ChevronRight size={20} />
       </motion.button>
 
+      <button type="button" onClick={() => setPaused(value => !value)} aria-label={paused ? 'Reanudar carrusel' : 'Pausar carrusel'} className="absolute bottom-3 left-16 z-20 w-11 h-11 flex items-center justify-center rounded-full bg-charcoal/70 text-white">{paused ? <Play size={16} /> : <Pause size={16} />}</button>
       {/* ── Dot indicators ── */}
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
-        role="tablist"
+        role="group"
         aria-label="Diapositivas"
       >
         {slides.map((_, i) => (
           <motion.button
             key={i}
-            role="tab"
             onClick={() => navigateWithDir(i)}
             aria-label={`Ir a la diapositiva ${i + 1}`}
-            aria-selected={i === current}
+            aria-pressed={i === current}
             animate={{
-              width: i === current ? 24 : 8,
+              width: 44,
               backgroundColor: i === current ? '#ffffff' : 'rgba(255,255,255,0.38)',
             }}
             transition={{ duration: 0.3, ease: EASE_PREMIUM }}
-            className="h-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="h-3 my-4 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           />
         ))}
       </div>
 
       {/* ── Progress bar (Framer Motion) ── */}
-      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-white/10 z-20">
+      {!reducedMotion && !paused && !focused && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-white/10 z-20">
         <motion.div
           key={current}
           className="h-full bg-white/50 origin-left"
@@ -373,7 +379,7 @@ export default function HeroCarousel() {
           animate={{ scaleX: 1 }}
           transition={{ duration: 5, ease: 'linear' }}
         />
-      </div>
+      </div>}
     </div>
   )
 }

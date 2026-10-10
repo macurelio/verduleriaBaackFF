@@ -9,11 +9,11 @@ import ProductsShowcaseSection from './components/sections/ProductsShowcaseSecti
 import PromoSection from './components/sections/PromoSection'
 import B2BSection from './components/sections/B2BSection'
 import CTASection from './components/sections/CTASection'
-import WelcomeModal from './components/ui/WelcomeModal'
 import OfferBanner from './components/ui/OfferBanner'
 import OfferModal from './components/ui/OfferModal'
 import MiniCartBar from './components/ui/MiniCartBar'
 import CartDrawer from './components/ui/CartDrawer'
+import { MotionConfig } from 'framer-motion'
 
 function useSessionRedirects() {
   useEffect(() => {
@@ -36,7 +36,8 @@ function AppContent() {
   }, [brandName, deliveryZone])
 
   return (
-    <div className="min-h-screen bg-charcoal pb-14 md:pb-0">
+    <div className="min-h-screen bg-canvas pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+      <a href="#productos" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-surface focus:p-3 focus:rounded-xl">Ir a productos</a>
       <OfferBanner onOpenOffer={() => setOfferOpen(true)} />
       <Navbar onOpenCart={() => setCartOpen(true)} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
       <main>
@@ -47,7 +48,6 @@ function AppContent() {
         <CTASection />
       </main>
       <Footer />
-      <WelcomeModal />
       <OfferModal open={offerOpen} onClose={() => setOfferOpen(false)} />
       <MiniCartBar onOpenCart={() => setCartOpen(true)} />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
@@ -57,8 +57,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <CartProvider>
-      <AppContent />
-    </CartProvider>
+    <MotionConfig reducedMotion="user">
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
+    </MotionConfig>
   )
 }

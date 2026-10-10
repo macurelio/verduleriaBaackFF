@@ -5,16 +5,17 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return;
     const cartItemId = product.id;
     setCart(currentCart => {
       const existing = currentCart.find(item => item.cartItemId === cartItemId);
       if (existing) {
         return currentCart.map(item =>
-          item.cartItemId === cartItemId ? { ...item, ...product, quantity: Math.min(99, item.quantity + 1) } : item
+          item.cartItemId === cartItemId ? { ...item, ...product, quantity: Math.min(99, item.quantity + quantity) } : item
         );
       }
-      return [...currentCart, { ...product, cartItemId, quantity: 1 }];
+      return [...currentCart, { ...product, cartItemId, quantity: Math.min(99, quantity) }];
     });
   };
 

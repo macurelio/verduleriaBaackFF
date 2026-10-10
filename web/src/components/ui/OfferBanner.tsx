@@ -29,11 +29,11 @@ export default function OfferBanner({ onOpenOffer }: OfferBannerProps) {
             <p className="text-white/90 font-body text-center leading-snug">
               <span className="font-heading font-black text-white">PACK DESTACADO:</span>{' '}
               {offer.title} ·{' '}
-              <span className="font-heading font-black text-white">${offer.promoPrice.toLocaleString('es-CL')}</span>
+              <span className="font-heading font-black text-white tabular-nums">${offer.promoPrice.toLocaleString('es-CL')}</span>
             </p>
             <button
               onClick={onOpenOffer}
-              className="flex-shrink-0 bg-white/20 hover:bg-white/30 active:scale-95 text-white font-heading font-black text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap"
+              className="flex-shrink-0 min-h-11 bg-white/20 hover:bg-white/30 active:scale-95 text-white font-heading font-black text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap"
             >
               Ver oferta →
             </button>
@@ -42,7 +42,7 @@ export default function OfferBanner({ onOpenOffer }: OfferBannerProps) {
           {/* Dismiss */}
           <button
             onClick={() => setVisible(false)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-1"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-white transition-colors min-w-11 min-h-11 inline-flex items-center justify-center"
             aria-label="Cerrar anuncio"
           >
             <X size={14} />
