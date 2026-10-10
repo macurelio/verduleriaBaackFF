@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { Leaf, Search, ShoppingBag, Sparkles, X, Menu } from 'lucide-react'
+import { Leaf, Search, ShoppingBag, Sparkles, X, Menu, MapPin } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
 import { formatPrice } from '../../utils/cart'
 import { useTheme } from '../../context/ThemeContext'
+import { useLocation } from '../../context/LocationContext'
 import ThemeSwitcher from '../ui/ThemeSwitcher'
 
 interface NavbarProps {
@@ -26,6 +27,7 @@ export default function Navbar({
   const { brandName } = useSiteConfig()
   const { getCartCount, getCartTotal } = useCart()
   const { theme } = useTheme()
+  const { selectedComuna, openModal } = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
 
@@ -66,9 +68,19 @@ export default function Navbar({
               <span className={`font-heading font-black text-lg sm:text-xl ${theme.textMain} tracking-tight`}>
                 {brandName}
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                Gran Santiago
-              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  openModal()
+                }}
+                title="Cambiar comuna de despacho"
+                className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition cursor-pointer"
+              >
+                <MapPin size={10} className="text-emerald-600 dark:text-emerald-400" />
+                <span>{selectedComuna ? selectedComuna : 'Gran Santiago'}</span>
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-normal">✎</span>
+              </button>
             </div>
             <p className={`text-[11px] sm:text-xs ${theme.textMuted} flex items-center gap-1.5 font-medium`}>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />

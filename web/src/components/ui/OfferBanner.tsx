@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Sparkles, Truck, Check } from 'lucide-react'
+import { X, Sparkles, Truck, Check, Lock } from 'lucide-react'
+import { useCart } from '../../context/CartContext'
 
 interface OfferBannerProps {
   onOpenOffer?: () => void
@@ -10,7 +11,11 @@ interface OfferBannerProps {
 export default function OfferBanner({ onOpenOffer, onApplyCoupon }: OfferBannerProps) {
   const [visible, setVisible] = useState(true)
   const [copied, setCopied] = useState(false)
+  const { getCartTotal } = useCart()
   const couponCode = 'FRESCO10'
+  const cartTotal = getCartTotal()
+  const isUnlocked = cartTotal >= 20000
+  const needed = Math.max(0, 20000 - cartTotal)
 
   const handleCopyCoupon = () => {
     navigator.clipboard?.writeText(couponCode)
@@ -38,9 +43,21 @@ export default function OfferBanner({ onOpenOffer, onApplyCoupon }: OfferBannerP
                 <button
                   type="button"
                   onClick={onOpenOffer}
-                  className="inline-flex items-center gap-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded-full font-heading font-bold text-[10px] sm:text-[11px] border border-emerald-500/30 uppercase tracking-wider transition-colors cursor-pointer"
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-heading font-bold text-[10px] sm:text-[11px] border uppercase tracking-wider transition-colors cursor-pointer ${
+                    isUnlocked
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                      : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/30'
+                  }`}
                 >
-                  <Sparkles size={11} className="text-emerald-400" /> Oferta Especial
+                  {isUnlocked ? (
+                    <>
+                      <Sparkles size={11} className="text-amber-400" /> ¡Cupón Desbloqueado!
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={11} className="text-emerald-400" /> Beneficio sobre $20.000
+                    </>
+                  )}
                 </button>
               ) : (
                 <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-heading font-bold text-[10px] sm:text-[11px] border border-emerald-500/30 uppercase tracking-wider">
@@ -49,15 +66,27 @@ export default function OfferBanner({ onOpenOffer, onApplyCoupon }: OfferBannerP
               )}
               <span className="hidden md:inline text-emerald-600">•</span>
               <p className="text-center sm:text-left text-[11px] sm:text-xs text-emerald-100">
-                10% DCTO en tu compra con el cupón{' '}
-                <button
-                  type="button"
-                  onClick={handleCopyCoupon}
-                  className="font-bold text-white underline decoration-emerald-400 underline-offset-2 hover:text-emerald-300 transition-colors"
-                  title="Copiar cupón"
-                >
-                  {couponCode}
-                </button>
+                {isUnlocked ? (
+                  <>
+                    ¡10% DCTO en tu compra con el cupón{' '}
+                    <button
+                      type="button"
+                      onClick={handleCopyCoupon}
+                      className="font-bold text-white underline decoration-emerald-400 underline-offset-2 hover:text-emerald-300 transition-colors"
+                      title="Copiar cupón"
+                    >
+                      {couponCode}
+                    </button>
+                    !
+                  </>
+                ) : (
+                  <>
+                    Supera los $20.000 para desbloquear 10% DCTO con cupón{' '}
+                    {cartTotal > 0 && (
+                      <span className="text-emerald-300 font-semibold">(te faltan ${needed.toLocaleString('es-CL')})</span>
+                    )}
+                  </>
+                )}
               </p>
               {onOpenOffer && (
                 <button
@@ -74,23 +103,27 @@ export default function OfferBanner({ onOpenOffer, onApplyCoupon }: OfferBannerP
             <div className="flex items-center gap-3 text-[11px]">
               <span className="flex items-center gap-1.5 text-emerald-300 font-medium">
                 <Truck size={13} className="text-emerald-400" />
-                <span>Envíos gratis sobre $20.000</span>
+                <span>{isUnlocked ? '¡Envío Gratis Desbloqueado!' : 'Envíos gratis sobre $20.000'}</span>
               </span>
-              <span className="hidden sm:inline text-emerald-700">•</span>
-              <button
-                type="button"
-                onClick={handleCopyCoupon}
-                className="inline-flex items-center gap-1 text-emerald-300 hover:text-white font-semibold underline underline-offset-2 transition-colors"
-              >
-                {copied ? (
-                  <>
-                    <Check size={12} className="text-emerald-400" />
-                    <span className="text-emerald-400">¡Copiado!</span>
-                  </>
-                ) : (
-                  <span>Copiar Cupón</span>
-                )}
-              </button>
+              {isUnlocked && (
+                <>
+                  <span className="hidden sm:inline text-emerald-700">•</span>
+                  <button
+                    type="button"
+                    onClick={handleCopyCoupon}
+                    className="inline-flex items-center gap-1 text-emerald-300 hover:text-white font-semibold underline underline-offset-2 transition-colors cursor-pointer"
+                  >
+                    {copied ? (
+                      <>
+                        <Check size={12} className="text-emerald-400" />
+                        <span className="text-emerald-400">¡Copiado!</span>
+                      </>
+                    ) : (
+                      <span>Copiar Cupón</span>
+                    )}
+                  </button>
+                </>
+              )}
             </div>
           </div>
 

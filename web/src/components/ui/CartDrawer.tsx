@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { X, ShoppingCart } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
 import { useCartCalculations } from '../../hooks/useCartCalculations'
+import { useLocation } from '../../context/LocationContext'
 import { createOrder, orderLines, type OrderQuote } from '../../api/orders'
 import { ApiError } from '../../api/client'
 import { formatPrice } from '../../utils/cart'
@@ -18,11 +19,27 @@ const emptyForm: DeliveryForm = { name: '', phone: '', address: '', comuna: '', 
 export default function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const config = useSiteConfig()
   const { cart, couponCode, setCouponCode, quote, quotePending, quoteError, retryQuote } = useCart()
+  const { selectedComuna } = useLocation()
   const [couponDraft, setCouponDraft] = useState('')
+  const [couponWarning, setCouponWarning] = useState('')
   const needsQuote = cart.some(item => item.source === 'custom-pack') || !!couponCode
   const priceReady = !needsQuote || !!quote
   const amounts = useCartCalculations()
-  const [form, setForm] = useState<DeliveryForm>(emptyForm)
+  const [form, setForm] = useState<DeliveryForm>(() => {
+    try {
+      const saved = localStorage.getItem('mv_selected_comuna')
+      return saved && config.comunas.includes(saved) ? { ...emptyForm, comuna: saved } : emptyForm
+    } catch {
+      return emptyForm
+    }
+  })
+
+  useEffect(() => {
+    if (selectedComuna && !form.comuna && config.comunas.includes(selectedComuna)) {
+      setForm((prev) => ({ ...prev, comuna: selectedComuna }))
+    }
+  }, [selectedComuna, form.comuna, config.comunas])
+
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [shippingAlertOpen, setShippingAlertOpen] = useState(false)
@@ -129,11 +146,96 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
     <div ref={contentRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-5 space-y-5">
       {cart.length === 0 ? <div className="text-center py-16 space-y-4"><span className="text-6xl" aria-hidden="true">🧺</span><p className="font-bold text-lg">Tu canasta está vacía</p><p className="text-muted text-sm">Elige frutas, verduras o packs para empezar.</p><button type="button" onClick={onClose} className="rounded-xl bg-mora text-white px-5 py-3 font-bold">Seguir comprando</button></div> : <>
         <CartItems />
-        <form onSubmit={event => { event.preventDefault(); setCouponCode(couponDraft.trim().toUpperCase()) }} className="space-y-2">
-          <label htmlFor="order-coupon" className="field-label">Cupón del pedido</label>
-          <div className="flex gap-2"><input id="order-coupon" maxLength={40} value={couponDraft} onChange={event => setCouponDraft(event.target.value)} disabled={submitting} className="min-w-0 flex-1 rounded-xl border border-border p-3" /><button type="submit" disabled={submitting || !couponDraft.trim()} className="min-h-11 rounded-xl bg-mora text-white px-3">Aplicar</button></div>
-          {couponCode && <button type="button" disabled={submitting} onClick={() => { setCouponCode(''); setCouponDraft('') }} className="min-h-11 text-mora underline">Quitar cupón {couponCode}</button>}
-          <p className="text-xs text-muted">Un cupón por pedido, aplicado al subtotal después del descuento del pack.</p>
+        {/* Aviso de cupón desbloqueado al superar $20.000 */}
+        {amounts.subtotal >= 20000 && !couponCode && (
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-2xl p-3 flex items-center justify-between gap-3 text-xs shadow-xs">
+            <div className="min-w-0">
+              <p className="font-heading font-black text-emerald-900 dark:text-emerald-200">
+                🎉 ¡Superaste los $20.000!
+              </p>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300">
+                Aplica el cupón <strong>FRESCO10</strong> para 10% de descuento adicional.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => {
+                setCouponCode('FRESCO10')
+                setCouponDraft('FRESCO10')
+                setCouponWarning('')
+              }}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-xs whitespace-nowrap shadow-sm cursor-pointer"
+            >
+              Aplicar FRESCO10
+            </button>
+          </div>
+        )}
+
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            const code = couponDraft.trim().toUpperCase()
+            if (!code) return
+            if (code === 'FRESCO10' && amounts.subtotal < 20000) {
+              setCouponWarning(
+                `El cupón FRESCO10 requiere una compra mínima de $20.000 (te faltan ${formatPrice(amounts.amountNeeded)}).`,
+              )
+              return
+            }
+            setCouponWarning('')
+            setCouponCode(code)
+          }}
+          className="space-y-2"
+        >
+          <label htmlFor="order-coupon" className="field-label">
+            Cupón del pedido
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="order-coupon"
+              maxLength={40}
+              value={couponDraft}
+              onChange={(event) => {
+                setCouponDraft(event.target.value)
+                setCouponWarning('')
+              }}
+              disabled={submitting}
+              placeholder="Ej: FRESCO10"
+              className="min-w-0 flex-1 rounded-xl border border-border p-3 text-sm"
+            />
+            <button
+              type="submit"
+              disabled={submitting || !couponDraft.trim()}
+              className="min-h-11 rounded-xl bg-mora hover:bg-mora-dark text-white px-4 text-sm font-bold disabled:opacity-60 cursor-pointer"
+            >
+              Aplicar
+            </button>
+          </div>
+          {couponWarning && (
+            <p role="alert" className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+              {couponWarning}
+            </p>
+          )}
+          {couponCode && (
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => {
+                setCouponCode('')
+                setCouponDraft('')
+                setCouponWarning('')
+              }}
+              className="min-h-9 text-mora text-xs font-bold underline cursor-pointer"
+            >
+              Quitar cupón {couponCode}
+            </button>
+          )}
+          <p className="text-xs text-muted">
+            {amounts.subtotal >= 20000
+              ? 'Cupón aplicado al subtotal después del descuento del pack.'
+              : `💡 El cupón FRESCO10 (10% DCTO) se activa en compras sobre $20.000 (te faltan ${formatPrice(amounts.amountNeeded)}).`}
+          </p>
         </form>
         {quotePending && <p role="status" className="text-muted text-sm">Validando descuentos y total…</p>}
         {quoteError && <p role="alert" className="text-error text-sm">{quoteError} Revisa el cupón o vuelve a intentar la cotización antes de registrar.</p>}

@@ -31,10 +31,14 @@ const promoToProduct = (promo: Promo): Product => ({
 
 export default function OfferModal({ open, onClose }: OfferModalProps) {
   const offers = useApiResource('promotions', fetchPromotions, promos)
-  const { cart, addToCart, incrementQuantity, decrementQuantity, setCouponCode } = useCart()
+  const { cart, addToCart, incrementQuantity, decrementQuantity, setCouponCode, couponCode: appliedCoupon } = useCart()
   const { waLink } = useSiteConfig()
   const [copiedCoupon, setCopiedCoupon] = useState(false)
   const couponCode = 'FRESCO10'
+
+  const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const isUnlocked = cartSubtotal >= 20000
+  const needed = Math.max(0, 20000 - cartSubtotal)
 
   const handleApplyCoupon = () => {
     navigator.clipboard?.writeText(couponCode)
@@ -49,20 +53,24 @@ export default function OfferModal({ open, onClose }: OfferModalProps) {
         {/* Modal Header */}
         <div className="p-5 sm:p-6 border-b border-stone-200 dark:border-zinc-800 flex items-center justify-between bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100 dark:from-emerald-950/60 dark:to-teal-950/60">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-600 text-white rounded-2xl shadow-md">
+            <div className={`p-2.5 rounded-2xl shadow-md ${isUnlocked ? 'bg-amber-500 text-white animate-pulse' : 'bg-emerald-600 text-white'}`}>
               <Sparkles size={22} />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 id="offer-modal-title" className="font-heading font-black text-lg sm:text-xl text-stone-900 dark:text-white">
-                  Packs en Oferta Especial
+                  {isUnlocked ? '¡Cupón 10% DCTO Desbloqueado! 🎉' : 'Packs en Oferta y Cupón'}
                 </h2>
-                <span className="text-[10px] font-heading font-black bg-emerald-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Semanal
+                <span className={`text-[10px] font-heading font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                  isUnlocked ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white'
+                }`}>
+                  {isUnlocked ? '> $20.000' : 'Meta $20.000'}
                 </span>
               </div>
               <p className="text-xs text-stone-600 dark:text-zinc-400 font-body mt-0.5">
-                Combos armados con descuento directo de hasta un 20% + 10% adicional con cupón.
+                {isUnlocked
+                  ? `Tu canasta superó los $20.000 (llevas ${formatPrice(cartSubtotal)}). Tienes un 10% de descuento adicional garantizado con cupón.`
+                  : `Combos armados con descuento directo. Supera los $20.000 para desbloquear 10% adicional con cupón.`}
               </p>
             </div>
           </div>
@@ -79,32 +87,45 @@ export default function OfferModal({ open, onClose }: OfferModalProps) {
         {/* Modal Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
           {/* Coupon Callout Banner inside Dialog */}
-          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+          <div className={`border rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm ${
+            isUnlocked
+              ? 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700'
+              : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800'
+          }`}>
             <div className="flex items-center gap-2.5">
-              <Tag size={18} className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+              <Tag size={20} className={isUnlocked ? 'text-amber-600 dark:text-amber-400 flex-shrink-0' : 'text-emerald-600 dark:text-emerald-400 flex-shrink-0'} />
               <div>
                 <p className="text-xs font-heading font-bold text-stone-900 dark:text-zinc-100">
-                  Cupón extra 10% de descuento en el pedido:
+                  {isUnlocked
+                    ? '¡Tu pedido califica! Aplica tu 10% de descuento extra:'
+                    : `Desbloquea 10% extra sumando ${formatPrice(needed)} más:`}
                 </p>
                 <p className="text-[11px] text-stone-500 dark:text-zinc-400">
-                  Código <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-black">{couponCode}</strong> aplicable en el carrito.
+                  Código <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-black">{couponCode}</strong>{' '}
+                  {isUnlocked ? 'listo para aplicarse al total de tu canasta.' : `válido en pedidos superiores a $20.000.`}
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={handleApplyCoupon}
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-heading font-bold transition active:scale-95 shadow-sm whitespace-nowrap flex items-center gap-1.5"
-            >
-              {copiedCoupon ? (
-                <>
-                  <Check size={13} />
-                  <span>¡Aplicado al carrito!</span>
-                </>
-              ) : (
-                <span>Aplicar Cupón</span>
-              )}
-            </button>
+            {isUnlocked ? (
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-heading font-black transition active:scale-95 shadow-md whitespace-nowrap flex items-center gap-1.5 cursor-pointer"
+              >
+                {copiedCoupon || appliedCoupon === couponCode ? (
+                  <>
+                    <Check size={14} />
+                    <span>¡Aplicado al carrito!</span>
+                  </>
+                ) : (
+                  <span>Aplicar Cupón FRESCO10</span>
+                )}
+              </button>
+            ) : (
+              <span className="text-[11px] font-semibold text-stone-500 bg-stone-200/60 dark:bg-zinc-800 px-3 py-1.5 rounded-lg whitespace-nowrap">
+                Faltan {formatPrice(needed)}
+              </span>
+            )}
           </div>
 
           {/* List of Special Promo Packs */}

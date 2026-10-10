@@ -17,6 +17,8 @@ import CartDrawer from './components/ui/CartDrawer'
 import ChatAssistant from './components/ui/ChatAssistant'
 import PackPromoCallout from './components/ui/PackPromoCallout'
 import PackBuilderModal from './components/ui/PackBuilderModal'
+import ComunaVerificationModal from './components/ui/ComunaVerificationModal'
+import { LocationProvider } from './context/LocationContext'
 import { MotionConfig } from 'framer-motion'
 
 function useSessionRedirects() {
@@ -29,7 +31,7 @@ function useSessionRedirects() {
 
 function AppContent() {
   const { brandName, deliveryZone } = useSiteConfig()
-  const { setCouponCode } = useCart()
+  const { getCartTotal, setCouponCode } = useCart()
   const { theme } = useTheme()
 
   const [offerOpen, setOfferOpen] = useState(false)
@@ -39,6 +41,22 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  const cartTotal = getCartTotal()
+  const previousTotalRef = useRef(cartTotal)
+  const hasTriggeredOfferModalRef = useRef(false)
+
+  // Desplegar automáticamente el modal de cupones cuando el carrito supera los $20.000
+  useEffect(() => {
+    if (cartTotal >= 20000 && previousTotalRef.current < 20000 && !hasTriggeredOfferModalRef.current) {
+      hasTriggeredOfferModalRef.current = true
+      setOfferOpen(true)
+      showToast('🎉 ¡Superaste los $20.000! Desbloqueaste 10% DCTO con cupón FRESCO10')
+    } else if (cartTotal < 20000) {
+      hasTriggeredOfferModalRef.current = false
+    }
+    previousTotalRef.current = cartTotal
+  }, [cartTotal])
 
   useSessionRedirects()
 
@@ -138,6 +156,7 @@ function AppContent() {
       <Footer />
 
       {/* Modals & Overlays */}
+      <ComunaVerificationModal />
       <OfferModal open={offerOpen} onClose={() => setOfferOpen(false)} />
       <PackBuilderModal
         open={packBuilderOpen}
@@ -158,10 +177,13 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <ThemeProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
+        <LocationProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </LocationProvider>
       </ThemeProvider>
     </MotionConfig>
   )
 }
+
