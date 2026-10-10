@@ -100,6 +100,7 @@ export interface CategoryInput {
 }
 
 export interface OrderItem {
+  packId?: string | null
   productId: string
   productName: string
   unit: ProductUnit
@@ -111,6 +112,10 @@ export interface OrderItem {
 export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'DELIVERED' | 'CANCELLED'
 
 export interface Order {
+  grossSubtotal?: number
+  packDiscount?: number
+  couponDiscount?: number
+  couponCode?: string | null
   id: string
   code: string
   customerName: string

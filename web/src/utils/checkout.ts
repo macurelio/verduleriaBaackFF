@@ -25,7 +25,10 @@ export function buildWhatsappText(brandName: string, form: DeliveryForm, cart: C
   if (form.payment) lines.push(`💳 *Pago:* ${form.payment}`)
   if (form.notes.trim()) lines.push(`📝 *Notas:* ${form.notes.trim()}`)
   lines.push('', '*🛒 Productos:*')
-  cart.forEach(item => lines.push(`• ${item.name} (${UNIT_LABELS[item.unit]}) x${item.quantity} — ${formatPrice(item.price * item.quantity)}`))
+  cart.forEach(item => {
+    lines.push(`• ${item.name} (${UNIT_LABELS[item.unit]}) x${item.quantity} — ${formatPrice(item.price * item.quantity)}`)
+    item.components?.forEach(component => lines.push(`  ${component.quantity * item.quantity} × ${component.product.name} (${UNIT_LABELS[component.product.unit]})`))
+  })
   lines.push('', `Subtotal: ${formatPrice(amounts.subtotal)}`,
     amounts.shipping === 0 ? 'Despacho: gratis' : `Despacho: ${formatPrice(amounts.shipping)}`,
     `*TOTAL: ${formatPrice(amounts.total)}*`, 'Pedido pendiente de confirmación de la tienda.')

@@ -1,8 +1,8 @@
 import { theme } from '../theme';
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity,
-  FlatList, ScrollView, KeyboardAvoidingView, Platform,
+  FlatList, ScrollView, KeyboardAvoidingView, Platform, Linking,
 } from 'react-native';
 import { Check, MessageCircle, Trash2, Plus, Minus, AlertCircle } from 'lucide-react-native';
 import { CartContext } from '../context/CartContext';
@@ -19,6 +19,7 @@ import {
 
 import { calculateCart, formatPrice as fmt } from '../utils/cart';
 import FreeShippingBanner from '../components/FreeShippingBanner';
+import { orderLines, postOrderApi } from '../api/orders';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const DELIVERY_DAYS = Array.from({ length: 7 }, (_, i) => {
@@ -45,8 +46,30 @@ export default function CartScreen({ navigation }) {
   const [payment, setPayment] = useState('');
   const [notes, setNotes] = useState('');
   const [touched, setTouched] = useState(false);
+  const [couponDraft, setCouponDraft] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [quoted, setQuoted] = useState(null);
+  const [apiError, setApiError] = useState('');
+  const [sending, setSending] = useState(false);
+  const [quoteAttempt, setQuoteAttempt] = useState(0);
+  const locked = useRef(false);
+  const saved = useRef(null);
+  const quoteKey = JSON.stringify({ cart, couponCode });
+  const needsQuote = cart.some(item => item.components) || !!couponCode;
+  const quote = quoted?.key === quoteKey ? quoted.data : null;
+  useEffect(() => {
+    if (!needsQuote || !cart.length) return;
+    let cancelled = false;
+    setApiError('');
+    const timer = setTimeout(() => postOrderApi('/orders/quote', { items: orderLines(cart), couponCode: couponCode || null })
+      .then(data => {
+        if (![data.subtotal, data.shipping, data.total].every(value => Number.isSafeInteger(value) && value >= 0) || data.total !== data.subtotal + data.shipping) throw new Error('Total invalido.');
+        if (!cancelled) setQuoted({ key: quoteKey, data });
+      }).catch(error => { if (!cancelled) setApiError(error.message); }), 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [cart, couponCode, needsQuote, quoteKey, quoteAttempt]);
 
-  const { subtotal, shipping, total } = calculateCart(cart, SHIPPING_FEE, FREE_SHIPPING_OVER);
+  const { subtotal, shipping, total } = quote || calculateCart(cart, SHIPPING_FEE, FREE_SHIPPING_OVER);
 
   const errors = useMemo(() => ({
     name: name.trim().length < 2,
@@ -60,9 +83,23 @@ export default function CartScreen({ navigation }) {
 
   const hasErrors = Object.values(errors).some(Boolean);
 
-  const sendOrderWhatsapp = () => {
+  const sendOrderWhatsapp = async () => {
     setTouched(true);
     if (hasErrors) return;
+    if (locked.current || (needsQuote && !quote)) return;
+    if (needsQuote) {
+      const payload = { customerName: name.trim(), phone: phone.replace(/[\s.-]/g, ''), address: address.trim(), comuna, deliveryDate: date, deliveryWindow: window_, paymentMethod: payment, notes: notes.trim(), items: orderLines(cart), couponCode: couponCode || null };
+      const fingerprint = JSON.stringify(payload);
+      locked.current = true; setSending(true); setApiError('');
+      try {
+        const order = saved.current?.fingerprint === fingerprint ? saved.current.order : await postOrderApi('/orders', payload);
+        saved.current = { fingerprint, order };
+        if (!/^https:\/\/wa\.me\//.test(order.whatsappUrl)) throw new Error('Pedido registrado. Consulta el enlace con la tienda.');
+        await Linking.openURL(order.whatsappUrl);
+      } catch (error) { setApiError(`${error.message} Consulta con la tienda antes de volver a registrar para evitar duplicados.`); }
+      finally { locked.current = false; setSending(false); }
+      return;
+    }
 
     const lines = ['/// NUEVO PEDIDO MORA VERDURAS ///', ''];
     cart.forEach(item => {
@@ -93,6 +130,7 @@ export default function CartScreen({ navigation }) {
         <View style={styles.itemInfo}>
           <Text style={styles.itemName}>{item.name}</Text>
           <Text style={styles.itemUnit}>{fmt(item.price)} · {UNIT_LABELS[item.unit]}</Text>
+          {item.components?.map(component => <Text key={component.product.id} style={styles.itemUnit}>{component.quantity} × {component.product.name}</Text>)}
         </View>
         <TouchableOpacity style={styles.removeBtn} onPress={() => removeItem(item.cartItemId)}>
           <Trash2 color="#EF4444" size={18} />
@@ -153,7 +191,7 @@ export default function CartScreen({ navigation }) {
           <Text style={styles.clearBtnText}>Vaciar pedido</Text>
         </TouchableOpacity>
 
-        <FreeShippingBanner />
+        <FreeShippingBanner subtotal={subtotal} />
         {/* Delivery form */}
         <Text style={styles.formTitle}>Datos de despacho</Text>
 
@@ -255,7 +293,16 @@ export default function CartScreen({ navigation }) {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.waBtn} onPress={sendOrderWhatsapp} activeOpacity={0.85}>
+        <Text style={styles.totalLabelText}>Cupón del pedido</Text>
+        <TextInput accessibilityLabel="Cupón del pedido" value={couponDraft} onChangeText={setCouponDraft} maxLength={40} autoCapitalize="characters" style={styles.input} editable={!sending} />
+        <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} disabled={sending} onPress={() => setCouponCode(couponDraft.trim().toUpperCase())}><Text style={styles.itemUnit}>Aplicar cupón</Text></TouchableOpacity>
+        {!!couponCode && <TouchableOpacity accessibilityRole="button" disabled={sending} onPress={() => { setCouponCode(''); setCouponDraft(''); }}><Text style={styles.itemUnit}>Quitar cupón {couponCode}</Text></TouchableOpacity>}
+        {needsQuote && !quote && !apiError && <Text accessibilityLiveRegion="polite">Validando descuentos…</Text>}
+        {!!quote?.packDiscount && <Text>Descuento packs: −{fmt(quote.packDiscount)}</Text>}
+        {!!quote?.couponDiscount && <Text>Descuento cupón: −{fmt(quote.couponDiscount)}</Text>}
+        {!!apiError && <Text accessibilityLiveRegion="polite" style={{ color: theme.error }}>{apiError}</Text>}
+        {!!apiError && !quote && <TouchableOpacity accessibilityRole="button" onPress={() => setQuoteAttempt(previous => previous + 1)} style={{ minHeight: 44, justifyContent: 'center' }}><Text style={styles.itemUnit}>Reintentar cotización</Text></TouchableOpacity>}
+        <TouchableOpacity style={styles.waBtn} disabled={sending || (needsQuote && !quote)} onPress={sendOrderWhatsapp} activeOpacity={0.85}>
           <MessageCircle color={theme.onAccent} size={22} />
           <Text style={styles.waBtnText}>Solicitar pedido por WhatsApp</Text>
         </TouchableOpacity>

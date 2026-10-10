@@ -1,47 +1,37 @@
-# Fase 5 — integración pendiente
+# Fase 5 — contrato implementado localmente
 
-## Estado y regla aprobada
+Packs personalizados integrados en web, Expo, administrador y backend externo C:\verduleriaBaack. No desplegado.
 
-El constructor ya agrega una selección de productos reales a precio de catálogo, en ambas apps. No representa todavía un pack con descuento en el pedido. La API existente recibe `items: [{productId, quantity}]`; esas líneas conservan sus precios normales. No se cambia ese comportamiento hasta tener soporte del servidor.
+## Reglas
 
-El usuario aprobó contar IDs distintos: 4–5 productos = 10 %, 6 o más = 15 %. Varias unidades del mismo ID cuentan como un producto. También confirmó excluir packs de las promociones. Los selectores excluyen productos de unidad `pack` o categoría `Packs`; el constructor personalizado excluye asimismo promociones predefinidas.
+Mínimo 4 productos distintos por pack: 4–5 activan 10 %, 6+ activan 15 %. Varias unidades del mismo ID no elevan el tramo. Excluir promociones, unidad pack y categoría Packs. Límite global 99 unidades por producto, incluyendo todas las composiciones.
 
-## Cupones en el administrador (implementado localmente)
+Un cupón por pedido: se aplica una vez al subtotal después del descuento del pack; no al despacho. Descuentos redondeados hacia abajo a CLP enteros. Envío configurado $2.500, gratis desde $20.000 de subtotal después de descuentos. Conservar configuración central.
 
-Sección **Cupones** en `/admin`: crear/editar nombre (también código del cliente), porcentaje entero 1–100 y estado activo. Nombres normalizados a mayúsculas, 2–40 caracteres sin espacios: letras ASCII, números, guion o guion bajo. Evita duplicados incluyendo cupones inactivos; permite reactivarlos.
+## API
 
-Backend `C:\verduleriaBaack`: `GET/POST /api/v1/admin/coupons`, `PUT /api/v1/admin/coupons/{UUID}`; permisos ROLE_ADMIN existentes. DTO `{name, percentage, active}`, respuesta agrega `id`. Migración nueva `V3__coupons.sql` con unicidad y restricciones de nombre/porcentaje. No hay endpoint público que liste códigos ni cupones creados de ejemplo. Los cupones aún no afectan el cálculo de pedidos: el checkout y la política de acumulación se integrarán después.
+POST /api/v1/orders/quote recibe items [{productId, quantity, packId?}] y couponCode opcional. Cotiza sin guardar pedidos. productId siempre es real; packId solo agrupa los componentes, nunca se usa como producto.
 
-Verificado: TypeScript/build admin; creación/edición/desactivación, duplicados, errores y móvil en Chromium con API simulada; pruebas unitarias Java correctas. Las pruebas PostgreSQL/Testcontainers se omitieron sin Docker. No desplegado.
+Respuesta: grossSubtotal, packDiscount, couponDiscount, couponCode, subtotal neto, shipping, total.
 
-## Propuesta de contrato aditivo (no implementado)
+POST /api/v1/orders recibe esos mismos campos junto con los datos existentes de cliente/entrega. Recarga precios, comprueba actividad/elegibilidad y cantidades, vuelve a calcular y registra. No recibe precios/porcentajes/totales del cliente. Pedidos antiguos sin packId ni couponCode siguen funcionando.
 
-```json
-{
-  "items": [{ "productId": "h1", "quantity": 1 }],
-  "customPacks": [{ "items": [{ "productId": "h2", "quantity": 2 }] }],
-  "couponCode": null
-}
-```
+Flyway V3__coupons.sql crea cupones. V4__order_discounts.sql conserva descuentos y código en pedidos, agrupación en líneas y subtotal bruto de pedidos históricos. El administrador y el mensaje WhatsApp muestran composición y descuentos.
 
-Mantener los campos actuales de cliente/entrega. Los pedidos antiguos siguen funcionando. El servidor recarga cada producto, comprueba actividad/elegibilidad, agrupa IDs repetidos, limita cantidades y calcula descuentos por cada composición. No aceptar porcentaje ni precio del cliente. Una promoción predefinida nunca cuenta para un pack personalizado. Validar cantidades totales por producto entre líneas normales y todos los packs.
+## Cupones en /admin
 
-Respuesta aditiva sugerida: `grossSubtotal`, `packDiscount`, `couponDiscount`, `appliedCoupon`, `customPacks` con composición y snapshots. Conservar `subtotal` como importe después de descuentos y antes de envío. Administrador y WhatsApp deben mostrar composición, descuentos y totales registrados. Agregar una capacidad explícita al GET de configuración para habilitar la UI solo con un backend compatible; no inferir capacidad por versión del frontend.
+Crear/editar nombre (también código), porcentaje entero 1–100 y activo/inactivo. Nombres únicos de 2–40 caracteres, mayúsculas, letras ASCII/números/guion/guion bajo, sin espacios. Reactivar mediante edición. Sin códigos de ejemplo ni listado público de códigos.
 
-## Decisiones todavía pendientes
+GET/POST /api/v1/admin/coupons, PUT /api/v1/admin/coupons/{UUID}, protegidos por ROLE_ADMIN. DTO {name, percentage, active}; respuesta agrega id. Validaciones cliente/servidor/SQL, incluyendo rechazo de porcentajes fraccionarios.
 
-- Acumulación de cupones con descuentos de packs.
-- Los códigos y porcentajes se administran en `/admin`; futuras vigencias en America/Santiago, mínimos y elegibilidad siguen pendientes.
-- Umbral de envío gratis: importe antes o después de descuentos.
-- Redondeo CLP: propuesta `floor(base * porcentaje / 100)` para el descuento.
-- Límites de uso de cupones: un pedido PENDING no demuestra compra; definir consumo/cancelación antes de ofrecer usos limitados.
+## Interfaz
 
-## Cambios necesarios en backend y administrador
+Constructor con cantidades, descuento y agregado como pack. Web persiste/reconcilia composición; retira el pack completo si desaparece un componente. Borrador y cupón no persisten después de recargar.
 
-Backend externo en `C:\verduleriaBaack`: DTOs aditivos, cálculo autoritativo, entidades y migraciones Flyway para composición y snapshots de descuento, endpoints públicos de cotización. La gestión protegida de cupones y su tabla ya están implementadas localmente. Cotizar antes de enviar, volver a calcular al registrar; cotizar no consume cupón. No modificar migraciones aplicadas ni confiar en precios del navegador.
+Carrito cotiza al cambiar productos/cantidades/cupón, descarta respuestas obsoletas y bloquea registro sin cotización válida. Permite quitar cupón inválido/reintentar. Web conserva importes registrados y reutiliza el pedido al abrir WhatsApp. Expo registra por API los pedidos con pack/cupón y conserva el resultado en esa pantalla; pedidos ordinarios mantienen WhatsApp directo.
 
-Administrador: añadir futuras vigencias; inspeccionar la composición de cada pack y descuentos en pedidos; preservar los campos existentes de configuración.
+## Verificación y publicación
 
-Frontend: conservar packs por composición, distinguir líneas individuales de packs, reconciliar IDs y disponibilidad, pedir cotización al editar y enviar composición al registrar. Al fallar la cotización, impedir cobrar con un descuento local. Expo también necesita integrar ese contrato antes de emitir pedidos descontados.
+TypeScript/builds web/admin, export Expo web, pruebas unitarias de servidor para tramos, cantidades repetidas, límite global, redondeo, cupón aplicado una vez y envío sobre subtotal neto. Navegador con API simulada: pack, cotización, cupón inválido/válido, registro con componentes reales sin precios enviados.
 
-Verificación: límites 3/4/5/6 productos, IDs repetidos, promociones excluidas, cantidades 1/99 y suma global, productos inactivos, cupones vencidos/no válidos, acumulación, redondeo y envío en el umbral; pruebas de integración contra PostgreSQL y revisión del pedido en administrador y WhatsApp.
+Pendiente ejecutar migraciones/pruebas PostgreSQL (Testcontainers se omite sin Docker), probar Android/iOS físicos y desplegar backend antes del frontend. Pruebas simuladas no confirman persistencia real ni entrega WhatsApp. Sin pagos en línea, reservas de stock, vigencias o límites de uso de cupones en esta fase.

@@ -151,17 +151,19 @@ export default function OrdersScreen() {
                   </div>
 
                   <div className="space-y-1">
-                    {order.items.map((item) => (
+                    {order.items.map((item, index) => (
                       <div
-                        key={item.productId}
+                        key={`${item.packId ?? 'single'}-${item.productId}-${index}`}
                         className="flex items-center justify-between text-sm"
                       >
                         <span className="text-sand/70">
-                          {item.quantity} × {item.productName}
+                          {item.packId && `Pack personalizado ${[...new Set(order.items.map(line => line.packId).filter(Boolean))].indexOf(item.packId) + 1} · `}{item.quantity} × {item.productName}
                         </span>
                         <span className="text-sand font-semibold">{fmtCLP(item.lineTotal)}</span>
                       </div>
                     ))}
+                    {!!order.packDiscount && <p className="text-sm text-sand">Descuento packs: −{fmtCLP(order.packDiscount)}</p>}
+                    {!!order.couponDiscount && <p className="text-sm text-sand">Cupón {order.couponCode}: −{fmtCLP(order.couponDiscount)}</p>}
                     <div className="flex items-center justify-between text-sm pt-2 border-t border-white/10">
                       <span className="text-sand/60">Subtotal · Envío</span>
                       <span className="text-sand/60">

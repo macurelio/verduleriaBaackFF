@@ -5,9 +5,9 @@ import { FREE_SHIPPING_OVER, SHIPPING_FEE, DELIVERY_ZONE } from '../config';
 import { calculateCart, formatPrice } from '../utils/cart';
 import { theme } from '../theme';
 
-export default function FreeShippingBanner() {
+export default function FreeShippingBanner({ subtotal } = {}) {
   const { cart } = useContext(CartContext);
-  const { isFreeShipping, amountNeeded, progress } = calculateCart(cart, SHIPPING_FEE, FREE_SHIPPING_OVER);
+  const { isFreeShipping, amountNeeded, progress } = calculateCart(subtotal === undefined ? cart : [{ price: subtotal, quantity: 1 }], SHIPPING_FEE, FREE_SHIPPING_OVER);
   return <View style={styles.banner}>
     <Text accessibilityLiveRegion="polite" style={styles.title}>{isFreeShipping ? 'Tu pedido tiene despacho gratis' : `Te faltan ${formatPrice(amountNeeded)} para despacho gratis`}</Text>
     <Text style={styles.hint}>Desde {formatPrice(FREE_SHIPPING_OVER)} · {DELIVERY_ZONE}</Text>

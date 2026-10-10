@@ -15,6 +15,7 @@ export default function CartItems() {
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-bold text-sm leading-snug">{item.name}</h3>
+          {item.components && <ul className="text-xs text-muted mt-2">{item.components.map(component => <li key={component.product.id}>{component.quantity} × {component.product.name} · {UNIT_LABELS[component.product.unit]}</li>)}</ul>}
           <p className="text-muted text-xs mt-1 tabular-nums">{formatPrice(item.price)} · {UNIT_LABELS[item.unit]}</p>
           <div className="flex items-center flex-wrap gap-1 mt-2">
             <button type="button" onClick={() => decrementQuantity(item.cartItemId)} aria-label={`Reducir cantidad de ${item.name}`} className="quantity-button"><Minus size={16} /></button>

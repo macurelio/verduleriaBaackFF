@@ -24,7 +24,7 @@ export interface Product {
   gradientFrom: string
   gradientTo: string
   featured?: boolean
-  source?: 'promotion'
+  source?: 'promotion' | 'custom-pack'
 }
 
 // ─── Category ────────────────────────────────────────────────────────────────
@@ -106,12 +106,20 @@ export interface ButtonProps {
 export interface CartItem extends Product {
   cartItemId: string
   quantity: number
+  components?: { product: Product; quantity: number }[]
 }
 
 export interface CartContextType {
   cart: CartItem[]
   addToCart: (product: Product, quantity?: number) => void
   addSelection: (items: { product: Product; quantity: number }[]) => boolean
+  addCustomPack: (items: { product: Product; quantity: number }[]) => boolean
+  couponCode: string
+  setCouponCode: (code: string) => void
+  quote: import('../api/orders').OrderQuote | null
+  quotePending: boolean
+  quoteError: string
+  retryQuote: () => void
   incrementQuantity: (cartItemId: string) => void
   decrementQuantity: (cartItemId: string) => void
   removeItem: (cartItemId: string) => void

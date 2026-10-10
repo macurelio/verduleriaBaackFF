@@ -65,3 +65,4 @@ export function openWhatsApp(message) {
     Linking.openURL(waLink(message)),
   );
 }
+export const API_URL = 'https://mora-verduras-api.onrender.com/api/v1';

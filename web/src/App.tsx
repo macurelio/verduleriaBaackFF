@@ -14,6 +14,7 @@ import OfferBanner from './components/ui/OfferBanner'
 import OfferModal from './components/ui/OfferModal'
 import MiniCartBar from './components/ui/MiniCartBar'
 import CartDrawer from './components/ui/CartDrawer'
+import ChatAssistant from './components/ui/ChatAssistant'
 import { MotionConfig } from 'framer-motion'
 
 function useSessionRedirects() {
@@ -53,6 +54,7 @@ function AppContent() {
       <OfferModal open={offerOpen} onClose={() => setOfferOpen(false)} />
       <MiniCartBar onOpenCart={() => setCartOpen(true)} />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <ChatAssistant />
     </div>
   )
 }

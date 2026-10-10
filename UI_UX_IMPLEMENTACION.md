@@ -58,10 +58,12 @@ Resultados de esta entrega:
 
 Avance: constructor de selección en web y Expo, cantidades por unidad de venta, incorporación conjunta al carrito con IDs reales, límites por producto y resumen. La web incluye búsqueda. La selección incorporada utiliza la persistencia y reconciliación existentes del carrito; el borrador del constructor no persiste. No se generan productos ficticios ni se envían precios nuevos a la API.
 
-Regla confirmada por el usuario: contar productos distintos, 10 % desde 4 y 15 % desde 6. Preparada en `web/src/utils/pack.ts` y probada en los límites. Todavía no se aplica al carrito: la API actual no acepta composiciones ni descuentos personalizados. El redondeo hacia abajo del descuento a CLP enteros es una propuesta, pendiente de concordar con el servidor.
+Regla confirmada por el usuario: contar productos distintos, 10 % desde 4 y 15 % desde 6. Implementada en cliente y servidor, con redondeo del descuento hacia abajo a CLP enteros y pruebas de límites.
 
-Cupones implementados localmente en `/admin`: crear/editar nombre (código), porcentaje entero 1–100 y estado activo. API protegida, tabla Flyway nueva y pruebas en el backend externo. Sin aplicación al checkout todavía. Selectores de promociones y del constructor excluyen packs, según confirmación del usuario.
+Cupones implementados localmente en `/admin` y checkout: crear/editar nombre (código), porcentaje entero 1–100 y estado activo. API protegida, tabla Flyway nueva y pruebas en el backend externo. Selectores de promociones y del constructor excluyen packs, según confirmación del usuario.
 
-Pendientes: acumulación, futuras vigencias/condiciones y base del umbral de envío. Composición estructurada en pedidos, cotización del servidor y activación de descuentos. La UI actual muestra el precio de catálogo. Detalles de contrato y pruebas en `FASE_5_CONTRATO.md`.
+Integrados packs personalizados en carrito y API: composición real agrupada con `packId`, cotización autoritativa, 10 % desde 4 productos distintos y 15 % desde 6; cupón aplicado una vez al pedido después del descuento de packs. Envío $2.500 y gratis desde $20.000 de subtotal neto. El administrador y WhatsApp muestran composición/descuentos. Web y Expo bloquean pedidos descontados sin cotización válida.
+
+Pendientes: integración con PostgreSQL/migraciones, Android/iOS físicos y despliegue coordinado (backend primero). Futuras vigencias/condiciones de cupones quedan fuera de esta fase. Detalles en `FASE_5_CONTRATO.md`.
 
 Tarifas por comuna, reservas de stock, idempotencia y nuevas imágenes requieren datos o soporte adicional; no se simulan como funciones de negocio en esta entrega.
