@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, List, LayoutGrid } from 'lucide-react'
 import { categoryApi } from '../api/resources'
 import type { Category, CategoryInput } from '../api/types'
 import {
@@ -23,6 +23,7 @@ const emptyForm = (): CategoryInput => ({
 
 export default function CategoriesScreen() {
   const [categories, setCategories] = useState<Category[]>([])
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editing, setEditing] = useState<Category | null>(null)
@@ -84,16 +85,50 @@ export default function CategoriesScreen() {
           <h1 className="font-heading font-black text-sand text-2xl">Categorías</h1>
           <p className="text-sand/50 text-sm">Secciones del catálogo en la tienda.</p>
         </div>
-        <ActionButton
-          variant="primary"
-          onClick={() => {
-            setEditing(null)
-            setForm(emptyForm())
-            setModalOpen(true)
-          }}
-        >
-          <Plus size={14} /> Nueva
-        </ActionButton>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div
+            className="flex items-center rounded-xl border border-white/10 p-0.5 bg-white/5"
+            role="group"
+            aria-label="Modo de visualización"
+          >
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              aria-label="Vista en lista"
+              title="Vista en lista"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-mora text-white shadow-sm'
+                  : 'text-sand/60 hover:text-sand'
+              }`}
+            >
+              <List size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              aria-label="Vista en cuadrícula"
+              title="Vista en cuadrícula"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-mora text-white shadow-sm'
+                  : 'text-sand/60 hover:text-sand'
+              }`}
+            >
+              <LayoutGrid size={16} />
+            </button>
+          </div>
+          <ActionButton
+            variant="primary"
+            onClick={() => {
+              setEditing(null)
+              setForm(emptyForm())
+              setModalOpen(true)
+            }}
+          >
+            <Plus size={14} /> Nueva
+          </ActionButton>
+        </div>
       </div>
 
       <ErrorBox message={error} />
@@ -102,6 +137,74 @@ export default function CategoriesScreen() {
         <Spinner label="Cargando categorías…" />
       ) : categories.length === 0 ? (
         <EmptyState message="Sin categorías." />
+      ) : viewMode === 'list' ? (
+        <div className="flex flex-col gap-2.5">
+          {categories
+            .slice()
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map((c) => (
+              <div
+                key={c.id}
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface border border-white/10 rounded-2xl px-4 py-3.5 hover:border-white/20 transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0">
+                    {c.emoji}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-heading font-bold text-sand text-base">{c.name}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs text-sand/50 font-mono">
+                        Orden: {c.sortOrder}
+                      </span>
+                    </div>
+                    {c.blurb && <p className="text-xs text-sand/60 truncate mt-0.5">{c.blurb}</p>}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center border-t border-white/5 pt-2 sm:border-t-0 sm:pt-0">
+                  <Toggle
+                    checked={c.active}
+                    onChange={async (v) => {
+                      setError('')
+                      try {
+                        await categoryApi.update(c.id, { ...c, active: v })
+                        await load()
+                      } catch (err) {
+                        setError(err instanceof Error ? err.message : 'Error')
+                      }
+                    }}
+                    label={c.active ? 'Activa' : 'Inactiva'}
+                  />
+                  <ActionButton
+                    onClick={() => {
+                      setEditing(c)
+                      setForm({
+                        name: c.name,
+                        emoji: c.emoji,
+                        blurb: c.blurb,
+                        sortOrder: c.sortOrder,
+                        active: c.active,
+                      })
+                      setModalOpen(true)
+                    }}
+                    title={`Editar ${c.name}`}
+                    aria-label={`Editar ${c.name}`}
+                  >
+                    <Pencil size={14} /> Editar
+                  </ActionButton>
+                  <ActionButton
+                    onClick={() => remove(c)}
+                    variant="danger"
+                    title="Eliminar"
+                    aria-label={`Eliminar ${c.name}`}
+                  >
+                    <Trash2 size={14} />
+                  </ActionButton>
+                </div>
+              </div>
+            ))}
+        </div>
       ) : (
         <div className="admin-mosaic">
           {categories

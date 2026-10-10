@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, List, LayoutGrid } from 'lucide-react'
 import { promotionApi, productApi } from '../api/resources'
 import type { Product, Promotion, PromotionInput } from '../api/types'
 import { formatPromotionItem, restorePromotionItems, UNIT_LABELS, type SelectedProduct } from '../promotionItems'
@@ -41,6 +41,7 @@ const emptyForm = (): PromotionInput => ({
 
 export default function PromotionsScreen() {
   const [promos, setPromos] = useState<Promotion[]>([])
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editing, setEditing] = useState<Promotion | null>(null)
@@ -226,9 +227,43 @@ export default function PromotionsScreen() {
           <h1 className="font-heading font-black text-sand text-2xl">Promociones</h1>
           <p className="text-sand/50 text-sm">Combinados y combos de temporada.</p>
         </div>
-        <ActionButton variant="primary" onClick={openCreate}>
-          <Plus size={14} /> Nueva
-        </ActionButton>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div
+            className="flex items-center rounded-xl border border-white/10 p-0.5 bg-white/5"
+            role="group"
+            aria-label="Modo de visualización"
+          >
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              aria-label="Vista en lista"
+              title="Vista en lista"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-mora text-white shadow-sm'
+                  : 'text-sand/60 hover:text-sand'
+              }`}
+            >
+              <List size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              aria-label="Vista en cuadrícula"
+              title="Vista en cuadrícula"
+              className={`p-2 rounded-lg transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-mora text-white shadow-sm'
+                  : 'text-sand/60 hover:text-sand'
+              }`}
+            >
+              <LayoutGrid size={16} />
+            </button>
+          </div>
+          <ActionButton variant="primary" onClick={openCreate}>
+            <Plus size={14} /> Nueva
+          </ActionButton>
+        </div>
       </div>
 
       <ErrorBox message={error} />
@@ -237,6 +272,101 @@ export default function PromotionsScreen() {
         <Spinner label="Cargando promociones…" />
       ) : promos.length === 0 ? (
         <EmptyState message="Sin promociones. Crea una con «Nueva»." />
+      ) : viewMode === 'list' ? (
+        <div className="flex flex-col gap-2.5">
+          {promos
+            .slice()
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map((p) => {
+              const discountPct =
+                p.originalPrice > p.promoPrice
+                  ? Math.round(((p.originalPrice - p.promoPrice) / p.originalPrice) * 100)
+                  : 0
+              return (
+                <div
+                  key={p.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface border border-white/10 rounded-2xl p-4 hover:border-white/20 transition-colors"
+                >
+                  <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                    <span className="w-12 h-12 rounded-xl bg-mora/20 border border-mora/30 flex items-center justify-center text-2xl shrink-0">
+                      {p.emoji}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-heading font-bold text-sand text-base">{p.title}</span>
+                        {p.tag && (
+                          <span className="px-2 py-0.5 rounded-md bg-white/10 text-sand/80 text-xs font-heading font-semibold">
+                            {p.tag}
+                          </span>
+                        )}
+                        <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs text-sand/50 font-mono">
+                          Orden: {p.sortOrder}
+                        </span>
+                        {p.badge && (
+                          <span className="px-2 py-0.5 rounded-md bg-mora/20 text-[#A5D6A7] text-xs font-semibold">
+                            {p.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-sand/60 mt-1 flex-wrap">
+                        {p.items && p.items.length > 0 && (
+                          <span className="font-medium text-sand/70">
+                            {p.items.length} {p.items.length === 1 ? 'producto' : 'productos'}
+                          </span>
+                        )}
+                        {p.description && (
+                          <span className="truncate max-w-lg text-sand/40 hidden md:inline">
+                            · {p.description}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between sm:justify-end gap-4 shrink-0 border-t border-white/5 pt-3 sm:border-t-0 sm:pt-0">
+                    <div className="text-left sm:text-right">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs text-sand/40 line-through">
+                          {fmtCLP(p.originalPrice)}
+                        </span>
+                        <span className="font-heading font-black text-[#A5D6A7] text-lg">
+                          {fmtCLP(p.promoPrice)}
+                        </span>
+                      </div>
+                      {discountPct > 0 && (
+                        <span className="text-[11px] font-bold text-amber-300">
+                          {discountPct}% de ahorro
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Toggle
+                        checked={p.active}
+                        onChange={(v) => toggleActive(p, v)}
+                        label={p.active ? 'Activa' : 'Inactiva'}
+                      />
+                      <ActionButton
+                        onClick={() => openEdit(p)}
+                        title={`Editar ${p.title}`}
+                        aria-label={`Editar ${p.title}`}
+                      >
+                        <Pencil size={14} /> Editar
+                      </ActionButton>
+                      <ActionButton
+                        onClick={() => remove(p)}
+                        variant="danger"
+                        title="Eliminar"
+                        aria-label={`Eliminar ${p.title}`}
+                      >
+                        <Trash2 size={14} />
+                      </ActionButton>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+        </div>
       ) : (
         <div className="admin-mosaic">
           {promos
