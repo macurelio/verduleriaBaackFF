@@ -15,6 +15,7 @@ import PromotionsScreen from './Promotions'
 import CategoriesScreen from './Categories'
 import ConfigScreen from './Config'
 import UsersScreen from './Users'
+import CouponsScreen from './Coupons'
 
 type ViewKey =
   | 'orders'
@@ -23,11 +24,13 @@ type ViewKey =
   | 'categories'
   | 'config'
   | 'users'
+  | 'coupons'
 
 const NAV: { key: ViewKey; label: string; icon: ReactNode }[] = [
   { key: 'orders', label: 'Pedidos', icon: <LayoutDashboard size={16} /> },
   { key: 'products', label: 'Productos', icon: <ShoppingBag size={16} /> },
   { key: 'promotions', label: 'Promociones', icon: <Tag size={16} /> },
+  { key: 'coupons', label: 'Cupones', icon: <Tag size={16} /> },
   { key: 'categories', label: 'Categorías', icon: <Grid3x3 size={16} /> },
   { key: 'config', label: 'Configuración', icon: <Settings size={16} /> },
   { key: 'users', label: 'Usuarios', icon: <Users size={16} /> },
@@ -51,6 +54,8 @@ export default function Layout() {
         return <ConfigScreen />
       case 'users':
         return <UsersScreen />
+      case 'coupons':
+        return <CouponsScreen />
     }
   }
 
@@ -110,7 +115,7 @@ export default function Layout() {
         </header>
 
         <main className="w-full p-3 sm:p-4 lg:p-5 max-w-[1440px] mx-auto">
-          <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4" aria-label="Secciones del panel">
+          <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-3 px-3 sm:-mx-4 sm:px-4" aria-label="Secciones del panel">
             {NAV.map(({ key, label, icon }) => (
               <button
                 key={key}

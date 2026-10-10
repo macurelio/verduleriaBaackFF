@@ -4,10 +4,21 @@ import { build } from 'esbuild'
 
 // Usa el compilador incluido con Vite; no instala un framework de pruebas.
 const bundle = await build({
-  stdin: { contents: "export * from './src/utils/cart'; export * from './src/utils/checkout'; export { waLink } from './src/config'", resolveDir: process.cwd(), loader: 'ts' },
+  stdin: { contents: "export * from './src/utils/cart'; export * from './src/utils/pack'; export * from './src/utils/checkout'; export { waLink } from './src/config'", resolveDir: process.cwd(), loader: 'ts' },
   bundle: true, write: false, platform: 'node', format: 'esm',
 })
-const { calculateCart, formatPrice, buildWhatsappText, isValidPhone, waLink } = await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`)
+const { calculateCart, calculatePack, formatPrice, buildWhatsappText, isValidPhone, waLink } = await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`)
+const packLine = (id, quantity = 1, price = 1001) => ({ product: { id, price, unit: 'unidad' }, quantity })
+assert.equal(calculatePack([]).discountPercent, 0)
+assert.equal(calculatePack([packLine('h1', 6)]).discountPercent, 0)
+assert.equal(calculatePack([packLine('h1', 2), packLine('h1', 4)]).distinctCount, 1)
+for (const [count, rate] of [[3, 0], [4, 10], [5, 10], [6, 15], [7, 15]]) {
+  const result = calculatePack(Array.from({ length: count }, (_, i) => packLine(`p${i}`)))
+  assert.equal(result.discountPercent, rate)
+  assert.equal(result.total + result.discount, result.subtotal)
+  assert.equal(result.discount, Math.floor(count * 1001 * rate / 100))
+}
+assert.equal(calculatePack([{ product: { id: 'promo-1', price: 1000, unit: 'pack', source: 'promotion' }, quantity: 1 }, packLine('h1', 0)]).distinctCount, 0)
 const nativeSource = await readFile(new URL('../../src/utils/cart.js', import.meta.url), 'utf8')
 const native = await import(`data:text/javascript;base64,${Buffer.from(nativeSource).toString('base64')}`)
 const line = (price, quantity = 1) => ({ price, quantity })

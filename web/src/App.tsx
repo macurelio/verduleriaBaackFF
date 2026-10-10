@@ -7,6 +7,7 @@ import HeroSection from './components/sections/HeroSection'
 import ProductsShowcaseSection from './components/sections/ProductsShowcaseSection'
 
 import PromoSection from './components/sections/PromoSection'
+import PackBuilder from './components/sections/PackBuilder'
 import B2BSection from './components/sections/B2BSection'
 import CTASection from './components/sections/CTASection'
 import OfferBanner from './components/ui/OfferBanner'
@@ -44,6 +45,7 @@ function AppContent() {
         <HeroSection />
         <ProductsShowcaseSection selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
         <PromoSection />
+        <PackBuilder />
         <B2BSection />
         <CTASection />
       </main>

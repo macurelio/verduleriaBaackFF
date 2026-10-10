@@ -106,10 +106,12 @@ export default function PromotionsScreen() {
   }, 0)
   const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-CL')
   const visibleProducts = products.filter((product) =>
+    product.unit !== 'pack' && normalize(product.category) !== 'packs' &&
     normalize(`${product.name} ${product.category}`).includes(normalize(productSearch.trim())),
   )
 
   const selectProduct = (product: Product, checked: boolean) => {
+    if (product.unit === 'pack' || normalize(product.category) === 'packs') return
     setSelectedProducts((previous) => checked
       ? [...previous, { productId: product.id, quantity: 1 }]
       : previous.filter((item) => item.productId !== product.id))
@@ -131,6 +133,11 @@ export default function PromotionsScreen() {
     }
     if (!selectedProducts.length && !itemsText.trim()) {
       setError('Selecciona al menos un producto para la promoción.')
+      return
+    }
+    if (selectedProducts.some(item => products.some(product => product.id === item.productId &&
+      (product.unit === 'pack' || normalize(product.category) === 'packs')))) {
+      setError('Los packs no pueden incluirse como productos de una promoción. Retira el pack antes de guardar.')
       return
     }
     if (selectedProducts.some((item) => !Number.isSafeInteger(item.quantity) || item.quantity < 1 || item.quantity > 99 || !products.some((p) => p.id === item.productId))) {
@@ -339,6 +346,11 @@ export default function PromotionsScreen() {
                 <h3 className="font-heading font-bold text-sand">Productos de la promoción</h3>
                 <span className="text-xs text-sand/60" role="status">{selectedProducts.length} seleccionado{selectedProducts.length === 1 ? '' : 's'}</span>
               </div>
+              <p className="text-sm text-sand/70">Los packs no se pueden agregar a una promoción.</p>
+              {selectedProducts.filter(item => products.some(product => product.id === item.productId && (product.unit === 'pack' || normalize(product.category) === 'packs'))).map(item => <div key={item.productId} className="flex flex-wrap items-center gap-2 text-sm text-sand">
+                <span>Pack excluido: {products.find(product => product.id === item.productId)?.name}</span>
+                <ActionButton onClick={() => setSelectedProducts(previous => previous.filter(selected => selected.productId !== item.productId))} disabled={busy}>Retirar pack</ActionButton>
+              </div>)}
               <TextInput type="search" aria-label="Buscar productos para la promoción" placeholder="Buscar por nombre o categoría…" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} disabled={productsLoading} />
               <ErrorBox message={productsError} />
               {productsError && <ActionButton onClick={() => setProductsRetry((value) => value + 1)}>Reintentar carga de productos</ActionButton>}

@@ -82,6 +82,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getCartCount = () => cart.reduce((sum, i) => sum + i.quantity, 0)
 
+  const addSelection = (items: { product: Product; quantity: number }[]) => {
+    const ids = new Set(items.map(({ product }) => product.id))
+    if (!items.length || ids.size !== items.length || items.some(({ product, quantity }) =>
+      !Number.isSafeInteger(quantity) || quantity < 1 ||
+      quantity + (cart.find(item => item.id === product.id)?.quantity ?? 0) > 99)) return false
+    setCart(previous => {
+      if (items.some(({ product, quantity }) => quantity + (previous.find(item => item.id === product.id)?.quantity ?? 0) > 99)) return previous
+      const next = [...previous]
+      for (const { product, quantity } of items) {
+        const index = next.findIndex(item => item.id === product.id)
+        if (index >= 0) next[index] = { ...next[index], ...product, quantity: next[index].quantity + quantity }
+        else next.push({ ...product, cartItemId: product.id, quantity })
+      }
+      return next
+    })
+    return true
+  }
+
   const getCartTotal = () =>
     cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
@@ -90,6 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         cart,
         addToCart,
+        addSelection,
         incrementQuantity,
         decrementQuantity,
         removeItem,

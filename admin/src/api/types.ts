@@ -162,3 +162,12 @@ export interface MeResponse {
   role: string
   enabled: boolean
 }
+export interface CouponInput {
+  name: string
+  percentage: number
+  active: boolean
+}
+
+export interface Coupon extends CouponInput {
+  id: string
+}

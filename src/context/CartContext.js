@@ -40,6 +40,23 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => setCart([]);
 
+  const addSelection = (items) => {
+    if (!items.length || new Set(items.map(({ product }) => product.id)).size !== items.length ||
+      items.some(({ product, quantity }) => !Number.isSafeInteger(quantity) || quantity < 1 ||
+        quantity + (cart.find(item => item.id === product.id)?.quantity || 0) > 99)) return false;
+    setCart(previous => {
+      if (items.some(({ product, quantity }) => quantity + (previous.find(item => item.id === product.id)?.quantity || 0) > 99)) return previous;
+      const next = [...previous];
+      items.forEach(({ product, quantity }) => {
+        const index = next.findIndex(item => item.id === product.id);
+        if (index >= 0) next[index] = { ...next[index], ...product, quantity: next[index].quantity + quantity };
+        else next.push({ ...product, cartItemId: product.id, quantity });
+      });
+      return next;
+    });
+    return true;
+  };
+
   const getCartCount = () => cart.reduce((count, item) => count + item.quantity, 0);
 
   const getTotalPrice = () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -48,6 +65,7 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider value={{
       cart,
       addToCart,
+      addSelection,
       incrementQuantity,
       decrementQuantity,
       removeItem,

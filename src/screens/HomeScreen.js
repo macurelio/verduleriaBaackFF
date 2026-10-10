@@ -18,6 +18,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CartContext } from '../context/CartContext';
 import HeroCarousel from '../components/HeroCarousel';
 import FeaturedProductsCarousel from '../components/FeaturedProductsCarousel';
+import PackBuilder from '../components/PackBuilder';
 import ToastMessage from '../components/ToastMessage';
 import WorkWithUsModal from '../components/WorkWithUsModal';
 import ProductDetailModal from '../components/ProductDetailModal';
@@ -243,6 +244,7 @@ export default function HomeScreen({ navigation }) {
             </View>
 
             <View style={styles.carouselSection}><FeaturedProductsCarousel /></View>
+            <PackBuilder />
           </>
         )}
 

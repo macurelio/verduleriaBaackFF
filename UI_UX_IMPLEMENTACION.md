@@ -56,6 +56,12 @@ Resultados de esta entrega:
 
 ## Segunda entrega (fase 5)
 
-Pendientes: reglas de packs personalizados, conteo de unidades o productos distintos, elegibles, mínimo, descuentos, cupones acumulables, vigencia y base del umbral. Después ampliar contrato servidor, composición estructurada, persistencia/reconciliación y administración. No publicar descuentos que solo existan en el navegador.
+Avance: constructor de selección en web y Expo, cantidades por unidad de venta, incorporación conjunta al carrito con IDs reales, límites por producto y resumen. La web incluye búsqueda. La selección incorporada utiliza la persistencia y reconciliación existentes del carrito; el borrador del constructor no persiste. No se generan productos ficticios ni se envían precios nuevos a la API.
+
+Regla confirmada por el usuario: contar productos distintos, 10 % desde 4 y 15 % desde 6. Preparada en `web/src/utils/pack.ts` y probada en los límites. Todavía no se aplica al carrito: la API actual no acepta composiciones ni descuentos personalizados. El redondeo hacia abajo del descuento a CLP enteros es una propuesta, pendiente de concordar con el servidor.
+
+Cupones implementados localmente en `/admin`: crear/editar nombre (código), porcentaje entero 1–100 y estado activo. API protegida, tabla Flyway nueva y pruebas en el backend externo. Sin aplicación al checkout todavía. Selectores de promociones y del constructor excluyen packs, según confirmación del usuario.
+
+Pendientes: acumulación, futuras vigencias/condiciones y base del umbral de envío. Composición estructurada en pedidos, cotización del servidor y activación de descuentos. La UI actual muestra el precio de catálogo. Detalles de contrato y pruebas en `FASE_5_CONTRATO.md`.
 
 Tarifas por comuna, reservas de stock, idempotencia y nuevas imágenes requieren datos o soporte adicional; no se simulan como funciones de negocio en esta entrega.

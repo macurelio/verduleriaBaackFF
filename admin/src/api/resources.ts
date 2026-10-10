@@ -13,9 +13,17 @@ import type {
   AdminUser,
   LoginResponse,
   MeResponse,
+  Coupon,
+  CouponInput,
 } from './types'
 
 const ADMIN = '/admin'
+
+export const couponApi = {
+  list: () => api.get<Coupon[]>(`${ADMIN}/coupons`),
+  create: (input: CouponInput) => api.post<Coupon>(`${ADMIN}/coupons`, input),
+  update: (id: string, input: CouponInput) => api.put<Coupon>(`${ADMIN}/coupons/${encodeURIComponent(id)}`, input),
+}
 
 export { ApiError }
 
