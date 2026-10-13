@@ -277,7 +277,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
     onAddMoreItems={() => {
       setShippingAlertOpen(false)
       onClose()
-      const el = document.getElementById('productos')
+      const el = document.getElementById('arma-tu-pack')
       el?.scrollIntoView({ behavior: 'smooth' })
     }}
     onProceedAnyway={() => {

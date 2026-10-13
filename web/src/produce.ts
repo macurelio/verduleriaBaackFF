@@ -15,7 +15,7 @@ import perejil from './assets/photos/perejil.jpg'
 import frutilla from './assets/photos/frutilla.jpg'
 import zapallo from './assets/photos/zapallo.jpg'
 
-// Fotos reales fotorrealistas de verduras, frutos secos y condimentos
+// Fotografías con atribución de verduras, frutos secos y condimentos
 import ajo from './assets/photos/ajo.jpg'
 import aceituna from './assets/photos/aceituna.jpg'
 import albahaca from './assets/photos/albahaca.jpg'
@@ -26,14 +26,10 @@ import pimiento from './assets/photos/pimiento.jpg'
 import choclo from './assets/photos/choclo.jpg'
 
 // Fotos reales dedicadas para categorías del mercado
-import catHojasVerdes from './assets/photos/cat_hojas_verdes.jpg'
-import catRaices from './assets/photos/cat_raices.jpg'
-import catFrutas from './assets/photos/cat_frutas.jpg'
-import catAromaticas from './assets/photos/cat_aromaticas.jpg'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Imágenes de frutas y verduras.
-//  - Fuente principal: fotos reales fotorrealistas de estudio.
+//  - Fuente principal: fotografías de Wikimedia Commons (ver photo-credits.html).
 //  - Fallback contextual por nombre de producto y por emoji.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -65,7 +61,7 @@ const PHOTO_BY_ID: Record<string, string> = {
 const PHOTO_BY_EMOJI: Record<string, string> = {
   '🥬': lechuga,
   '🍃': espinaca,
-  '🥗': catHojasVerdes,
+  '🥗': lechuga,
   '🌿': albahaca,
   '🥔': papa,
   '🧅': cebolla,
@@ -76,7 +72,7 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🍋': limon,
   '🍌': platano,
   '🍀': perejil,
-  '🧺': catRaices,
+  '🧺': papa,
   '🍓': frutilla,
   '🎃': zapallo,
   '🧄': ajo,
@@ -85,25 +81,25 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🍠': camote,
   '🫑': pimiento,
   '🌽': choclo,
-  '🎁': catFrutas,
+  '🎁': platano,
 }
 
 const CATEGORY_PHOTO: Record<string, string> = {
-  'Hojas Verdes': catHojasVerdes,
-  'Raíces y Tubérculos': catRaices,
-  Frutas: catFrutas,
-  'Hierbas y Aromáticas': catAromaticas,
+  'Hojas Verdes': lechuga,
+  'Raíces y Tubérculos': papa,
+  Frutas: platano,
+  'Hierbas y Aromáticas': cilantro,
   'Frutos Secos': almendra,
   Despensa: aceituna,
-  Packs: catRaices,
-  Promociones: catRaices,
+  Packs: papa,
+  Promociones: papa,
 }
 
 const SUGGESTED_PACK_PHOTO: Record<string, string> = {
-  'pack-ensalada': catHojasVerdes,
-  'pack-semanal': catRaices,
-  'pack-frutas': catFrutas,
-  'pack-cocina': catAromaticas,
+  'pack-ensalada': lechuga,
+  'pack-semanal': papa,
+  'pack-frutas': platano,
+  'pack-cocina': cilantro,
 }
 
 const NAME_KEYWORDS: [RegExp, string][] = [
@@ -137,6 +133,7 @@ export interface ProduceLike {
   id?: string
   name?: string
   emoji?: string
+  category?: string
   image?: string
 }
 
@@ -150,7 +147,7 @@ export function getProduceImage(item: ProduceLike | null | undefined): string | 
     }
   }
   if (item.emoji) return PHOTO_BY_EMOJI[item.emoji]
-  return undefined
+  return item.category ? CATEGORY_PHOTO[item.category] : undefined
 }
 
 export function getSuggestedPackImage(id: string): string | undefined {

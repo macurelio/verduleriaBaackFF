@@ -88,6 +88,7 @@ export default function Footer() {
             &copy; {year} {BRAND_NAME}. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-4">
+            <a href={`${import.meta.env.BASE_URL}photo-credits.html`} className="hover:underline">Créditos de fotografías</a>
             <ThemeSwitcher />
             <p className="flex items-center gap-1 text-white/70">
               Hecho con <Heart size={12} className="fill-sand text-sand mx-0.5" /> en Chile

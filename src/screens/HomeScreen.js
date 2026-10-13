@@ -10,7 +10,6 @@ import { ShoppingCart, Instagram, Briefcase, Plus } from 'lucide-react-native';
 
 import { products } from '../data/products';
 import { PRODUCT_CATEGORY_LIST } from '../data/categories';
-import { comboPromotions } from '../data/combos';
 import { UNIT_LABELS, SHIPPING_FEE, FREE_SHIPPING_OVER } from '../config';
 import FreeShippingBanner from '../components/FreeShippingBanner';
 import { calculateCart, formatPrice } from '../utils/cart';
@@ -19,11 +18,11 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CartContext } from '../context/CartContext';
 import HeroCarousel from '../components/HeroCarousel';
 import FeaturedProductsCarousel from '../components/FeaturedProductsCarousel';
+import PhotoCredits from '../components/PhotoCredits';
 import PackBuilder from '../components/PackBuilder';
 import ToastMessage from '../components/ToastMessage';
 import WorkWithUsModal from '../components/WorkWithUsModal';
 import ProductDetailModal from '../components/ProductDetailModal';
-import PromoDetailModal from '../components/PromoDetailModal';
 
 const fmt = (n) => '$' + Number(n).toLocaleString('es-CL');
 
@@ -46,7 +45,6 @@ export default function HomeScreen({ navigation }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Todos');
-  const [activeModal, setActiveModal] = useState(null);
 
   // Card entrance animation
   const cardAnims = useRef(
@@ -89,39 +87,8 @@ export default function HomeScreen({ navigation }) {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
-  const handleComboAction = () => {
-    if (!activeModal) return;
-    if (activeModal.targetCategory) {
-      selectCategory(activeModal.targetCategory);
-    }
-    setActiveModal(null);
-  };
-
-  const handleComboAdd = (combo) => {
-    selectCategory(combo.targetCategory || 'Todos');
-    showToast('Personaliza tu pack en el armador con al menos 4 productos y más de $10.000.');
-    setActiveModal(null);
-  };
-
   const numCols = width >= 1200 ? 5 : width >= 900 ? 4 : width >= 640 ? 3 : 2;
   const cardWidth = Math.floor((width - 48 - (numCols - 1) * 10) / numCols);
-
-  const renderComboBanner = (combo) => (
-    <TouchableOpacity
-      key={combo.id}
-      style={[styles.comboBanner, { backgroundColor: combo.gradientTo }]}
-      activeOpacity={0.88}
-      onPress={() => setActiveModal({ ...combo, type: 'combo' })}
-    >
-      <Text style={styles.comboEmoji}>{combo.emoji}</Text>
-      <View style={styles.comboBannerOverlay}>
-        <Text style={styles.comboBadge}>{combo.badge}</Text>
-        <Text style={styles.comboTitle}>{combo.title}</Text>
-        <Text style={styles.comboSubtitle}>{combo.subtitle}</Text>
-        <Text style={styles.comboCta}>Toca para ver el detalle</Text>
-      </View>
-    </TouchableOpacity>
-  );
 
   const renderProduct = (item) => {
     const entranceAnim = cardAnims[item.id];
@@ -232,23 +199,11 @@ export default function HomeScreen({ navigation }) {
           <>
             <HeroCarousel onCategoryPress={(cat) => selectCategory(cat)} />
 
-            <View style={styles.comboSection}>
-              <View style={styles.comboSectionHeader}>
-                <View>
-                  <Text style={styles.comboSectionLabel}>PACKS</Text>
-                  <Text style={styles.comboSectionTitle}>Combos y ahorros</Text>
-                </View>
-                <Text style={styles.comboSectionHint}>Desliza para ver más</Text>
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.comboScrollContent}>
-                {comboPromotions.map(renderComboBanner)}
-              </ScrollView>
-            </View>
-
             <View style={styles.carouselSection}><FeaturedProductsCarousel /></View>
-            <PackBuilder />
           </>
         )}
+
+        <PackBuilder />
 
         {activeCategory === 'Todos' && (
           <>
@@ -288,6 +243,7 @@ export default function HomeScreen({ navigation }) {
         })}
 
         <View style={styles.footer}>
+              <PhotoCredits />
           <Text style={styles.footerBrand}>Mora<Text style={styles.footerBrandAccent}>Verduras</Text></Text>
           <Text style={styles.footerText}>Verduras y frutas frescas a domicilio en el Gran Santiago. Pedidos por WhatsApp.</Text>
           <TouchableOpacity
@@ -315,13 +271,7 @@ export default function HomeScreen({ navigation }) {
         onAddToCart={(name) => { setDetailModalVisible(false); showToast(`¡${name} en tu selección de pack!`); }}
       />
       <WorkWithUsModal visible={workWithUsVisible} onClose={() => setWorkWithUsVisible(false)} />
-      <PromoDetailModal
-        visible={!!activeModal}
-        item={activeModal}
-        onClose={() => setActiveModal(null)}
-        onPrimaryAction={handleComboAction}
-        onAddToCart={handleComboAdd}
-      />
+
 
     </View>
   );

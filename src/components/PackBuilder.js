@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { suggestedPacks } from '../data/suggestedPacks';
 import { products } from '../data/products';
 import { CartContext } from '../context/CartContext';
 import { getProduceImage } from '../produce';
@@ -23,6 +24,17 @@ export default function PackBuilder() {
   return <View style={styles.section}>
     <Text accessibilityRole="header" style={styles.heading}>Arma tu pack personalizado</Text>
     <Text style={styles.copy}>Elige al menos 4 productos distintos. Cada pack debe superar {formatPrice(PACK_MIN_EXCLUSIVE)} después del descuento, sin envío.</Text>
+    <Text style={styles.heading}>Packs sugeridos</Text>
+    {suggestedPacks.map(pack => {
+      const components = pack.lines.map(line => ({ product: eligible.find(product => product.id === line.productId), quantity: line.quantity })).filter(line => line.product);
+      const amounts = calculatePack(components);
+      if (!amounts.eligible) return null;
+      return <TouchableOpacity key={pack.id} accessibilityRole="button" onPress={() => { setMessage(''); setQuantities(Object.fromEntries(components.map(({ product, quantity }) => [product.id, quantity]))); }} style={[styles.row, { flexWrap: 'wrap' }]}>
+        <Image source={getProduceImage(components[0].product)} style={{ width: 64, height: 64, borderRadius: 8 }} />
+        <View style={styles.name}><Text style={styles.text}>{pack.title} · {formatPrice(amounts.total)}</Text><Text style={styles.copy}>{pack.description}</Text><Text style={styles.copy}>Personalizar pack</Text></View>
+      </TouchableOpacity>;
+    })}
+    <Text style={styles.heading}>Elige tus productos</Text>
     {eligible.map(product => {
       const quantity = quantities[product.id] || 0;
       const remaining = 99 - orderLines(cart).filter(item => item.productId === product.id).reduce((sum, item) => sum + item.quantity, 0);

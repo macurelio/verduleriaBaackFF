@@ -17,5 +17,5 @@ export function calculatePack(selection: PackSelection) {
   const discountPercent = distinctCount >= 6 ? 15 : distinctCount >= 4 ? 10 : 0
   const discount = Math.floor(subtotal * discountPercent / 100)
   const total = subtotal - discount
-  return { distinctCount, subtotal, discountPercent, discount, total, eligible: distinctCount >= 4 && total > PACK_MIN_EXCLUSIVE }
+  return { distinctCount, subtotal, discountPercent, discount, total, eligible: distinctCount >= 4 && distinctCount === selection.length && Number.isSafeInteger(total) && total > PACK_MIN_EXCLUSIVE }
 }

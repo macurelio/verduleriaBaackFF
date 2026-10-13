@@ -1,11 +1,51 @@
 [
   {
+    "product": "aceituna",
+    "source": "https://commons.wikimedia.org/wiki/File:Green_olives.jpg",
+    "author": "Renee Comet (Photographer)",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "title": "File:Green olives.jpg"
+  },
+  {
     "product": "acelga",
     "source": "https://commons.wikimedia.org/wiki/File:Bl%C3%A4tter_vom_Roten_Mangold_(Chard).jpg",
     "author": "August Geyler",
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "title": "File:Blätter vom Roten Mangold (Chard).jpg"
+  },
+  {
+    "product": "ajo",
+    "source": "https://commons.wikimedia.org/wiki/File:Garlic_bulbs_and_cloves.jpg",
+    "author": "Ivar Leidus",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Garlic bulbs and cloves.jpg"
+  },
+  {
+    "product": "albahaca",
+    "source": "https://commons.wikimedia.org/wiki/File:Basil_leaves.jpg",
+    "author": "Paul Goyette",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "title": "File:Basil leaves.jpg"
+  },
+  {
+    "product": "almendra",
+    "source": "https://commons.wikimedia.org/wiki/File:Almonds_-_in_shell,_shell_cracked_open,_shelled,_blanched.jpg",
+    "author": "Ivar Leidus",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Almonds - in shell, shell cracked open, shelled, blanched.jpg"
+  },
+  {
+    "product": "arandano",
+    "source": "https://commons.wikimedia.org/wiki/File:Blueberries-In-Pack.jpg",
+    "author": "Evan-Amos",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "title": "File:Blueberries-In-Pack.jpg"
   },
   {
     "product": "betarraga",
@@ -16,6 +56,14 @@
     "title": "File:Beetroots in a basket.jpg"
   },
   {
+    "product": "camote",
+    "source": "https://commons.wikimedia.org/wiki/File:Sweet_potatoes_(20240221).jpg",
+    "author": "Fumikas Sagisavas",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "title": "File:Sweet potatoes (20240221).jpg"
+  },
+  {
     "product": "cebolla",
     "source": "https://commons.wikimedia.org/wiki/File:Mixed_onions.jpg",
     "author": "Colin",
@@ -24,12 +72,36 @@
     "title": "File:Mixed onions.jpg"
   },
   {
-    "product": "espinaca",
-    "source": "https://commons.wikimedia.org/wiki/File:Afang_Soup.jpg",
-    "author": "Yemisi Ogbe",
+    "product": "choclo",
+    "source": "https://commons.wikimedia.org/wiki/File:Corncobs.jpg",
+    "author": "User:Asbestos",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "title": "File:Corncobs.jpg"
+  },
+  {
+    "product": "cilantro",
+    "source": "https://commons.wikimedia.org/wiki/File:Coriander_Leaves.jpg",
+    "author": "Rupeshm364",
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "title": "File:Afang Soup.jpg"
+    "title": "File:Coriander Leaves.jpg"
+  },
+  {
+    "product": "espinaca",
+    "source": "https://commons.wikimedia.org/wiki/File:Spinach_leaves.jpg",
+    "author": "Nillerdk",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "title": "File:Spinach leaves.jpg"
+  },
+  {
+    "product": "frutilla",
+    "source": "https://commons.wikimedia.org/wiki/File:Strawberries.jpg",
+    "author": "Brian Prechtel",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "title": "File:Strawberries.jpg"
   },
   {
     "product": "lechuga",
@@ -38,6 +110,14 @@
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "title": "File:Lactuca sativa 'Ashbrook'.jpg"
+  },
+  {
+    "product": "limon",
+    "source": "https://commons.wikimedia.org/wiki/File:Lemon.jpg",
+    "author": "André Karwath aka Aka\n",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+    "title": "File:Lemon.jpg"
   },
   {
     "product": "palta",
@@ -56,12 +136,36 @@
     "title": "File:Potatoes, Wirral flower and vegetable show - DSC08219.JPG"
   },
   {
+    "product": "perejil",
+    "source": "https://commons.wikimedia.org/wiki/File:Parsley_Leaves_(92974).jpg",
+    "author": "SarKaLay စာကလေး",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Parsley Leaves (92974).jpg"
+  },
+  {
+    "product": "pimiento",
+    "source": "https://commons.wikimedia.org/wiki/File:Bell_pepper.jpg",
+    "author": "Justus Blümer from Deutschland",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "title": "File:Bell pepper.jpg"
+  },
+  {
+    "product": "platano",
+    "source": "https://commons.wikimedia.org/wiki/File:Bananas_on_black_background_02.jpg",
+    "author": "Krzysztof Golik",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Bananas on black background 02.jpg"
+  },
+  {
     "product": "rucula",
-    "source": "https://commons.wikimedia.org/wiki/File:Coleslaw_with_rocket_(arugula)_and_lemon_dressing.jpg",
-    "author": "Horacio Cambeiro",
+    "source": "https://commons.wikimedia.org/wiki/File:Eruca_sativa.jpg",
+    "author": "Whut",
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-    "title": "File:Coleslaw with rocket (arugula) and lemon dressing.jpg"
+    "title": "File:Eruca sativa.jpg"
   },
   {
     "product": "tomate",
@@ -78,5 +182,13 @@
     "license": "Public domain",
     "licenseUrl": "",
     "title": "File:Carrots of many colors.jpg"
+  },
+  {
+    "product": "zapallo",
+    "source": "https://commons.wikimedia.org/wiki/File:Pumpkin.jpg",
+    "author": "Fredde 99",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "title": "File:Pumpkin.jpg"
   }
 ]

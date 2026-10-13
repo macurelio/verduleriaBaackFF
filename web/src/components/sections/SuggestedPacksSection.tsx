@@ -4,7 +4,7 @@ import { suggestedPacks, type SuggestedPack, type SuggestedPackLine } from '../.
 import { fetchProducts } from '../../api/catalog'
 import { useApiResource } from '../../api/useApiResource'
 import { useTheme } from '../../context/ThemeContext'
-import { getProduceImage, getSuggestedPackImage } from '../../produce'
+import { getProduceImage } from '../../produce'
 import { formatPrice } from '../../utils/cart'
 import { calculatePack } from '../../utils/pack'
 import { UNIT_LABELS } from '../../config'
@@ -56,7 +56,7 @@ export default function SuggestedPacksSection({ onCustomize }: SuggestedPacksSec
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {packs.map(({ pack, resolved, amounts }) => {
-          const image = getSuggestedPackImage(pack.id)
+          const photos = resolved.slice(0, 4).map(({ product }) => ({ product, image: getProduceImage(product) }))
           return (
             <article
               key={pack.id}
@@ -66,18 +66,11 @@ export default function SuggestedPacksSection({ onCustomize }: SuggestedPacksSec
                 className="relative h-44 overflow-hidden"
                 style={{ background: `linear-gradient(135deg, ${pack.gradientFrom}, ${pack.gradientTo})` }}
               >
-                {image ? (
-                  <img
-                    src={image}
-                    alt={pack.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                ) : (
-                  <span className="absolute inset-0 flex items-center justify-center text-7xl select-none">
-                    {pack.emoji}
-                  </span>
-                )}
+                <div className="grid grid-cols-2 h-full" aria-label={`Productos de ${pack.title}`}>
+                  {photos.map(({ product, image }) => image ? (
+                    <img key={product.id} src={image} alt={product.name} className="w-full h-full min-h-0 object-cover" loading="lazy" />
+                  ) : <span key={product.id} className="flex items-center justify-center text-4xl">{product.emoji}</span>)}
+                </div>
                 <div className="absolute top-2.5 left-2.5 bg-stone-950/85 backdrop-blur-md text-amber-300 text-[10px] font-heading font-black px-2.5 py-1 rounded-full border border-stone-700 uppercase tracking-wider">
                   {pack.tag}
                 </div>
