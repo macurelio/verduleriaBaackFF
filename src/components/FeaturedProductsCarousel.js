@@ -1,7 +1,8 @@
+import { getProduceImage } from '../produce';
 import { theme } from '../theme';
 import React, { useContext } from 'react';
 import {
-  View,
+  View, Image,
   Text,
   StyleSheet,
   FlatList,
@@ -27,7 +28,7 @@ export default function FeaturedProductsCarousel() {
   const renderItem = ({ item }) => (
     <View style={[styles.card, { width: CARD_WIDTH }]}>
       <View style={[styles.imageWrapper, { backgroundColor: item.gradientTo }]}>
-        <Text style={styles.productEmoji}>{item.emoji}</Text>
+        <Image source={getProduceImage(item)} accessibilityLabel={item.name} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
         <View style={styles.priceBadge}>
           <Text style={styles.priceBadgeText}>${item.price.toLocaleString('es-CL')}</Text>
         </View>
@@ -45,12 +46,12 @@ export default function FeaturedProductsCarousel() {
         <TouchableOpacity
           style={styles.addButton}
           disabled={(cart.find(product => product.id === item.id)?.quantity || 0) >= 99}
-          accessibilityLabel={`Añadir ${item.name} al carrito`}
+          accessibilityLabel={`Añadir ${item.name} a tu pack`}
           onPress={() => handleAdd(item)}
           activeOpacity={0.85}
         >
           <ShoppingCart color="#0E2C1C" size={14} />
-          <Text style={styles.addButtonText}>Añadir al carrito</Text>
+          <Text style={styles.addButtonText}>Sumar al pack</Text>
         </TouchableOpacity>
       </View>
     </View>

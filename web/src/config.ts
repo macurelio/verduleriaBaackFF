@@ -16,6 +16,8 @@ export const INSTAGRAM_URL = 'https://www.instagram.com/mora.verduras'
 export const DELIVERY_ZONE = 'Gran Santiago'
 
 export const SHIPPING_FEE = 2500
+// Cada pack debe superar este valor después del descuento, sin envío.
+export const PACK_MIN_EXCLUSIVE = 10000
 export const FREE_SHIPPING_OVER = 20000
 
 export const COMUNAS = [

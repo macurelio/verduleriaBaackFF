@@ -22,7 +22,10 @@ function loadCart(): CartItem[] {
       Number.isSafeInteger(item.quantity) && item.quantity > 0 && item.quantity <= 99,
     ).filter(item => item.source === 'custom-pack' && Array.isArray(item.components) && item.components.length >= 4 && item.components.every(component =>
       component.product && typeof component.product.id === 'string' && component.product.unit !== 'pack' && !component.product.source &&
-      Number.isSafeInteger(component.product.price) && component.product.price >= 0 && Number.isSafeInteger(component.quantity) && component.quantity >= 1 && component.quantity <= 99))
+      Number.isSafeInteger(component.product.price) && component.product.price >= 0 && Number.isSafeInteger(component.quantity) && component.quantity >= 1 && component.quantity <= 99)).filter(item => {
+      const amounts = calculatePack(item.components ?? [])
+      return amounts.eligible && amounts.distinctCount === item.components?.length
+    })
   } catch {
     return []
   }
@@ -61,7 +64,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const product = productById.get(component.product.id)
         return product && product.unit !== 'pack' && product.category !== 'Packs' ? [{ product, quantity: component.quantity }] : []
       }) ?? []
-      if (components.length !== item.components?.length || calculatePack(components).distinctCount < 4) return []
+      if (components.length !== item.components?.length || !calculatePack(components).eligible) return []
       return [{ ...item, components, price: calculatePack(components).total }]
     }))
   }, [products])
@@ -95,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
   const addCustomPack = (components: { product: Product; quantity: number }[]) => {
     const amounts = calculatePack(components)
-    if (amounts.distinctCount < 4 || amounts.distinctCount !== components.length) return false
+    if (!amounts.eligible || amounts.distinctCount !== components.length) return false
     const id = `pack-${crypto.randomUUID()}`
     const item: CartItem = { id, cartItemId: id, name: 'Pack personalizado', description: components.map(component => component.product.name).join(', '), category: 'Packs', unit: 'pack', emoji: '🧺', badge: `${amounts.discountPercent} %`, gradientFrom: '#2F7D32', gradientTo: '#D9F2BD', price: amounts.total, quantity: 1, source: 'custom-pack', components }
     if (!canAdd(item, 1, cart)) return false

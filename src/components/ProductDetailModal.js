@@ -1,7 +1,8 @@
+import { getProduceImage } from '../produce';
 import { theme } from '../theme';
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity,
+  Modal, View, Text, Image, StyleSheet, TouchableOpacity,
   ScrollView, Animated, useWindowDimensions,
 } from 'react-native';
 import { X, ShoppingCart, Plus, Minus, Check } from 'lucide-react-native';
@@ -83,7 +84,7 @@ export default function ProductDetailModal({ product, visible, onClose, onAddToC
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           <View style={[styles.imageWrapper, { backgroundColor: product.gradientTo }]}>
-            <Text style={styles.productEmoji}>{product.emoji}</Text>
+            <Image source={getProduceImage(product)} accessibilityLabel={product.name} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
             <View style={styles.imagePricePill}>
               <Text style={styles.imagePriceText}>{fmt(product.price)} c/u</Text>
             </View>
@@ -148,7 +149,7 @@ export default function ProductDetailModal({ product, visible, onClose, onAddToC
               <>
                 <ShoppingCart color="#0E2C1C" size={20} />
                 <Text style={styles.addBtnText}>
-                  {remaining === 0 ? 'Límite de 99 alcanzado' : `Agregar ${selectedQuantity} al carrito`} · {fmt(totalPrice)}
+                  {remaining === 0 ? 'Límite de 99 alcanzado' : `Agregar ${selectedQuantity} a tu pack`} · {fmt(totalPrice)}
                 </Text>
               </>
             )}

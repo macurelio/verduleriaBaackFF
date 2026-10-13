@@ -1,34 +1,33 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { products } from '../data/products';
 import { CartContext } from '../context/CartContext';
-import { UNIT_LABELS } from '../config';
+import { getProduceImage } from '../produce';
+import { calculatePack } from '../utils/pack';
+import { UNIT_LABELS, PACK_MIN_EXCLUSIVE } from '../config';
 import { formatPrice } from '../utils/cart';
 import { theme } from '../theme';
 import { orderLines } from '../api/orders';
 
 export default function PackBuilder() {
-  const { cart, addCustomPack } = useContext(CartContext);
-  const [quantities, setQuantities] = useState({});
+  const { cart, addCustomPack, packQuantities: quantities, setPackQuantities: setQuantities } = useContext(CartContext);
   const [message, setMessage] = useState('');
   const eligible = products.filter(product => product.unit !== 'pack' && product.category !== 'Packs' && product.source !== 'promotion');
   const selection = eligible.filter(product => quantities[product.id] > 0).map(product => ({ product, quantity: quantities[product.id] }));
-  const subtotal = selection.reduce((sum, { product, quantity }) => sum + product.price * quantity, 0);
-  const percentage = selection.length >= 6 ? 15 : selection.length >= 4 ? 10 : 0;
-  const total = subtotal - Math.floor(subtotal * percentage / 100);
+  const { total, eligible: ready } = calculatePack(selection);
   const change = (id, quantity) => { setMessage(''); setQuantities(previous => ({ ...previous, [id]: quantity })); };
   const add = () => {
-    if (!addCustomPack(selection)) { setMessage('Elige al menos 4 productos distintos. El límite por producto en el pedido es 99.'); return; }
+    if (!addCustomPack(selection)) { setMessage('Elige al menos 4 productos distintos y supera $10.000 después del descuento. El límite por producto es 99.'); return; }
     setQuantities({}); setMessage('Tu pack personalizado se agregó al carrito.');
   };
   return <View style={styles.section}>
     <Text accessibilityRole="header" style={styles.heading}>Arma tu pack personalizado</Text>
-    <Text style={styles.copy}>Elige productos según su unidad de venta.</Text>
+    <Text style={styles.copy}>Elige al menos 4 productos distintos. Cada pack debe superar {formatPrice(PACK_MIN_EXCLUSIVE)} después del descuento, sin envío.</Text>
     {eligible.map(product => {
       const quantity = quantities[product.id] || 0;
       const remaining = 99 - orderLines(cart).filter(item => item.productId === product.id).reduce((sum, item) => sum + item.quantity, 0);
       return <View key={product.id} style={styles.row}>
-        <View style={styles.name}><Text style={styles.text}>{product.emoji} {product.name}</Text><Text style={styles.copy}>{formatPrice(product.price)} / {UNIT_LABELS[product.unit]}</Text></View>
+        <Image source={getProduceImage(product)} accessibilityLabel={product.name} style={{ width: 48, height: 48, borderRadius: 8 }} /><View style={styles.name}><Text style={styles.text}>{product.emoji} {product.name}</Text><Text style={styles.copy}>{formatPrice(product.price)} / {UNIT_LABELS[product.unit]}</Text></View>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Quitar ${product.name} de la selección`} disabled={!quantity} onPress={() => change(product.id, quantity - 1)} style={styles.control}><Text style={styles.text}>−</Text></TouchableOpacity>
         <Text style={styles.text}>{quantity}</Text>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Agregar ${product.name} a la selección`} disabled={quantity >= remaining} onPress={() => change(product.id, quantity + 1)} style={styles.control}><Text style={styles.text}>+</Text></TouchableOpacity>
@@ -36,7 +35,7 @@ export default function PackBuilder() {
     })}
     <Text style={styles.text}>{selection.length} productos distintos · {formatPrice(total)}</Text>
     <Text style={styles.copy}>4 productos distintos: 10 %. Desde 6: 15 %. El envío se calcula en el carrito.</Text>
-    <TouchableOpacity accessibilityRole="button" disabled={selection.length < 4} onPress={add} style={[styles.button, selection.length < 4 && { opacity: 0.5 }]}><Text style={styles.buttonText}>Agregar pack al carrito</Text></TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" disabled={!ready} onPress={add} style={[styles.button, !ready && { opacity: 0.5 }]}><Text style={styles.buttonText}>Agregar pack al carrito</Text></TouchableOpacity>
     <Text accessibilityLiveRegion="polite" style={styles.copy}>{message}</Text>
   </View>;
 }

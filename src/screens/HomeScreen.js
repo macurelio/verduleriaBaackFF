@@ -1,15 +1,16 @@
+import { getProduceImage } from '../produce';
 import { theme } from '../theme';
 import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, Linking, useWindowDimensions,
-  Animated, TextInput,
+  Animated, TextInput, Image,
 } from 'react-native';
 import { ShoppingCart, Instagram, Briefcase, Plus } from 'lucide-react-native';
 
 import { products } from '../data/products';
 import { PRODUCT_CATEGORY_LIST } from '../data/categories';
-import { comboPromotions, comboToCartProduct } from '../data/combos';
+import { comboPromotions } from '../data/combos';
 import { UNIT_LABELS, SHIPPING_FEE, FREE_SHIPPING_OVER } from '../config';
 import FreeShippingBanner from '../components/FreeShippingBanner';
 import { calculateCart, formatPrice } from '../utils/cart';
@@ -80,7 +81,7 @@ export default function HomeScreen({ navigation }) {
 
   const handleAddToCart = useCallback((item) => {
     addToCart(item);
-    showToast(`¡${item.name} al carrito!`);
+    showToast(`¡${item.name} agregado a tu selección de pack!`);
   }, [addToCart]);
 
   const selectCategory = (cat) => {
@@ -97,7 +98,8 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleComboAdd = (combo) => {
-    handleAddToCart(comboToCartProduct(combo));
+    selectCategory(combo.targetCategory || 'Todos');
+    showToast('Personaliza tu pack en el armador con al menos 4 productos y más de $10.000.');
     setActiveModal(null);
   };
 
@@ -143,7 +145,7 @@ export default function HomeScreen({ navigation }) {
           }}
         >
           <View style={[styles.imageContainer, { backgroundColor: item.gradientTo }]}>
-            <Text style={styles.productEmoji}>{item.emoji}</Text>
+            <Image source={getProduceImage(item)} accessibilityLabel={item.name} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
             {item.badge ? (
               <View style={styles.imageBadge}>
                 <Text style={styles.imageBadgeText}>{item.badge}</Text>
@@ -166,7 +168,7 @@ export default function HomeScreen({ navigation }) {
               onPress={() => handleAddToCart(item)}
             >
               <Plus color="#0E2C1C" size={14} />
-              <Text style={styles.addToCartText}>Agregar</Text>
+              <Text style={styles.addToCartText}>Sumar al pack</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -310,7 +312,7 @@ export default function HomeScreen({ navigation }) {
         product={selectedProduct}
         visible={detailModalVisible}
         onClose={() => setDetailModalVisible(false)}
-        onAddToCart={(name) => { setDetailModalVisible(false); showToast(`¡${name} al carrito!`); }}
+        onAddToCart={(name) => { setDetailModalVisible(false); showToast(`¡${name} en tu selección de pack!`); }}
       />
       <WorkWithUsModal visible={workWithUsVisible} onClose={() => setWorkWithUsVisible(false)} />
       <PromoDetailModal

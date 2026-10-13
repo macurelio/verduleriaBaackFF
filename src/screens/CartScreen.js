@@ -1,3 +1,5 @@
+import { PACK_MIN_EXCLUSIVE } from '../config';
+import { calculatePack } from '../utils/pack';
 import { theme } from '../theme';
 import React, { useState, useContext, useMemo, useEffect, useRef } from 'react';
 import {
@@ -82,11 +84,12 @@ export default function CartScreen({ navigation }) {
   }), [name, phone, address, comuna, date, window_, payment]);
 
   const hasErrors = Object.values(errors).some(Boolean);
+  const priceReady = cart.length > 0 && cart.every(item => item.components && calculatePack(item.components).eligible) && !!quote && quote.subtotal > PACK_MIN_EXCLUSIVE;
 
   const sendOrderWhatsapp = async () => {
     setTouched(true);
     if (hasErrors) return;
-    if (locked.current || (needsQuote && !quote)) return;
+    if (locked.current || !priceReady) return;
     if (needsQuote) {
       const payload = { customerName: name.trim(), phone: phone.replace(/[\s.-]/g, ''), address: address.trim(), comuna, deliveryDate: date, deliveryWindow: window_, paymentMethod: payment, notes: notes.trim(), items: orderLines(cart), couponCode: couponCode || null };
       const fingerprint = JSON.stringify(payload);
@@ -297,12 +300,13 @@ export default function CartScreen({ navigation }) {
         <TextInput accessibilityLabel="Cupón del pedido" value={couponDraft} onChangeText={setCouponDraft} maxLength={40} autoCapitalize="characters" style={styles.input} editable={!sending} />
         <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} disabled={sending} onPress={() => setCouponCode(couponDraft.trim().toUpperCase())}><Text style={styles.itemUnit}>Aplicar cupón</Text></TouchableOpacity>
         {!!couponCode && <TouchableOpacity accessibilityRole="button" disabled={sending} onPress={() => { setCouponCode(''); setCouponDraft(''); }}><Text style={styles.itemUnit}>Quitar cupón {couponCode}</Text></TouchableOpacity>}
+        {!priceReady && !!quote && <Text accessibilityLiveRegion="polite">El subtotal después del cupón debe superar $10.000, sin envío.</Text>}
         {needsQuote && !quote && !apiError && <Text accessibilityLiveRegion="polite">Validando descuentos…</Text>}
         {!!quote?.packDiscount && <Text>Descuento packs: −{fmt(quote.packDiscount)}</Text>}
         {!!quote?.couponDiscount && <Text>Descuento cupón: −{fmt(quote.couponDiscount)}</Text>}
         {!!apiError && <Text accessibilityLiveRegion="polite" style={{ color: theme.error }}>{apiError}</Text>}
         {!!apiError && !quote && <TouchableOpacity accessibilityRole="button" onPress={() => setQuoteAttempt(previous => previous + 1)} style={{ minHeight: 44, justifyContent: 'center' }}><Text style={styles.itemUnit}>Reintentar cotización</Text></TouchableOpacity>}
-        <TouchableOpacity style={styles.waBtn} disabled={sending || (needsQuote && !quote)} onPress={sendOrderWhatsapp} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.waBtn} disabled={sending || !priceReady} onPress={sendOrderWhatsapp} activeOpacity={0.85}>
           <MessageCircle color={theme.onAccent} size={22} />
           <Text style={styles.waBtnText}>Solicitar pedido por WhatsApp</Text>
         </TouchableOpacity>

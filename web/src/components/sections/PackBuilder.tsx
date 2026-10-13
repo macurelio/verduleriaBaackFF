@@ -6,7 +6,7 @@ import { orderLines } from '../../api/orders'
 import { useApiResource } from '../../api/useApiResource'
 import { useCart } from '../../context/CartContext'
 import { useTheme } from '../../context/ThemeContext'
-import { UNIT_LABELS } from '../../config'
+import { UNIT_LABELS, PACK_MIN_EXCLUSIVE } from '../../config'
 import { formatPrice } from '../../utils/cart'
 import { calculatePack } from '../../utils/pack'
 import { getProduceImage } from '../../produce'
@@ -92,6 +92,10 @@ export default function PackBuilder({
       setMessage({ type: 'error', text: 'Elige al menos 4 productos distintos para armar tu pack.' })
       return
     }
+    if (!amounts.eligible) {
+      setMessage({ type: 'error', text: `Tu pack debe superar ${formatPrice(PACK_MIN_EXCLUSIVE)} después del descuento, sin envío.` })
+      return
+    }
     if (!addCustomPack(selection)) {
       setMessage({
         type: 'error',
@@ -126,7 +130,7 @@ export default function PackBuilder({
           </h2>
           <p className={`text-xs sm:text-sm ${theme.textMuted} font-body mt-1`}>
             Elige <strong>4 o más productos distintos</strong>: 10% de descuento desde 4 y{' '}
-            <strong>15% desde 6</strong>. Todos nuestros pedidos se venden como packs.
+            <strong>15% desde 6</strong>. Cada pack debe superar {formatPrice(PACK_MIN_EXCLUSIVE)} después del descuento, sin envío.
           </p>
         </div>
 
@@ -282,7 +286,9 @@ export default function PackBuilder({
                 : amounts.distinctCount < 6
                   ? `10% de descuento activo. Con ${6 - amounts.distinctCount} más llegas al 15%.`
                   : '¡15% de descuento activo!'}{' '}
-              El envío se calcula en el carrito.
+              {amounts.total <= PACK_MIN_EXCLUSIVE
+                ? `Agrega productos o cantidades: te faltan ${formatPrice(PACK_MIN_EXCLUSIVE + 1 - amounts.total)} para alcanzar el mínimo del pack.`
+                : 'Tu pack cumple el mínimo. El envío se calcula en el carrito.'}
             </p>
             <div className="h-2 rounded-full bg-stone-200 dark:bg-zinc-700 overflow-hidden max-w-sm" aria-hidden="true">
               <div
@@ -322,7 +328,7 @@ export default function PackBuilder({
             <button
               type="button"
               onClick={add}
-              disabled={amounts.distinctCount < 4}
+              disabled={!amounts.eligible}
               className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl min-h-11 px-5 py-3 font-heading font-bold text-xs uppercase tracking-wider transition active:scale-95 disabled:bg-stone-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
             >
               <Sparkles size={16} />

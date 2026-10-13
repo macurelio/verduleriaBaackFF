@@ -1,0 +1,82 @@
+[
+  {
+    "product": "acelga",
+    "source": "https://commons.wikimedia.org/wiki/File:Bl%C3%A4tter_vom_Roten_Mangold_(Chard).jpg",
+    "author": "August Geyler",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Blätter vom Roten Mangold (Chard).jpg"
+  },
+  {
+    "product": "betarraga",
+    "source": "https://commons.wikimedia.org/wiki/File:Beetroots_in_a_basket.jpg",
+    "author": "W.carter",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Beetroots in a basket.jpg"
+  },
+  {
+    "product": "cebolla",
+    "source": "https://commons.wikimedia.org/wiki/File:Mixed_onions.jpg",
+    "author": "Colin",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "title": "File:Mixed onions.jpg"
+  },
+  {
+    "product": "espinaca",
+    "source": "https://commons.wikimedia.org/wiki/File:Afang_Soup.jpg",
+    "author": "Yemisi Ogbe",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Afang Soup.jpg"
+  },
+  {
+    "product": "lechuga",
+    "source": "https://commons.wikimedia.org/wiki/File:Lactuca_sativa_%27Ashbrook%27.jpg",
+    "author": "DeFacto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Lactuca sativa 'Ashbrook'.jpg"
+  },
+  {
+    "product": "palta",
+    "source": "https://commons.wikimedia.org/wiki/File:Avocado_Hass_-_single_and_halved.jpg",
+    "author": "Ivar Leidus",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Avocado Hass - single and halved.jpg"
+  },
+  {
+    "product": "papa",
+    "source": "https://commons.wikimedia.org/wiki/File:Potatoes,_Wirral_flower_and_vegetable_show_-_DSC08219.JPG",
+    "author": "Rept0n1x",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "title": "File:Potatoes, Wirral flower and vegetable show - DSC08219.JPG"
+  },
+  {
+    "product": "rucula",
+    "source": "https://commons.wikimedia.org/wiki/File:Coleslaw_with_rocket_(arugula)_and_lemon_dressing.jpg",
+    "author": "Horacio Cambeiro",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "title": "File:Coleslaw with rocket (arugula) and lemon dressing.jpg"
+  },
+  {
+    "product": "tomate",
+    "source": "https://commons.wikimedia.org/wiki/File:Organic_home-grown_tomatoes_-_unripe_to_ripe.jpg",
+    "author": "Michal Klajban",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Organic home-grown tomatoes - unripe to ripe.jpg"
+  },
+  {
+    "product": "zanahoria",
+    "source": "https://commons.wikimedia.org/wiki/File:Carrots_of_many_colors.jpg",
+    "author": "Stephen Ausmus",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "title": "File:Carrots of many colors.jpg"
+  }
+]

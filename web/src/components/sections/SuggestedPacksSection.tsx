@@ -27,7 +27,7 @@ export default function SuggestedPacksSection({ onCustomize }: SuggestedPacksSec
         : []
     })
     const amounts = calculatePack(resolved)
-    if (amounts.distinctCount < 4) return []
+    if (!amounts.eligible) return []
     return [{ pack, resolved, amounts }]
   })
 

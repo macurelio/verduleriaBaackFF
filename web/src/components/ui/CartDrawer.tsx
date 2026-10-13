@@ -1,3 +1,5 @@
+import { PACK_MIN_EXCLUSIVE } from '../../config'
+import { calculatePack } from '../../utils/pack'
 import { useRef, useState, useEffect } from 'react'
 import { X, ShoppingCart } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
@@ -22,8 +24,8 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   const { selectedComuna } = useLocation()
   const [couponDraft, setCouponDraft] = useState('')
   const [couponWarning, setCouponWarning] = useState('')
-  const needsQuote = cart.some(item => item.source === 'custom-pack') || !!couponCode
-  const priceReady = !needsQuote || !!quote
+  const validPacks = cart.length > 0 && cart.every(item => item.source === 'custom-pack' && calculatePack(item.components ?? []).eligible)
+  const priceReady = validPacks && !!quote && quote.subtotal > PACK_MIN_EXCLUSIVE
   const amounts = useCartCalculations()
   const [form, setForm] = useState<DeliveryForm>(() => {
     try {
@@ -93,7 +95,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   }
 
   const executeSubmit = async (withWhatsapp: boolean) => {
-    if (submitLock.current) return
+    if (submitLock.current || !priceReady) return
     if (alreadySaved) {
       if (withWhatsapp && whatsappUrl) window.open(whatsappUrl, '_blank', 'noopener noreferrer')
       return
@@ -237,6 +239,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
               : `💡 El cupón FRESCO10 (10% DCTO) se activa en compras sobre $20.000 (te faltan ${formatPrice(amounts.amountNeeded)}).`}
           </p>
         </form>
+        {!priceReady && !quotePending && !quoteError && <p role="alert" className="text-error text-sm">Cada pack y el subtotal con cupón deben superar {formatPrice(PACK_MIN_EXCLUSIVE)}, sin envío. Ajusta tu pack o retira el cupón.</p>}
         {quotePending && <p role="status" className="text-muted text-sm">Validando descuentos y total…</p>}
         {quoteError && <p role="alert" className="text-error text-sm">{quoteError} Revisa el cupón o vuelve a intentar la cotización antes de registrar.</p>}
         {quoteError && <button type="button" onClick={retryQuote} className="min-h-11 text-mora underline">Reintentar cotización</button>}

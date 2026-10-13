@@ -1,4 +1,5 @@
 import type { Product } from '../types'
+import { PACK_MIN_EXCLUSIVE } from '../config'
 
 export type PackSelection = { product: Product; quantity: number }[]
 
@@ -15,5 +16,6 @@ export function calculatePack(selection: PackSelection) {
   const subtotal = [...quantities.values()].reduce((sum, item) => sum + item.price * item.quantity, 0)
   const discountPercent = distinctCount >= 6 ? 15 : distinctCount >= 4 ? 10 : 0
   const discount = Math.floor(subtotal * discountPercent / 100)
-  return { distinctCount, subtotal, discountPercent, discount, total: subtotal - discount }
+  const total = subtotal - discount
+  return { distinctCount, subtotal, discountPercent, discount, total, eligible: distinctCount >= 4 && total > PACK_MIN_EXCLUSIVE }
 }
