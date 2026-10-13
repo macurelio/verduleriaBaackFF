@@ -25,7 +25,11 @@ import camote from './assets/photos/camote.jpg'
 import pimiento from './assets/photos/pimiento.jpg'
 import choclo from './assets/photos/choclo.jpg'
 
-// Fotos reales dedicadas para categorías del mercado
+// Fotografías referenciales de categorías, con atribución en photo-credits.html.
+import catHojasVerdes from './assets/photos/cat_hojas_verdes.jpg'
+import catRaices from './assets/photos/cat_raices.jpg'
+import catFrutas from './assets/photos/cat_frutas.jpg'
+import catAromaticas from './assets/photos/cat_aromaticas.jpg'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Imágenes de frutas y verduras.
@@ -85,10 +89,10 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
 }
 
 const CATEGORY_PHOTO: Record<string, string> = {
-  'Hojas Verdes': lechuga,
-  'Raíces y Tubérculos': papa,
-  Frutas: platano,
-  'Hierbas y Aromáticas': cilantro,
+  'Hojas Verdes': catHojasVerdes,
+  'Raíces y Tubérculos': catRaices,
+  Frutas: catFrutas,
+  'Hierbas y Aromáticas': catAromaticas,
   'Frutos Secos': almendra,
   Despensa: aceituna,
   Packs: papa,

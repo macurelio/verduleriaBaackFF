@@ -64,6 +64,38 @@
     "title": "File:Sweet potatoes (20240221).jpg"
   },
   {
+    "product": "cat_aromaticas",
+    "source": "https://commons.wikimedia.org/wiki/File:Basil_leaves.jpg",
+    "author": "Paul Goyette",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "title": "File:Basil leaves.jpg"
+  },
+  {
+    "product": "cat_frutas",
+    "source": "https://commons.wikimedia.org/wiki/File:Strawberries.jpg",
+    "author": "Brian Prechtel",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "title": "File:Strawberries.jpg"
+  },
+  {
+    "product": "cat_hojas_verdes",
+    "source": "https://commons.wikimedia.org/wiki/File:Spinach_leaves.jpg",
+    "author": "Nillerdk",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "title": "File:Spinach leaves.jpg"
+  },
+  {
+    "product": "cat_raices",
+    "source": "https://commons.wikimedia.org/wiki/File:Beetroots_in_a_basket.jpg",
+    "author": "W.carter",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "title": "File:Beetroots in a basket.jpg"
+  },
+  {
     "product": "cebolla",
     "source": "https://commons.wikimedia.org/wiki/File:Mixed_onions.jpg",
     "author": "Colin",

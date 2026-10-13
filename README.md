@@ -35,12 +35,15 @@ No hay backend en este repo: los datos vienen de la API **`mora-verduras-api`** 
 
 ## Imágenes
 
-El catálogo usa **fotos JPG fotorrealistas** de frutas/verduras (sin marcas de agua ni ilustraciones SVG):
+El catálogo y las categorías usan **fotografías reales JPG de Wikimedia Commons**, con autor y licencia documentados (28 archivos en cada app; las categorías reutilizan fotografías de productos):
 
 - `web/src/assets/photos/*.jpg` — fotos de productos y categorías. El mapeo está en `web/src/produce.ts` (`id` → foto, con fallback por nombre y emoji para productos nuevos del admin).
 - Copia sin empaquetar del mismo juego en `assets/photos/` (raíz del repo).
 - El favicon es `web/public/favicon.png`.
-- La app Expo sigue usando emojis (pendiente portar las imágenes).
+- Expo carga las fotos desde `src/produce.js`; los logos y los iconos de aplicación siguen siendo PNG.
+- Créditos: `assets/photos/CREDITS.json`, `web/public/photo-credits.json` y `web/public/photo-credits.html`.
+- `python scripts/fetch-produce-photos.py` descarga nuevamente las fotografías fijadas en los créditos; requiere acceso a internet.
+- Las carpetas de imágenes del proyecto no contienen SVG. Los recursos históricos de snacks en `assets/` no se usan en el catálogo de Mora Verduras.
 
 ## Configuración
 
