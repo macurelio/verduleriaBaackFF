@@ -1,6 +1,5 @@
 import { api } from './client'
 import type { Product, CategoryMeta } from '../types'
-import type { Promo } from '../data/promos'
 
 // ─── DTOs del backend (mora-verduras-api) ────────────────────────────────────
 
@@ -31,16 +30,6 @@ export interface ApiCategoryResponse {
   name: string
   emoji: string
   blurb: string
-  sortOrder: number
-  active: boolean
-}
-
-export interface ApiPromotionResponse extends Promo {
-  subtitle: string
-  targetCategory: string | null
-  primaryLabel: string
-  validFrom: string | null
-  validTo: string | null
   sortOrder: number
   active: boolean
 }
@@ -86,16 +75,6 @@ export async function fetchCategories(): Promise<CategoryMeta[]> {
     .filter((c) => c.active)
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(({ name, emoji, blurb }) => ({ name: name as CategoryMeta['name'], emoji, blurb }))
-}
-
-export async function fetchPromotions(): Promise<Promo[]> {
-  const list = await api.get<ApiPromotionResponse[]>('/promotions')
-  return list
-    .filter((p) => p.active &&
-      (!p.validFrom || new Date(p.validFrom).getTime() <= Date.now()) &&
-      (!p.validTo || new Date(p.validTo.length === 10 ? `${p.validTo}T23:59:59` : p.validTo).getTime() >= Date.now()))
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map(({ subtitle: _subtitle, targetCategory: _tc, primaryLabel: _pl, validFrom: _vf, validTo: _vt, sortOrder: _so, active: _a, ...promo }) => promo)
 }
 
 export function fetchSiteConfig(): Promise<SiteConfigResponse> {

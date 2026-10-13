@@ -9,7 +9,7 @@ export default function HeroSection({ onOpenPackBuilder }: HeroSectionProps) {
     if (onOpenPackBuilder) {
       onOpenPackBuilder()
     } else {
-      const el = document.getElementById('packs') || document.getElementById('armar-pack')
+      const el = document.getElementById('arma-tu-pack')
       el?.scrollIntoView({ behavior: 'smooth' })
     }
   }
@@ -39,7 +39,7 @@ export default function HeroSection({ onOpenPackBuilder }: HeroSectionProps) {
 
             {/* Subtitle */}
             <p className="text-emerald-100/90 text-sm sm:text-base leading-relaxed font-body">
-              Pide por kilos sueltos o aprovecha nuestros packs listos con descuentos de hasta un 20%. También puedes diseñar tu propio pack a medida con despacho directo en Gran Santiago.
+              Vendemos packs de verduras y frutas que armas tú: elige 4 o más productos, recibe hasta 15% de descuento automático y te lo llevamos a domicilio en Gran Santiago.
             </p>
 
             {/* Action Buttons */}
@@ -50,7 +50,7 @@ export default function HeroSection({ onOpenPackBuilder }: HeroSectionProps) {
                 className="px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-heading font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center gap-2"
               >
                 <Sparkles size={16} className="text-stone-950" />
-                <span>Diseñar mi Propio Pack (-15%)</span>
+                <span>Armar mi Pack (-15%)</span>
               </button>
 
               <a
@@ -58,7 +58,7 @@ export default function HeroSection({ onOpenPackBuilder }: HeroSectionProps) {
                 className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-heading font-bold text-xs uppercase tracking-wider transition border border-white/20 backdrop-blur-md flex items-center gap-2 active:scale-95"
               >
                 <Package size={16} />
-                <span>Ver Packs Armados</span>
+                <span>Ver Packs Sugeridos</span>
               </a>
             </div>
           </div>

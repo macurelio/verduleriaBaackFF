@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Product, CartItem, CartContextType } from '../types'
-import { fetchProducts, fetchPromotions } from '../api/catalog'
+import { fetchProducts } from '../api/catalog'
 import { useApiResource } from '../api/useApiResource'
-import type { Promo } from '../data/promos'
 import { calculatePack } from '../utils/pack'
 import { quoteOrder, orderLines, type OrderQuote } from '../api/orders'
 
@@ -21,9 +20,9 @@ function loadCart(): CartItem[] {
       ['kilo', 'unidad', 'atado', 'bolsa', 'docena', 'pack'].includes(item.unit) &&
       Number.isSafeInteger(item.price) && item.price >= 0 &&
       Number.isSafeInteger(item.quantity) && item.quantity > 0 && item.quantity <= 99,
-    ).filter(item => item.source !== 'custom-pack' || (Array.isArray(item.components) && item.components.length >= 4 && item.components.every(component =>
+    ).filter(item => item.source === 'custom-pack' && Array.isArray(item.components) && item.components.length >= 4 && item.components.every(component =>
       component.product && typeof component.product.id === 'string' && component.product.unit !== 'pack' && !component.product.source &&
-      Number.isSafeInteger(component.product.price) && component.product.price >= 0 && Number.isSafeInteger(component.quantity) && component.quantity >= 1 && component.quantity <= 99)))
+      Number.isSafeInteger(component.product.price) && component.product.price >= 0 && Number.isSafeInteger(component.quantity) && component.quantity >= 1 && component.quantity <= 99))
   } catch {
     return []
   }
@@ -53,53 +52,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; clearTimeout(timer) }
   }, [cart, couponCode, needsQuote, quoteKey, quoteAttempt])
   const products = useApiResource<Product[] | null>('products', fetchProducts, null)
-  const promotions = useApiResource<Promo[] | null>('promotions', fetchPromotions, null)
 
   useEffect(() => {
-    if (!products && !promotions) return
-    const productById = new Map(products?.map((product) => [product.id, product]))
-    const promoById = new Map(promotions?.map((promo) => [promo.id, promo]))
+    if (!products) return
+    const productById = new Map(products.map((product) => [product.id, product]))
     setCart((previous) => previous.flatMap((item) => {
-      if (item.source === 'custom-pack') {
-        if (!products) return [item]
-        const components = item.components?.flatMap(component => {
-          const product = productById.get(component.product.id)
-          return product && product.unit !== 'pack' && product.category !== 'Packs' ? [{ product, quantity: component.quantity }] : []
-        }) ?? []
-        if (components.length !== item.components?.length || calculatePack(components).distinctCount < 4) return []
-        return [{ ...item, components, price: calculatePack(components).total }]
-      }
-      const isPromotion = item.source === 'promotion' || item.id.startsWith('promo-') || item.id.startsWith('combo-')
-      if (isPromotion) {
-        if (!promotions) return [item]
-        const promo = promoById.get(item.id)
-        return promo ? [{ ...item, name: promo.title, price: promo.promoPrice, description: promo.description, source: 'promotion' as const }] : []
-      }
-      if (!products) return [item]
-      const current = productById.get(item.id)
-      return current ? [{ ...item, ...current }] : []
+      const components = item.components?.flatMap(component => {
+        const product = productById.get(component.product.id)
+        return product && product.unit !== 'pack' && product.category !== 'Packs' ? [{ product, quantity: component.quantity }] : []
+      }) ?? []
+      if (components.length !== item.components?.length || calculatePack(components).distinctCount < 4) return []
+      return [{ ...item, components, price: calculatePack(components).total }]
     }))
-  }, [products, promotions])
+  }, [products])
 
   useEffect(() => {
     try { localStorage.setItem(CART_KEY, JSON.stringify(cart)) } catch { /* Storage may be disabled. */ }
   }, [cart])
-
-  const addToCart = (product: Product, quantity = 1) => {
-    if (!Number.isSafeInteger(quantity) || quantity < 1) return
-    setCart((prev) => {
-      const already = orderLines(prev).filter(item => item.productId === product.id).reduce((sum, item) => sum + item.quantity, 0)
-      const addedQuantity = Math.min(quantity, 99 - already)
-      if (addedQuantity <= 0) return prev
-      const existing = prev.find((i) => i.cartItemId === product.id)
-      if (existing) {
-        return prev.map((i) =>
-          i.cartItemId === product.id ? { ...i, ...product, quantity: i.quantity + addedQuantity } : i,
-        )
-      }
-      return [...prev, { ...product, cartItemId: product.id, quantity: addedQuantity } as CartItem]
-    })
-  }
 
   const incrementQuantity = (cartItemId: string) =>
     setCart((prev) =>
@@ -134,24 +103,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return true
   }
 
-  const addSelection = (items: { product: Product; quantity: number }[]) => {
-    const ids = new Set(items.map(({ product }) => product.id))
-    if (!items.length || ids.size !== items.length || items.some(({ product, quantity }) =>
-      !Number.isSafeInteger(quantity) || quantity < 1 ||
-      quantity + (cart.find(item => item.id === product.id)?.quantity ?? 0) > 99)) return false
-    setCart(previous => {
-      if (items.some(({ product, quantity }) => quantity + (previous.find(item => item.id === product.id)?.quantity ?? 0) > 99)) return previous
-      const next = [...previous]
-      for (const { product, quantity } of items) {
-        const index = next.findIndex(item => item.id === product.id)
-        if (index >= 0) next[index] = { ...next[index], ...product, quantity: next[index].quantity + quantity }
-        else next.push({ ...product, cartItemId: product.id, quantity })
-      }
-      return next
-    })
-    return true
-  }
-
   const getCartTotal = () =>
     cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
@@ -159,8 +110,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider
       value={{
         cart,
-        addToCart,
-        addSelection,
         addCustomPack, couponCode, setCouponCode, quote, quotePending, quoteError, retryQuote,
         incrementQuantity,
         decrementQuantity,

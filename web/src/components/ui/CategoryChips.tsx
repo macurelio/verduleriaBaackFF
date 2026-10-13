@@ -12,8 +12,12 @@ interface CategoryChipsProps {
 }
 
 export default function CategoryChips({ selectedCategory, onSelectCategory }: CategoryChipsProps) {
-  const categoryList = useApiResource('categories', fetchCategories, CATEGORIES)
-  const productList = useApiResource('products', fetchProducts, products)
+  const categoryList = useApiResource('categories', fetchCategories, CATEGORIES).filter(
+    (category) => category.name !== 'Packs',
+  )
+  const productList = useApiResource('products', fetchProducts, products).filter(
+    (product) => product.unit !== 'pack' && product.category !== 'Packs',
+  )
   const { theme } = useTheme()
 
   const counts = useMemo(() => {

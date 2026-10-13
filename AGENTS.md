@@ -31,7 +31,7 @@ Verify changes with the web build and/or `tsc --noEmit`.
 
 ## `web/` specifics
 
-- Base path `/verduleriaBaackFF/` is hardcoded in `web/vite.config.js` **and** `app.json`. The favicon is an emoji SVG (`web/public/favicon.svg`) referenced via `%BASE_URL%` in `web/index.html`. Never hardcode `/images/...`.
+- Base path `/verduleriaBaackFF/` is hardcoded in `web/vite.config.js` **and** `app.json`. The favicon is a PNG (`web/public/favicon.png`) referenced via `%BASE_URL%` in `web/index.html`. Never hardcode `/images/...`.
 - Tailwind design tokens live only in `web/tailwind.config.js`: semantic colors `canvas`, `surface`, `ink`, `border`, `error`, `whatsapp`; brand `mora` (`DEFAULT #2F7D32`), plus `cream`, `sand`, `muted`, `cocoa`, `charcoal`; fonts `heading` (Outfit) / `body` (Inter); easings `smooth`, `premium`, `out-expo`. Use tokens instead of raw hex (`bg-charcoal`, `text-sand`, …).
 - TS is strict with `noUnusedLocals` / `noUnusedParameters`. The `@/*` path alias is declared in `web/tsconfig.json` but **not** configured in `vite.config.js` — it would break at runtime; all existing code uses relative imports.
 - Checkout (`web/src/components/ui/CartDrawer.tsx`) validates the form and calls `createOrder` in `web/src/api/orders.ts`. Payload lines are `{productId, quantity}`; the server calculates authoritative prices/totals. Preserve duplicate-click protection and uncertain-result handling. `useSiteConfig` supplies API overrides, including the WhatsApp number.

@@ -42,7 +42,7 @@ export default function Navbar({
     if (onOpenPackBuilder) {
       onOpenPackBuilder()
     } else {
-      const el = document.getElementById('packs') || document.getElementById('armar-pack')
+      const el = document.getElementById('arma-tu-pack')
       el?.scrollIntoView({ behavior: 'smooth' })
     }
     setMobileMenuOpen(false)
@@ -199,13 +199,13 @@ export default function Navbar({
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-center py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-zinc-800 text-stone-800 dark:text-zinc-100 text-xs font-heading font-bold text-center"
             >
-              Ver Packs Listos
+              Packs Sugeridos
             </a>
           </div>
 
           <div className="flex flex-col gap-1 text-sm font-semibold pt-2 border-t border-stone-200/50">
             <a
-              href="#productos"
+              href="#arma-tu-pack"
               onClick={() => {
                 onSelectCategory?.(null)
                 setMobileMenuOpen(false)
@@ -214,7 +214,7 @@ export default function Navbar({
                 selectedCategory === null ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-stone-50 dark:hover:bg-zinc-800'
               }`}
             >
-              Todos los Productos
+              Armar mi Pack
             </a>
             <a
               href="#trabaja"

@@ -1,7 +1,7 @@
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { UNIT_LABELS } from '../../config'
-import { getProduceImage, getPromoImage } from '../../produce'
+import { getProduceImage } from '../../produce'
 import { formatPrice } from '../../utils/cart'
 
 export default function CartItems() {
@@ -10,7 +10,7 @@ export default function CartItems() {
   return (
     <ul className="space-y-3" aria-label="Productos del pedido">
       {cart.map((item) => {
-        const image = item.source === 'promotion' ? getPromoImage(item) : getProduceImage(item)
+        const image = getProduceImage(item)
 
         return (
           <li

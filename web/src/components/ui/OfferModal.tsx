@@ -1,37 +1,18 @@
 import { useState } from 'react'
-import { X, Sparkles, Tag, Plus, Minus, Check, MessageCircle } from 'lucide-react'
-import { promos, type Promo } from '../../data/promos'
-import { fetchPromotions } from '../../api/catalog'
-import { useApiResource } from '../../api/useApiResource'
+import { X, Sparkles, Tag, Check, MessageCircle, Package } from 'lucide-react'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
 import { useCart } from '../../context/CartContext'
-import { getPromoImage } from '../../produce'
 import { formatPrice } from '../../utils/cart'
-import type { Product } from '../../types'
 import Dialog from './Dialog'
 
 interface OfferModalProps {
   open: boolean
   onClose: () => void
+  onBuildPack?: () => void
 }
 
-const promoToProduct = (promo: Promo): Product => ({
-  id: promo.id,
-  name: promo.title,
-  category: 'Packs',
-  description: promo.description,
-  price: promo.promoPrice,
-  unit: 'pack',
-  emoji: promo.emoji,
-  badge: promo.badge,
-  gradientFrom: promo.gradientFrom,
-  gradientTo: promo.gradientTo,
-  source: 'promotion',
-})
-
-export default function OfferModal({ open, onClose }: OfferModalProps) {
-  const offers = useApiResource('promotions', fetchPromotions, promos)
-  const { cart, addToCart, incrementQuantity, decrementQuantity, setCouponCode, couponCode: appliedCoupon } = useCart()
+export default function OfferModal({ open, onClose, onBuildPack }: OfferModalProps) {
+  const { cart, setCouponCode, couponCode: appliedCoupon } = useCart()
   const { waLink } = useSiteConfig()
   const [copiedCoupon, setCopiedCoupon] = useState(false)
   const couponCode = 'FRESCO10'
@@ -59,7 +40,7 @@ export default function OfferModal({ open, onClose }: OfferModalProps) {
             <div>
               <div className="flex items-center gap-2">
                 <h2 id="offer-modal-title" className="font-heading font-black text-lg sm:text-xl text-stone-900 dark:text-white">
-                  {isUnlocked ? '¡Cupón 10% DCTO Desbloqueado! 🎉' : 'Packs en Oferta y Cupón'}
+                  {isUnlocked ? '¡Cupón 10% DCTO Desbloqueado! 🎉' : 'Cupón de descuento'}
                 </h2>
                 <span className={`text-[10px] font-heading font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
                   isUnlocked ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white'
@@ -70,7 +51,7 @@ export default function OfferModal({ open, onClose }: OfferModalProps) {
               <p className="text-xs text-stone-600 dark:text-zinc-400 font-body mt-0.5">
                 {isUnlocked
                   ? `Tu canasta superó los $20.000 (llevas ${formatPrice(cartSubtotal)}). Tienes un 10% de descuento adicional garantizado con cupón.`
-                  : `Combos armados con descuento directo. Supera los $20.000 para desbloquear 10% adicional con cupón.`}
+                  : `Arma tu pack y supera los $20.000 para desbloquear 10% adicional con cupón.`}
               </p>
             </div>
           </div>
@@ -128,114 +109,22 @@ export default function OfferModal({ open, onClose }: OfferModalProps) {
             )}
           </div>
 
-          {/* List of Special Promo Packs */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-stone-400">
-              Packs Disponibles para Agregar:
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {offers.map((promo) => {
-                const cartItem = cart.find((i) => i.id === promo.id)
-                const inCartQty = cartItem?.quantity || 0
-                const promoImg = getPromoImage(promo)
-
-                return (
-                  <div
-                    key={promo.id}
-                    className="rounded-2xl border border-stone-200 dark:border-zinc-800 bg-stone-50/50 dark:bg-zinc-800/50 p-4 flex flex-col justify-between hover:shadow-md transition"
-                  >
-                    <div>
-                      {/* Promo Image & Tag */}
-                      <div
-                        className="relative h-32 rounded-xl overflow-hidden flex items-center justify-center mb-3 shadow-inner"
-                        style={{
-                          background: `linear-gradient(135deg, ${promo.gradientFrom}, ${promo.gradientTo})`,
-                        }}
-                      >
-                        {promoImg ? (
-                          <img
-                            src={promoImg}
-                            alt={promo.title}
-                            className="w-24 h-24 object-contain drop-shadow"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="text-5xl">{promo.emoji}</span>
-                        )}
-                        <span className="absolute top-2 left-2 bg-stone-950/80 text-amber-300 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
-                          {promo.tag}
-                        </span>
-                        <span className="absolute bottom-2 right-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow">
-                          Ahorras {formatPrice(promo.savings)}
-                        </span>
-                      </div>
-
-                      <h4 className="font-heading font-black text-sm text-stone-900 dark:text-zinc-100">
-                        {promo.title}
-                      </h4>
-                      <p className="text-[11px] text-stone-500 dark:text-zinc-400 line-clamp-2 mt-1">
-                        {promo.description}
-                      </p>
-
-                      {promo.items && (
-                        <ul className="text-[11px] text-stone-600 dark:text-zinc-300 space-y-0.5 mt-2 max-h-16 overflow-y-auto">
-                          {promo.items.slice(0, 4).map((it, idx) => (
-                            <li key={idx} className="flex items-center gap-1.5 truncate">
-                              <span className="w-1 h-1 rounded-full bg-emerald-500" />
-                              <span className="truncate">{it}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-
-                    {/* Price & Action */}
-                    <div className="pt-3 border-t border-stone-200/60 dark:border-zinc-700/60 mt-3 flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] text-stone-400 line-through tabular-nums block">
-                          {formatPrice(promo.originalPrice)}
-                        </span>
-                        <span className="text-base font-heading font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
-                          {formatPrice(promo.promoPrice)}
-                        </span>
-                      </div>
-
-                      {inCartQty > 0 ? (
-                        <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-800 rounded-xl p-0.5">
-                          <button
-                            type="button"
-                            onClick={() => decrementQuantity(promo.id)}
-                            className="w-6 h-6 rounded-lg bg-stone-100 dark:bg-zinc-800 text-stone-800 dark:text-zinc-200 hover:bg-stone-200 flex items-center justify-center font-bold text-xs"
-                          >
-                            <Minus size={12} />
-                          </button>
-                          <span className="font-heading font-bold text-xs text-emerald-900 dark:text-emerald-200 w-5 text-center">
-                            {inCartQty}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => incrementQuantity(promo.id)}
-                            className="w-6 h-6 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 flex items-center justify-center font-bold text-xs"
-                          >
-                            <Plus size={12} />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => addToCart(promoToProduct(promo))}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-xs transition active:scale-95 shadow-sm flex items-center gap-1"
-                        >
-                          <Plus size={13} />
-                          <span>Añadir</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
+          <div className="rounded-2xl border border-stone-200 dark:border-zinc-800 bg-stone-50/60 dark:bg-zinc-800/50 p-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Package size={22} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <p className="text-xs text-stone-600 dark:text-zinc-300 font-body">
+                Elige 4 o más productos distintos y obtén <strong>10% a 15% de descuento</strong> automático en tu pack.
+              </p>
             </div>
+            {onBuildPack && (
+              <button
+                type="button"
+                onClick={onBuildPack}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-heading font-black transition active:scale-95 shadow-md whitespace-nowrap"
+              >
+                Armar mi pack
+              </button>
+            )}
           </div>
         </div>
 

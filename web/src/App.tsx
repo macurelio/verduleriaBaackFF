@@ -5,8 +5,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import HeroSection from './components/sections/HeroSection'
-import ProductsShowcaseSection from './components/sections/ProductsShowcaseSection'
-import PromoSection from './components/sections/PromoSection'
+import SuggestedPacksSection from './components/sections/SuggestedPacksSection'
 import PackBuilder from './components/sections/PackBuilder'
 import B2BSection from './components/sections/B2BSection'
 import CTASection from './components/sections/CTASection'
@@ -15,11 +14,14 @@ import OfferModal from './components/ui/OfferModal'
 import MiniCartBar from './components/ui/MiniCartBar'
 import CartDrawer from './components/ui/CartDrawer'
 import ChatAssistant from './components/ui/ChatAssistant'
-import PackPromoCallout from './components/ui/PackPromoCallout'
-import PackBuilderModal from './components/ui/PackBuilderModal'
 import ComunaVerificationModal from './components/ui/ComunaVerificationModal'
 import { LocationProvider } from './context/LocationContext'
+import type { SuggestedPack, SuggestedPackLine } from './data/suggestedPacks'
 import { MotionConfig } from 'framer-motion'
+
+function scrollToBuilder() {
+  document.getElementById('arma-tu-pack')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 function useSessionRedirects() {
   useEffect(() => {
@@ -36,7 +38,7 @@ function AppContent() {
 
   const [offerOpen, setOfferOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
-  const [packBuilderOpen, setPackBuilderOpen] = useState(false)
+  const [packQuantities, setPackQuantities] = useState<Record<string, number>>({})
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
@@ -83,15 +85,24 @@ function AppContent() {
     showToast(`¡Cupón ${code} aplicado al pedido!`)
   }
 
+  const handleCustomizePack = (pack: SuggestedPack, lines: SuggestedPackLine[]) => {
+    setSelectedCategory(null)
+    setSearchQuery('')
+    setPackQuantities(Object.fromEntries(lines.map((line) => [line.productId, line.quantity])))
+    showToast(`Cargamos "${pack.title}": ajústalo a tu gusto y agrégalo al carrito.`)
+    // Espera un frame para que el armador ya muestre la selección antes de desplazarse.
+    window.requestAnimationFrame(scrollToBuilder)
+  }
+
   return (
     <div
       className={`min-h-screen ${theme.bg} ${theme.textMain} pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 font-body selection:bg-emerald-500 selection:text-white transition-colors duration-300`}
     >
       <a
-        href="#productos"
+        href="#arma-tu-pack"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-stone-900 focus:p-3 focus:rounded-xl focus:shadow-lg focus:border focus:border-stone-300"
       >
-        Ir a productos
+        Ir a armar mi pack
       </a>
 
       {/* Floating Toast Notification */}
@@ -119,31 +130,26 @@ function AppContent() {
         onSelectCategory={setSelectedCategory}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onOpenPackBuilder={() => setPackBuilderOpen(true)}
+        onOpenPackBuilder={scrollToBuilder}
       />
 
       <main>
         {/* Hero Section */}
-        <HeroSection onOpenPackBuilder={() => setPackBuilderOpen(true)} />
+        <HeroSection onOpenPackBuilder={scrollToBuilder} />
 
-        {/* Callout Banner: Custom Pack Promotion */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <PackPromoCallout onOpenPackBuilder={() => setPackBuilderOpen(true)} />
-        </div>
+        {/* Suggested packs: starting points loaded into the builder */}
+        <SuggestedPacksSection onCustomize={handleCustomizePack} />
 
-        {/* Pre-made Packs Showcase */}
-        <PromoSection onOpenPackBuilder={() => setPackBuilderOpen(true)} />
-
-        {/* Loose Produce Showcase with Filters & Search */}
-        <ProductsShowcaseSection
+        {/* Pack builder: the only way to buy */}
+        <PackBuilder
+          quantities={packQuantities}
+          onQuantitiesChange={setPackQuantities}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          onAdded={showToast}
         />
-
-        {/* Inline Pack Builder Section */}
-        <PackBuilder />
 
         {/* B2B / Wholesale Section */}
         <B2BSection />
@@ -157,15 +163,17 @@ function AppContent() {
 
       {/* Modals & Overlays */}
       <ComunaVerificationModal />
-      <OfferModal open={offerOpen} onClose={() => setOfferOpen(false)} />
-      <PackBuilderModal
-        open={packBuilderOpen}
-        onClose={() => setPackBuilderOpen(false)}
-        onSuccess={showToast}
+      <OfferModal
+        open={offerOpen}
+        onClose={() => setOfferOpen(false)}
+        onBuildPack={() => {
+          setOfferOpen(false)
+          window.requestAnimationFrame(scrollToBuilder)
+        }}
       />
       <MiniCartBar
         onOpenCart={() => setCartOpen(true)}
-        onOpenPackBuilder={() => setPackBuilderOpen(true)}
+        onOpenPackBuilder={scrollToBuilder}
       />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       <ChatAssistant />

@@ -1,0 +1,90 @@
+export interface SuggestedPackLine {
+  productId: string
+  quantity: number
+}
+
+/**
+ * Punto de partida para el armador de packs. Cada línea referencia un producto
+ * real del catálogo; los precios y descuentos se calculan con `calculatePack`.
+ * Las líneas cuyo producto no exista en el catálogo activo se omiten.
+ */
+export interface SuggestedPack {
+  id: string
+  title: string
+  description: string
+  tag: string
+  emoji: string
+  gradientFrom: string
+  gradientTo: string
+  lines: SuggestedPackLine[]
+}
+
+export const suggestedPacks: SuggestedPack[] = [
+  {
+    id: 'pack-ensalada',
+    title: 'Pack Ensalada',
+    description: 'Hojas frescas y vegetales del día para ensaladas toda la semana.',
+    tag: 'Lo más pedido',
+    emoji: '🥗',
+    gradientFrom: '#14532d',
+    gradientTo: '#052e16',
+    lines: [
+      { productId: 'h1', quantity: 1 },
+      { productId: 'h4', quantity: 1 },
+      { productId: 'f1', quantity: 1 },
+      { productId: 'f2', quantity: 1 },
+    ],
+  },
+  {
+    id: 'pack-semanal',
+    title: 'Canasta Semanal',
+    description: 'La compra básica del hogar para 2 personas, lista en un solo pedido.',
+    tag: 'Más completo',
+    emoji: '🧺',
+    gradientFrom: '#3f3f2e',
+    gradientTo: '#1c1c14',
+    lines: [
+      { productId: 'r1', quantity: 2 },
+      { productId: 'r2', quantity: 1 },
+      { productId: 'r3', quantity: 1 },
+      { productId: 'f1', quantity: 1 },
+      { productId: 'h1', quantity: 1 },
+      { productId: 'r4', quantity: 1 },
+      { productId: 'f3', quantity: 1 },
+      { productId: 'h4', quantity: 1 },
+      { productId: 'f2', quantity: 2 },
+    ],
+  },
+  {
+    id: 'pack-frutas',
+    title: 'Box Frutas',
+    description: 'Frutas maduras para el desayuno y la colación.',
+    tag: 'Dulce',
+    emoji: '🍓',
+    gradientFrom: '#7c2d12',
+    gradientTo: '#450a0a',
+    lines: [
+      { productId: 'f4', quantity: 2 },
+      { productId: 'f3', quantity: 1 },
+      { productId: 'f2', quantity: 2 },
+      { productId: 'f1', quantity: 1 },
+    ],
+  },
+  {
+    id: 'pack-cocina',
+    title: 'Pack Cocina',
+    description: 'Base para sofritos, guisos y sopas con hierbas frescas.',
+    tag: 'Para cocinar',
+    emoji: '🌿',
+    gradientFrom: '#166534',
+    gradientTo: '#022c22',
+    lines: [
+      { productId: 'r1', quantity: 1 },
+      { productId: 'r2', quantity: 1 },
+      { productId: 'r3', quantity: 1 },
+      { productId: 'a1', quantity: 1 },
+      { productId: 'a2', quantity: 1 },
+      { productId: 'a4', quantity: 1 },
+    ],
+  },
+]

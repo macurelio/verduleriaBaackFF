@@ -78,12 +78,6 @@ export interface UseCarouselReturn {
   resume: () => void
 }
 
-// ─── ProductCard props ───────────────────────────────────────────────────────
-
-export interface ProductCardProps {
-  product: Product
-}
-
 // ─── ProductCarousel props ───────────────────────────────────────────────────
 
 export interface ProductCarouselProps {
@@ -118,8 +112,6 @@ export interface CartItem extends Product {
 
 export interface CartContextType {
   cart: CartItem[]
-  addToCart: (product: Product, quantity?: number) => void
-  addSelection: (items: { product: Product; quantity: number }[]) => boolean
   addCustomPack: (items: { product: Product; quantity: number }[]) => boolean
   couponCode: string
   setCouponCode: (code: string) => void

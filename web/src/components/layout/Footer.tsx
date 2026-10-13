@@ -4,7 +4,7 @@ import ThemeSwitcher from '../ui/ThemeSwitcher'
 
 const FOOTER_LINKS = [
   { label: 'Inicio', href: '#inicio' },
-  { label: 'Productos', href: '#productos' },
+  { label: 'Arma tu pack', href: '#arma-tu-pack' },
   { label: 'Contacto', href: '#contacto' },
 ]
 

@@ -1,23 +1,21 @@
-import lechuga from './assets/photos/lechuga.png'
-import espinaca from './assets/photos/espinaca.png'
-import acelga from './assets/photos/acelga.png'
-import rucula from './assets/photos/rucula.png'
-import papa from './assets/photos/papa.png'
-import cebolla from './assets/photos/cebolla.png'
-import zanahoria from './assets/photos/zanahoria.png'
-import betarraga from './assets/photos/betarraga.png'
-import tomate from './assets/photos/tomate.png'
-import palta from './assets/photos/palta.png'
-import limon from './assets/photos/limon.png'
-import platano from './assets/photos/platano.png'
-import cilantro from './assets/photos/cilantro.png'
-import perejil from './assets/photos/perejil.png'
-import ensalada from './assets/photos/ensalada.png'
-import canasta from './assets/photos/canasta.png'
-import frutilla from './assets/photos/frutilla.png'
-import zapallo from './assets/photos/zapallo.png'
+import lechuga from './assets/photos/lechuga.jpg'
+import espinaca from './assets/photos/espinaca.jpg'
+import acelga from './assets/photos/acelga.jpg'
+import rucula from './assets/photos/rucula.jpg'
+import papa from './assets/photos/papa.jpg'
+import cebolla from './assets/photos/cebolla.jpg'
+import zanahoria from './assets/photos/zanahoria.jpg'
+import betarraga from './assets/photos/betarraga.jpg'
+import tomate from './assets/photos/tomate.jpg'
+import palta from './assets/photos/palta.jpg'
+import limon from './assets/photos/limon.jpg'
+import platano from './assets/photos/platano.jpg'
+import cilantro from './assets/photos/cilantro.jpg'
+import perejil from './assets/photos/perejil.jpg'
+import frutilla from './assets/photos/frutilla.jpg'
+import zapallo from './assets/photos/zapallo.jpg'
 
-// Nuevas fotos reales fotorrealistas de verduras, frutos secos y condimentos
+// Fotos reales fotorrealistas de verduras, frutos secos y condimentos
 import ajo from './assets/photos/ajo.jpg'
 import aceituna from './assets/photos/aceituna.jpg'
 import albahaca from './assets/photos/albahaca.jpg'
@@ -33,29 +31,9 @@ import catRaices from './assets/photos/cat_raices.jpg'
 import catFrutas from './assets/photos/cat_frutas.jpg'
 import catAromaticas from './assets/photos/cat_aromaticas.jpg'
 
-import lechugaSvg from './assets/produce/lechuga.svg'
-import espinacaSvg from './assets/produce/espinaca.svg'
-import acelgaSvg from './assets/produce/acelga.svg'
-import ruculaSvg from './assets/produce/rucula.svg'
-import papaSvg from './assets/produce/papa.svg'
-import cebollaSvg from './assets/produce/cebolla.svg'
-import zanahoriaSvg from './assets/produce/zanahoria.svg'
-import betarragaSvg from './assets/produce/betarraga.svg'
-import tomateSvg from './assets/produce/tomate.svg'
-import paltaSvg from './assets/produce/palta.svg'
-import limonSvg from './assets/produce/limon.svg'
-import platanoSvg from './assets/produce/platano.svg'
-import cilantroSvg from './assets/produce/cilantro.svg'
-import perejilSvg from './assets/produce/perejil.svg'
-import ensaladaSvg from './assets/produce/ensalada.svg'
-import canastaSvg from './assets/produce/canasta.svg'
-import frutillaSvg from './assets/produce/frutilla.svg'
-import zapalloSvg from './assets/produce/zapallo.svg'
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Imágenes de frutas y verduras.
-//  - Fuente principal: fotos reales fotorrealistas de estudio (calidad 8k).
-//  - Fallback: ilustraciones SVG ("Open Crop Icons").
+//  - Fuente principal: fotos reales fotorrealistas de estudio.
 //  - Fallback contextual por nombre de producto y por emoji.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -84,27 +62,10 @@ const PHOTO_BY_ID: Record<string, string> = {
   v2: choclo,
 }
 
-const SVG_BY_ID: Record<string, string> = {
-  h1: lechugaSvg,
-  h2: espinacaSvg,
-  h3: acelgaSvg,
-  h4: ruculaSvg,
-  r1: papaSvg,
-  r2: cebollaSvg,
-  r3: zanahoriaSvg,
-  r4: betarragaSvg,
-  f1: tomateSvg,
-  f2: paltaSvg,
-  f3: limonSvg,
-  f4: platanoSvg,
-  a1: cilantroSvg,
-  a2: perejilSvg,
-}
-
 const PHOTO_BY_EMOJI: Record<string, string> = {
   '🥬': lechuga,
   '🍃': espinaca,
-  '🥗': acelga,
+  '🥗': catHojasVerdes,
   '🌿': albahaca,
   '🥔': papa,
   '🧅': cebolla,
@@ -115,7 +76,7 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🍋': limon,
   '🍌': platano,
   '🍀': perejil,
-  '🧺': canasta,
+  '🧺': catRaices,
   '🍓': frutilla,
   '🎃': zapallo,
   '🧄': ajo,
@@ -124,29 +85,7 @@ const PHOTO_BY_EMOJI: Record<string, string> = {
   '🍠': camote,
   '🫑': pimiento,
   '🌽': choclo,
-}
-
-const SVG_BY_EMOJI: Record<string, string> = {
-  '🥬': lechugaSvg,
-  '🍃': espinacaSvg,
-  '🥗': acelgaSvg,
-  '🌿': cilantroSvg,
-  '🥔': papaSvg,
-  '🧅': cebollaSvg,
-  '🥕': zanahoriaSvg,
-  '🫒': betarragaSvg,
-  '🍅': tomateSvg,
-  '🥑': paltaSvg,
-  '🍋': limonSvg,
-  '🍌': platanoSvg,
-  '🍀': perejilSvg,
-  '🧺': canastaSvg,
-  '🍓': frutillaSvg,
-  '🎃': zapalloSvg,
-  '🧄': cebollaSvg,
-  '🥜': papaSvg,
-  '🫐': frutillaSvg,
-  '🍠': papaSvg,
+  '🎁': catFrutas,
 }
 
 const CATEGORY_PHOTO: Record<string, string> = {
@@ -156,29 +95,15 @@ const CATEGORY_PHOTO: Record<string, string> = {
   'Hierbas y Aromáticas': catAromaticas,
   'Frutos Secos': almendra,
   Despensa: aceituna,
-  Packs: canasta,
-  Promociones: canasta,
+  Packs: catRaices,
+  Promociones: catRaices,
 }
 
-const CATEGORY_SVG: Record<string, string> = {
-  'Hojas Verdes': ensaladaSvg,
-  'Raíces y Tubérculos': zanahoriaSvg,
-  Frutas: tomateSvg,
-  'Hierbas y Aromáticas': perejilSvg,
-}
-
-const PROMO_PHOTO: Record<string, string> = {
-  'promo-1': ensalada,
-  'promo-2': canasta,
-  'promo-3': frutilla,
-  'promo-4': zapallo,
-}
-
-const PROMO_SVG: Record<string, string> = {
-  'promo-1': ensaladaSvg,
-  'promo-2': canastaSvg,
-  'promo-3': frutillaSvg,
-  'promo-4': zapalloSvg,
+const SUGGESTED_PACK_PHOTO: Record<string, string> = {
+  'pack-ensalada': catHojasVerdes,
+  'pack-semanal': catRaices,
+  'pack-frutas': catFrutas,
+  'pack-cocina': catAromaticas,
 }
 
 const NAME_KEYWORDS: [RegExp, string][] = [
@@ -219,23 +144,19 @@ export function getProduceImage(item: ProduceLike | null | undefined): string | 
   if (!item) return undefined
   if (item.image) return item.image
   if (item.id && PHOTO_BY_ID[item.id]) return PHOTO_BY_ID[item.id]
-  if (item.id && SVG_BY_ID[item.id]) return SVG_BY_ID[item.id]
   if (item.name) {
     for (const [pattern, img] of NAME_KEYWORDS) {
       if (pattern.test(item.name)) return img
     }
   }
-  if (item.emoji) return PHOTO_BY_EMOJI[item.emoji] ?? SVG_BY_EMOJI[item.emoji]
+  if (item.emoji) return PHOTO_BY_EMOJI[item.emoji]
   return undefined
 }
 
-export function getPromoImage(promo: ProduceLike): string | undefined {
-  if (promo.id && PROMO_PHOTO[promo.id]) return PROMO_PHOTO[promo.id]
-  if (promo.id && PROMO_SVG[promo.id]) return PROMO_SVG[promo.id]
-  if (promo.emoji) return PHOTO_BY_EMOJI[promo.emoji] ?? SVG_BY_EMOJI[promo.emoji]
-  return undefined
+export function getSuggestedPackImage(id: string): string | undefined {
+  return SUGGESTED_PACK_PHOTO[id]
 }
 
 export function getCategoryImage(name: string): string | undefined {
-  return CATEGORY_PHOTO[name] ?? CATEGORY_SVG[name]
+  return CATEGORY_PHOTO[name]
 }

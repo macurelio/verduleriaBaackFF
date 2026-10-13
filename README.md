@@ -35,11 +35,11 @@ No hay backend en este repo: los datos vienen de la API **`mora-verduras-api`** 
 
 ## Imágenes
 
-El catálogo usa **fotos PNG realistas** de frutas/verduras (generadas con IA, 768×768) sobre los gradientes de cada producto:
+El catálogo usa **fotos JPG fotorrealistas** de frutas/verduras (sin marcas de agua ni ilustraciones SVG):
 
-- `web/src/assets/photos/*.png` — fotos principal. El mapeo está en `web/src/produce.ts` (`id` → foto, con fallback por emoji para productos nuevos del admin).
-- `web/src/assets/produce/*.svg` — ilustraciones SVG de respaldo (pack **Open Crop Icons** de `openfarmcc/open-crop-icons`, licencia **CC0 / dominio público**; `palta.svg` y `limon.svg` son propias).
-- Backup sin empaquetar de ambos juegos en `assets/produce/` y `assets/photos/` (raíz del repo).
+- `web/src/assets/photos/*.jpg` — fotos de productos y categorías. El mapeo está en `web/src/produce.ts` (`id` → foto, con fallback por nombre y emoji para productos nuevos del admin).
+- Copia sin empaquetar del mismo juego en `assets/photos/` (raíz del repo).
+- El favicon es `web/public/favicon.png`.
 - La app Expo sigue usando emojis (pendiente portar las imágenes).
 
 ## Configuración
